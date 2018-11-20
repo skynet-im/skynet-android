@@ -1,5 +1,7 @@
 package de.vectordata.skynet.task.engine;
 
+import android.util.Log;
+
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -11,6 +13,8 @@ import de.vectordata.skynet.task.model.TaskState;
 
 
 public class TaskingEngine {
+
+    private static final String TAG = "TaskingEngine";
 
     private Queue<Task> pendingTasks = new ConcurrentLinkedQueue<>();
     private List<Task> runningTasks = new CopyOnWriteArrayList<>();
@@ -24,7 +28,7 @@ public class TaskingEngine {
     }
 
     public long scheduleTask(Task task) {
-        System.out.println(name + "Task scheduled: " + task.getClass().getSimpleName());
+        Log.d(TAG, name + "Task scheduled: " + task.getClass().getSimpleName());
         pendingTasks.offer(task);
         update();
         return task.getId();
@@ -39,10 +43,10 @@ public class TaskingEngine {
     }
 
     public void onTaskUpdated(Task task) {
-        System.out.println(name + "Task " + task.getClass().getSimpleName() + " updated: {STATE=" + task.getState().name() + ", PROGRESS=" + task.getProgress().getValue() + "}");
+        Log.d(TAG, name + "Task " + task.getClass().getSimpleName() + " updated: {STATE=" + task.getState().name() + ", PROGRESS=" + task.getProgress().getValue() + "}");
         if (task.getState().isFinished()) {
             runningTasks.remove(task);
-            System.out.println(name + "Removed " + task.getClass().getSimpleName() + " from running tasks");
+            Log.d(TAG, name + "Removed " + task.getClass().getSimpleName() + " from running tasks");
             update();
         }
         for (TaskCallback callback : callbacks) callback.onTaskUpdate(task);
@@ -63,7 +67,7 @@ public class TaskingEngine {
     }
 
     private void executeTask(Task task) {
-        System.out.println(name + "Executing task: " + task.getClass().getSimpleName());
+        Log.d(TAG, name + "Executing task: " + task.getClass().getSimpleName());
         task.init(this);
         runningTasks.add(task);
         task.onExecute();
