@@ -1,7 +1,18 @@
 package de.vectordata.skynet.data;
 
+import android.arch.persistence.room.Room;
+import android.content.Context;
+
+import de.vectordata.skynet.data.sql.db.SkynetDatabase;
+
 public class StorageAccess {
 
-    private static final String TAG = "StorageAccess";
+    private static SkynetDatabase skynetDatabase;
+
+    public static SkynetDatabase getDatabase(Context context) {
+        if (skynetDatabase == null)
+            skynetDatabase = Room.databaseBuilder(context.getApplicationContext(), SkynetDatabase.class, "skynet-db").build();
+        return skynetDatabase;
+    }
 
 }
