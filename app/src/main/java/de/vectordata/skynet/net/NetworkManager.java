@@ -1,7 +1,54 @@
 package de.vectordata.skynet.net;
 
-public class NetworkManager {
+import android.util.Log;
+
+import de.vectordata.libjvsl.VSLClient;
+import de.vectordata.libjvsl.VSLClientListener;
+import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.net.packet.Packet;
+import de.vectordata.skynet.util.Constants;
+
+public class NetworkManager implements VSLClientListener {
 
     private static final String TAG = "NetworkManager";
 
+    private VSLClient vslClient;
+    private PacketHandler packetHandler;
+
+    private boolean connected;
+
+    public void connect() {
+        Log.i(TAG, "Connecting to server...");
+        packetHandler = new PacketHandler();
+        vslClient = new VSLClient(Constants.PRODUCT_LATEST, Constants.PRODUCT_OLDEST);
+        vslClient.setListener(this);
+        vslClient.connect(Constants.SERVER_IP, Constants.SERVER_PORT, Constants.SERVER_KEY);
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void sendPacket(Packet packet) {
+        PacketBuffer buffer = new PacketBuffer();
+        packet.writePacket(buffer);
+        vslClient.sendPacket(packet.getId(), buffer.toArray());
+    }
+
+    @Override
+    public void onConnectionEstablished() {
+        Log.i(TAG, "Connection to server established");
+        connected = true;
+    }
+
+    @Override
+    public void onPacketReceived(byte id, byte[] payload) {
+        packetHandler.handlePacket(id, payload);
+    }
+
+    @Override
+    public void onConnectionClosed(String s) {
+        Log.i(TAG, "Connection to server closed");
+        connected = false;
+    }
 }
