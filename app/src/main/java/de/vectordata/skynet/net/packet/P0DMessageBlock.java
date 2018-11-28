@@ -1,24 +1,26 @@
 package de.vectordata.skynet.net.packet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.ConnectionState;
 
-public class P01ConnectionResponse implements Packet {
+public class P0DMessageBlock implements Packet {
 
-    public ConnectionState connectionState;
-    public int latestVersionCode;
-    public String latestVersion;
+    public List<byte[]> messages = new ArrayList<>();
 
     @Override
     public void writePacket(PacketBuffer buffer) {
+        buffer.writeUInt16(messages.size());
+        for (byte[] message : messages)
+            buffer.writeByteArray(message, true);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer) {
-        connectionState = ConnectionState.values()[buffer.readByte()];
-        latestVersionCode = buffer.readInt32();
-        latestVersion = buffer.readString();
+        int count = buffer.readUInt16();
+        for (int i = 0; i < count; i++) messages.add(buffer.readByteArray());
     }
 
     @Override
@@ -28,6 +30,7 @@ public class P01ConnectionResponse implements Packet {
 
     @Override
     public byte getId() {
-        return 0x01;
+        return 0x0D;
     }
 }
+

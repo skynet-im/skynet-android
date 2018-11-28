@@ -1,14 +1,14 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.ConnectionState;
 
-public class P01ConnectionResponse implements Packet {
+public class P0ACreateChannel implements Packet {
 
-    public ConnectionState connectionState;
-    public int latestVersionCode;
-    public String latestVersion;
+    public long channelId;
+    public ChannelType channelType;
+    public long counterpartId;
 
     @Override
     public void writePacket(PacketBuffer buffer) {
@@ -16,9 +16,10 @@ public class P01ConnectionResponse implements Packet {
 
     @Override
     public void readPacket(PacketBuffer buffer) {
-        connectionState = ConnectionState.values()[buffer.readByte()];
-        latestVersionCode = buffer.readInt32();
-        latestVersion = buffer.readString();
+        channelId = buffer.readInt64();
+        channelType = ChannelType.values()[buffer.readByte()];
+        if (channelType == ChannelType.DIRECT)
+            counterpartId = buffer.readInt64();
     }
 
     @Override
@@ -28,6 +29,6 @@ public class P01ConnectionResponse implements Packet {
 
     @Override
     public byte getId() {
-        return 0x01;
+        return 0x0A;
     }
 }
