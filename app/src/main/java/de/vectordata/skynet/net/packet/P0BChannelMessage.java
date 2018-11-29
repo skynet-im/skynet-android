@@ -10,6 +10,7 @@ import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.crypto.KeyStore;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.MessageFlags;
+import de.vectordata.skynet.net.packet.base.Packet;
 
 public class P0BChannelMessage implements Packet {
 

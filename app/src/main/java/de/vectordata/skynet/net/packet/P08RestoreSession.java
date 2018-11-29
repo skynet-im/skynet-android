@@ -6,6 +6,7 @@ import java.util.List;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.packet.base.Packet;
 
 public class P08RestoreSession implements Packet {
 

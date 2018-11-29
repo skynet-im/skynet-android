@@ -1,4 +1,4 @@
-package de.vectordata.skynet.net.packet;
+package de.vectordata.skynet.net.packet.base;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.KeyProvider;

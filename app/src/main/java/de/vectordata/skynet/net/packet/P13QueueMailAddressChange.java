@@ -5,12 +5,13 @@ import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.MessageFlags;
-import de.vectordata.skynet.net.packet.annotation.ChannelMessage;
+import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.annotation.Flags;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 @Flags(MessageFlags.UNENCRYPTED)
-@ChannelMessage(ChannelType.LOOPBACK)
-public class P13QueueMailAddressChange implements Packet {
+@Channel(ChannelType.LOOPBACK)
+public class P13QueueMailAddressChange extends ChannelMessagePacket {
 
     public String newMailAddress;
 

@@ -4,6 +4,7 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.ConnectionState;
+import de.vectordata.skynet.net.packet.base.Packet;
 
 public class P01ConnectionResponse implements Packet {
 

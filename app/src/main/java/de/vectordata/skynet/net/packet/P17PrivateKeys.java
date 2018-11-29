@@ -7,24 +7,25 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.annotation.ChannelMessage;
+import de.vectordata.skynet.net.packet.annotation.Channel;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
-@ChannelMessage(ChannelType.LOOPBACK)
-public class P17PrivateKeys implements Packet {
+@Channel(ChannelType.LOOPBACK)
+public class P17PrivateKeys extends ChannelMessagePacket {
 
     public List<byte[]> keys = new ArrayList<>();
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeByte((byte) keys.size());
-        for(byte[] key : keys)
+        for (byte[] key : keys)
             buffer.writeByteArray(key, true);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         int count = buffer.readByte();
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
             keys.add(buffer.readByteArray());
     }
 

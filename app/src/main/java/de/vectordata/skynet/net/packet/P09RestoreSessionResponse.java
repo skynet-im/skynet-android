@@ -4,6 +4,7 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.base.Packet;
 
 public class P09RestoreSessionResponse implements Packet {
 

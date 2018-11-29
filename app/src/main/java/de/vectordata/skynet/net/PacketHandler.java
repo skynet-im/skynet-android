@@ -22,8 +22,21 @@ import de.vectordata.skynet.net.packet.P18PublicKeys;
 import de.vectordata.skynet.net.packet.P19DerivedKey;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
 import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
+import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
 import de.vectordata.skynet.net.packet.P1DGroupChannelKeyNotify;
-import de.vectordata.skynet.net.packet.Packet;
+import de.vectordata.skynet.net.packet.P1EGroupChannelUpdate;
+import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.P21MessageOverride;
+import de.vectordata.skynet.net.packet.P22MessageReceived;
+import de.vectordata.skynet.net.packet.P23MessageRead;
+import de.vectordata.skynet.net.packet.P24DaystreamMessage;
+import de.vectordata.skynet.net.packet.P25Nickname;
+import de.vectordata.skynet.net.packet.P26PersonalMessage;
+import de.vectordata.skynet.net.packet.P27ProfileImage;
+import de.vectordata.skynet.net.packet.P29DeviceList;
+import de.vectordata.skynet.net.packet.P2ABackgroundImage;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.base.Packet;
 
 public class PacketHandler {
 
@@ -39,6 +52,10 @@ public class PacketHandler {
     }
 
     void handlePacket(byte id, byte[] payload) {
+        handlePacket(id, payload, null);
+    }
+
+    private void handlePacket(byte id, byte[] payload, P0BChannelMessage parent) {
         int uId = id & 0xFF;
         if (uId >= REGISTERED_PACKETS.length)
             return;
@@ -46,6 +63,9 @@ public class PacketHandler {
         Packet packet = REGISTERED_PACKETS[id];
         if (packet == null)
             return;
+
+        if (packet instanceof ChannelMessagePacket)
+            ((ChannelMessagePacket) packet).setParent(parent);
 
         PacketBuffer buffer = new PacketBuffer(payload);
         packet.readPacket(buffer, keyProvider);
@@ -77,7 +97,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0BChannelMessage packet) {
-
+        handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
@@ -132,7 +152,55 @@ public class PacketHandler {
 
     }
 
+    public void handlePacket(P1CDirectChannelCustomization packet) {
+
+    }
+
     public void handlePacket(P1DGroupChannelKeyNotify packet) {
+
+    }
+
+    public void handlePacket(P1EGroupChannelUpdate packet) {
+
+    }
+
+    public void handlePacket(P20ChatMessage packet) {
+
+    }
+
+    public void handlePacket(P21MessageOverride packet) {
+
+    }
+
+    public void handlePacket(P22MessageReceived packet) {
+
+    }
+
+    public void handlePacket(P23MessageRead packet) {
+
+    }
+
+    public void handlePacket(P24DaystreamMessage packet) {
+
+    }
+
+    public void handlePacket(P25Nickname packet) {
+
+    }
+
+    public void handlePacket(P26PersonalMessage packet) {
+
+    }
+
+    public void handlePacket(P27ProfileImage packet) {
+
+    }
+
+    public void handlePacket(P29DeviceList packet) {
+
+    }
+
+    public void handlePacket(P2ABackgroundImage packet) {
 
     }
 }

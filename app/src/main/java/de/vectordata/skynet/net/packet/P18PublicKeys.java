@@ -10,12 +10,13 @@ import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.KeyFormat;
 import de.vectordata.skynet.net.model.KeyRole;
 import de.vectordata.skynet.net.model.MessageFlags;
-import de.vectordata.skynet.net.packet.annotation.ChannelMessage;
+import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.annotation.Flags;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 @Flags(MessageFlags.UNENCRYPTED)
-@ChannelMessage(ChannelType.LOOPBACK)
-public class P18PublicKeys implements Packet {
+@Channel(ChannelType.LOOPBACK)
+public class P18PublicKeys extends ChannelMessagePacket {
 
     public long accountId;
     public List<Key> keys = new ArrayList<>();

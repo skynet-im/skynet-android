@@ -5,6 +5,7 @@ import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.MessageSendError;
+import de.vectordata.skynet.net.packet.base.Packet;
 
 public class P0CChannelMessageResponse implements Packet {
 

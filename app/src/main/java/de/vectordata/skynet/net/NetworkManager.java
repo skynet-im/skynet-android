@@ -5,7 +5,7 @@ import android.util.Log;
 import de.vectordata.libjvsl.VSLClient;
 import de.vectordata.libjvsl.VSLClientListener;
 import de.vectordata.libjvsl.util.PacketBuffer;
-import de.vectordata.skynet.net.packet.Packet;
+import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.util.Constants;
 
 public class NetworkManager implements VSLClientListener {

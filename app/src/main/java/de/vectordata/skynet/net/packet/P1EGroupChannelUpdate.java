@@ -1,0 +1,72 @@
+package de.vectordata.skynet.net.packet;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.vectordata.libjvsl.crypt.AesStatic;
+import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
+import de.vectordata.skynet.crypto.KeyStore;
+import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.MessageFlags;
+import de.vectordata.skynet.net.packet.annotation.Channel;
+import de.vectordata.skynet.net.packet.annotation.Flags;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+
+@Flags(MessageFlags.UNENCRYPTED)
+@Channel(ChannelType.DIRECT)
+public class P1EGroupChannelUpdate extends ChannelMessagePacket {
+
+    long groupRevision;
+    List<Member> members = new ArrayList<>();
+    byte[] channelKey;
+    byte[] historyKey;
+
+    @Override
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        buffer.writeInt64(groupRevision);
+        buffer.writeUInt16(members.size());
+        for (Member member : members) {
+            buffer.writeInt64(member.accountId);
+            buffer.writeByte(member.groupMemberFlags);
+        }
+        KeyStore channelKeys = keyProvider.getChannelKeys(getParent().channelId);
+        PacketBuffer encrypted = new PacketBuffer();
+        encrypted.writeByteArray(channelKey, true);
+        encrypted.writeByteArray(historyKey, true);
+        AesStatic.encryptWithHmac(encrypted.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+    }
+
+    @Override
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        groupRevision = buffer.readInt64();
+        int count = buffer.readUInt16();
+        for (int i = 0; i < count; i++) {
+            members.add(new Member(buffer.readInt64(), buffer.readByte()));
+        }
+        KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);
+        PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+
+    }
+
+    @Override
+    public void handlePacket(PacketHandler handler) {
+        handler.handlePacket(this);
+    }
+
+    @Override
+    public byte getId() {
+        return 0x1E;
+    }
+
+    public class Member {
+        long accountId;
+        byte groupMemberFlags;
+
+        public Member(long accountId, byte groupMemberFlags) {
+            this.accountId = accountId;
+            this.groupMemberFlags = groupMemberFlags;
+        }
+    }
+}
