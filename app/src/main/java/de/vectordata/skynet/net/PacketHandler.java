@@ -21,6 +21,8 @@ import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
 import de.vectordata.skynet.net.packet.P19DerivedKey;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
+import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
+import de.vectordata.skynet.net.packet.P1DGroupChannelKeyNotify;
 import de.vectordata.skynet.net.packet.Packet;
 
 public class PacketHandler {
@@ -123,6 +125,14 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1AVerifiedKeys packet) {
+
+    }
+
+    public void handlePacket(P1BDirectChannelUpdate packet) {
+
+    }
+
+    public void handlePacket(P1DGroupChannelKeyNotify packet) {
 
     }
 }
