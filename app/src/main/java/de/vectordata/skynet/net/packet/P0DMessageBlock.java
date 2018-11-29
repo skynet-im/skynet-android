@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P0DMessageBlock implements Packet {
@@ -11,14 +12,14 @@ public class P0DMessageBlock implements Packet {
     public List<byte[]> messages = new ArrayList<>();
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeUInt16(messages.size());
         for (byte[] message : messages)
             buffer.writeByteArray(message, true);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++) messages.add(buffer.readByteArray());
     }

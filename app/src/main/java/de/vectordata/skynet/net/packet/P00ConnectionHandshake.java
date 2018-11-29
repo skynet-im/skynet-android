@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P00ConnectionHandshake implements Packet {
@@ -10,14 +11,14 @@ public class P00ConnectionHandshake implements Packet {
     public int versionCode;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt32(protocolVersion);
         buffer.writeString(applicationIdentifier);
         buffer.writeInt32(versionCode);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override

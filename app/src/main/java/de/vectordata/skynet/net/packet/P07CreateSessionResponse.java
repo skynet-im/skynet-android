@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.CreateSessionError;
 
@@ -11,11 +12,11 @@ public class P07CreateSessionResponse implements Packet {
     public CreateSessionError errorCode;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         accountId = buffer.readInt64();
         sessionId = buffer.readInt64();
         errorCode = CreateSessionError.values()[buffer.readByte()];

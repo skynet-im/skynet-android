@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P11SubscribeChannel implements Packet {
@@ -9,13 +10,13 @@ public class P11SubscribeChannel implements Packet {
     public byte packetId;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(channelId);
         buffer.writeByte(packetId);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override

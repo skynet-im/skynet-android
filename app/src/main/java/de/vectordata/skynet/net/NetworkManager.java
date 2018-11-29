@@ -12,14 +12,20 @@ public class NetworkManager implements VSLClientListener {
 
     private static final String TAG = "NetworkManager";
 
+    private SkynetContext skynetContext;
+
     private VSLClient vslClient;
     private PacketHandler packetHandler;
 
     private boolean connected;
 
+    public NetworkManager(SkynetContext skynetContext) {
+        this.skynetContext = skynetContext;
+    }
+
     public void connect() {
         Log.i(TAG, "Connecting to server...");
-        packetHandler = new PacketHandler();
+        packetHandler = new PacketHandler(skynetContext);
         vslClient = new VSLClient(Constants.PRODUCT_LATEST, Constants.PRODUCT_OLDEST);
         vslClient.setListener(this);
         vslClient.connect(Constants.SERVER_IP, Constants.SERVER_PORT, Constants.SERVER_KEY);
@@ -31,7 +37,7 @@ public class NetworkManager implements VSLClientListener {
 
     public void sendPacket(Packet packet) {
         PacketBuffer buffer = new PacketBuffer();
-        packet.writePacket(buffer);
+        packet.writePacket(buffer, skynetContext);
         vslClient.sendPacket(packet.getId(), buffer.toArray());
     }
 

@@ -3,8 +3,11 @@ package de.vectordata.skynet.net.packet;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.vectordata.libjvsl.crypt.AesStatic;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.crypto.KeyProvider;
+import de.vectordata.skynet.crypto.KeyStore;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.MessageFlags;
 
@@ -25,7 +28,7 @@ public class P0BChannelMessage implements Packet {
     public List<Dependency> dependencies = new ArrayList<>();
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeByte(packetVersion);
         buffer.writeInt64(channelId);
         buffer.writeInt64(messageId);
@@ -34,9 +37,12 @@ public class P0BChannelMessage implements Packet {
         buffer.writeByte(contentPacketId);
         buffer.writeByte(contentPacketVersion);
 
-        // TODO ENCRYPTION
-        buffer.writeByteArray(contentPacket, true);
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0) buffer.writeByteArray(fileKey, true);
+        KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
+        PacketBuffer encryptedBuffer = new PacketBuffer();
+        encryptedBuffer.writeByteArray(contentPacket, true);
+        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
+            encryptedBuffer.writeByteArray(fileKey, true);
+        AesStatic.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
 
         buffer.writeUInt16(dependencies.size());
         for (Dependency dependency : dependencies) {
@@ -47,7 +53,7 @@ public class P0BChannelMessage implements Packet {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         packetVersion = buffer.readByte();
         channelId = buffer.readInt64();
         senderId = buffer.readInt64();
@@ -59,9 +65,11 @@ public class P0BChannelMessage implements Packet {
         contentPacketId = buffer.readByte();
         contentPacketVersion = buffer.readByte();
 
-        // TODO ENCRYPTION
-        contentPacket = buffer.readByteArray();
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0) fileKey = buffer.readByteArray();
+        KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
+        byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
+        PacketBuffer decryptedBuffer = new PacketBuffer(decryptedData);
+        contentPacket = decryptedBuffer.readByteArray();
+        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0) fileKey = decryptedBuffer.readByteArray();
 
         int dependencyCount = buffer.readUInt16();
         for (int i = 0; i < dependencyCount; i++)

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P08RestoreSession implements Packet {
@@ -14,7 +15,7 @@ public class P08RestoreSession implements Packet {
     public List<ChannelItem> channels = new ArrayList<>();
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(accountId);
         buffer.writeByteArray(keyHash, false);
         buffer.writeInt64(sessionId);
@@ -26,7 +27,7 @@ public class P08RestoreSession implements Packet {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override

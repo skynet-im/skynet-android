@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P04DeleteAccount implements Packet {
@@ -8,12 +9,12 @@ public class P04DeleteAccount implements Packet {
     public byte[] keyHash;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeByteArray(keyHash, false);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override

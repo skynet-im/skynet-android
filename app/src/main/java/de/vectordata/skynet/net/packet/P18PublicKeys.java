@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.KeyFormat;
@@ -20,7 +21,7 @@ public class P18PublicKeys implements Packet {
     public List<Key> keys = new ArrayList<>();
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(accountId);
         buffer.writeByte((byte) keys.size());
         for (Key key : keys) {
@@ -31,7 +32,7 @@ public class P18PublicKeys implements Packet {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         accountId = buffer.readInt64();
         byte count = buffer.readByte();
         for (int i = 0; i < count; i++) {

@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 
@@ -11,11 +12,11 @@ public class P0ACreateChannel implements Packet {
     public long counterpartId;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         channelId = buffer.readInt64();
         channelType = ChannelType.values()[buffer.readByte()];
         if (channelType == ChannelType.DIRECT)

@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
@@ -29,6 +30,12 @@ public class PacketHandler {
             new P01ConnectionResponse()
     };
 
+    private KeyProvider keyProvider;
+
+    public PacketHandler(KeyProvider keyProvider) {
+        this.keyProvider = keyProvider;
+    }
+
     void handlePacket(byte id, byte[] payload) {
         int uId = id & 0xFF;
         if (uId >= REGISTERED_PACKETS.length)
@@ -39,7 +46,7 @@ public class PacketHandler {
             return;
 
         PacketBuffer buffer = new PacketBuffer(payload);
-        packet.readPacket(buffer);
+        packet.readPacket(buffer, keyProvider);
         packet.handlePacket(this);
     }
 

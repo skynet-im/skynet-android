@@ -1,13 +1,14 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public interface Packet {
 
-    void writePacket(PacketBuffer buffer);
+    void writePacket(PacketBuffer buffer, KeyProvider keyProvider);
 
-    void readPacket(PacketBuffer buffer);
+    void readPacket(PacketBuffer buffer, KeyProvider keyProvider);
 
     void handlePacket(PacketHandler handler);
 

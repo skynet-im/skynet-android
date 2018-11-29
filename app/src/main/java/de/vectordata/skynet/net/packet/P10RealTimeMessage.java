@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P10RealTimeMessage implements Packet {
@@ -12,7 +13,7 @@ public class P10RealTimeMessage implements Packet {
     public byte[] contentPacket;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(channelId);
         buffer.writeByte(messageFlags);
         buffer.writeByte(contentPacketId);
@@ -20,7 +21,7 @@ public class P10RealTimeMessage implements Packet {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         channelId = buffer.readInt64();
         senderId = buffer.readInt64();
         messageFlags = buffer.readByte();

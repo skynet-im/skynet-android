@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 
 public class P06CreateSession implements Packet {
@@ -10,14 +11,14 @@ public class P06CreateSession implements Packet {
     public String fcmRegistrationToken;
 
     @Override
-    public void writePacket(PacketBuffer buffer) {
+    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(accountName);
         buffer.writeByteArray(keyHash, false);
         buffer.writeString(fcmRegistrationToken);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer) {
+    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override

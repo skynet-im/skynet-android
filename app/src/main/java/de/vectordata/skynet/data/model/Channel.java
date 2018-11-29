@@ -2,8 +2,10 @@ package de.vectordata.skynet.data.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 
 @Entity(tableName = "channels")
 public class Channel {
@@ -11,6 +13,7 @@ public class Channel {
     @PrimaryKey
     private long channelId;
 
+    @TypeConverters(ChannelTypeConverter.class)
     private ChannelType channelType;
 
     private long counterpartId;
