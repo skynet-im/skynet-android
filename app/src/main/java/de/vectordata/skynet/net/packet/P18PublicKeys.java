@@ -34,6 +34,7 @@ public class P18PublicKeys extends ChannelMessagePacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        keys.clear();
         accountId = buffer.readInt64();
         byte count = buffer.readByte();
         for (int i = 0; i < count; i++) {

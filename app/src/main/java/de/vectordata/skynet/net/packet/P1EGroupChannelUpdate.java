@@ -40,6 +40,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        members.clear();
         groupRevision = buffer.readInt64();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++) {

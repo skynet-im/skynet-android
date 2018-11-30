@@ -55,6 +55,7 @@ public class P0BChannelMessage implements Packet {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        dependencies.clear();
         packetVersion = buffer.readByte();
         channelId = buffer.readInt64();
         senderId = buffer.readInt64();

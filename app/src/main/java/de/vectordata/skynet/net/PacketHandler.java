@@ -35,6 +35,9 @@ import de.vectordata.skynet.net.packet.P26PersonalMessage;
 import de.vectordata.skynet.net.packet.P27ProfileImage;
 import de.vectordata.skynet.net.packet.P29DeviceList;
 import de.vectordata.skynet.net.packet.P2ABackgroundImage;
+import de.vectordata.skynet.net.packet.P2BOnlineState;
+import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
+import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 
@@ -201,6 +204,18 @@ public class PacketHandler {
     }
 
     public void handlePacket(P2ABackgroundImage packet) {
+
+    }
+
+    public void handlePacket(P2BOnlineState packet) {
+
+    }
+
+    public void handlePacket(P2CDeviceListDetails packet) {
+
+    }
+
+    public void handlePacket(P2ESearchAccountResponse packet) {
 
     }
 }

@@ -24,6 +24,7 @@ public class P17PrivateKeys extends ChannelMessagePacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        keys.clear();
         int count = buffer.readByte();
         for (int i = 0; i < count; i++)
             keys.add(buffer.readByteArray());
