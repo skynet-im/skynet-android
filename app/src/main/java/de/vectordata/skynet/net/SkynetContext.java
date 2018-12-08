@@ -5,6 +5,8 @@ import de.vectordata.skynet.crypto.KeyStore;
 
 public class SkynetContext implements KeyProvider {
 
+    private static SkynetContext currentContext;
+
     private NetworkManager networkManager;
 
     public SkynetContext() {
@@ -18,5 +20,11 @@ public class SkynetContext implements KeyProvider {
     @Override
     public KeyStore getChannelKeys(long channelId) {
         return null; // TODO
+    }
+
+    public static SkynetContext getCurrent() {
+        if (currentContext == null)
+            currentContext = new SkynetContext();
+        return currentContext;
     }
 }

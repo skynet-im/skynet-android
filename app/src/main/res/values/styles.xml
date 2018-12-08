@@ -17,4 +17,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Skynet.Button.Colored" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">#0094EE</item>
+    </style>
+
 </resources>
