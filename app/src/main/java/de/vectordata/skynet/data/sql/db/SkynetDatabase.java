@@ -1,7 +1,7 @@
 package de.vectordata.skynet.data.sql.db;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
 
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.sql.dao.ChannelDao;

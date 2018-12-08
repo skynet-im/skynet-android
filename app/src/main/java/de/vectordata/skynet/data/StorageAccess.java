@@ -1,6 +1,6 @@
 package de.vectordata.skynet.data;
 
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 import android.content.Context;
 
 import de.vectordata.skynet.data.sql.db.SkynetDatabase;

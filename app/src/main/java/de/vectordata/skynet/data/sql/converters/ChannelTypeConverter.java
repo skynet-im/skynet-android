@@ -1,6 +1,6 @@
 package de.vectordata.skynet.data.sql.converters;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import de.vectordata.skynet.data.model.enums.ChannelType;
 
