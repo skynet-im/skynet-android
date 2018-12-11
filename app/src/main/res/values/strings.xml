@@ -2,10 +2,20 @@
     <string name="app_name">Skynet</string>
     <string name="app_name_full">Skynet Messenger</string>
 
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
     <string name="input_email">email</string>
     <string name="input_password">password</string>
 
     <string name="action_login">Log in</string>
+
+    <string name="error_header_login">Login error</string>
+    <string name="error_firebase">Could not initialize messaging system. Please make sure you have Google Play Services installed.</string>
+    <string name="error_firebase_token">Invalid firebase token.</string>
+    <string name="error_invalid_credentials">Username or password incorrect. Please try again.</string>
 
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>

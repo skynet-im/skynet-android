@@ -11,6 +11,15 @@ public class P06CreateSession implements Packet {
     public byte[] keyHash;
     public String fcmRegistrationToken;
 
+    public P06CreateSession() {
+    }
+
+    public P06CreateSession(String accountName, byte[] keyHash, String fcmRegistrationToken) {
+        this.accountName = accountName;
+        this.keyHash = keyHash;
+        this.fcmRegistrationToken = fcmRegistrationToken;
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(accountName);

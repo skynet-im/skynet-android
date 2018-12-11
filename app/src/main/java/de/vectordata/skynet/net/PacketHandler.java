@@ -40,6 +40,8 @@ import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
+import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
 
@@ -48,9 +50,11 @@ public class PacketHandler {
             new P01ConnectionResponse()
     };
 
+    private ResponseAwaiter responseAwaiter;
     private KeyProvider keyProvider;
 
-    public PacketHandler(KeyProvider keyProvider) {
+    public PacketHandler(ResponseAwaiter responseAwaiter, KeyProvider keyProvider) {
+        this.responseAwaiter = responseAwaiter;
         this.keyProvider = keyProvider;
     }
 
@@ -58,7 +62,7 @@ public class PacketHandler {
         handlePacket(id, payload, null);
     }
 
-    private void handlePacket(byte id, byte[] payload, P0BChannelMessage parent) {
+    private void handlePacket(byte id, byte[] payload, Packet parent) {
         int uId = id & 0xFF;
         if (uId >= REGISTERED_PACKETS.length)
             return;
@@ -68,11 +72,15 @@ public class PacketHandler {
             return;
 
         if (packet instanceof ChannelMessagePacket)
-            ((ChannelMessagePacket) packet).setParent(parent);
+            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
+
+        if (packet instanceof RealtimeMessagePacket)
+            ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
         PacketBuffer buffer = new PacketBuffer(payload);
         packet.readPacket(buffer, keyProvider);
         packet.handlePacket(this);
+        responseAwaiter.onPacket(packet);
     }
 
     public void handlePacket(P01ConnectionResponse packet) {
@@ -116,7 +124,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P10RealTimeMessage packet) {
-
+        handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
     public void handlePacket(P13QueueMailAddressChange packet) {

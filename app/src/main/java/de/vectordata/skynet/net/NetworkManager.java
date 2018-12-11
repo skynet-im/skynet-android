@@ -6,6 +6,7 @@ import de.vectordata.libjvsl.VSLClient;
 import de.vectordata.libjvsl.VSLClientListener;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.response.ResponseAwaiter;
 import de.vectordata.skynet.util.Constants;
 
 public class NetworkManager implements VSLClientListener {
@@ -16,16 +17,18 @@ public class NetworkManager implements VSLClientListener {
 
     private VSLClient vslClient;
     private PacketHandler packetHandler;
+    private ResponseAwaiter responseAwaiter = new ResponseAwaiter();
 
     private boolean connected;
 
-    public NetworkManager(SkynetContext skynetContext) {
+    NetworkManager(SkynetContext skynetContext) {
         this.skynetContext = skynetContext;
     }
 
     public void connect() {
         Log.i(TAG, "Connecting to server...");
-        packetHandler = new PacketHandler(skynetContext);
+        responseAwaiter.initialize();
+        packetHandler = new PacketHandler(responseAwaiter, skynetContext);
         vslClient = new VSLClient(Constants.PRODUCT_LATEST, Constants.PRODUCT_OLDEST);
         vslClient.setListener(this);
         vslClient.connect(Constants.SERVER_IP, Constants.SERVER_PORT, Constants.SERVER_KEY);
@@ -35,10 +38,11 @@ public class NetworkManager implements VSLClientListener {
         return connected;
     }
 
-    public void sendPacket(Packet packet) {
+    public ResponseAwaiter sendPacket(Packet packet) {
         PacketBuffer buffer = new PacketBuffer();
         packet.writePacket(buffer, skynetContext);
         vslClient.sendPacket(packet.getId(), buffer.toArray());
+        return responseAwaiter;
     }
 
     @Override
