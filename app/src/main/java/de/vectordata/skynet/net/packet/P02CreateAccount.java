@@ -10,6 +10,14 @@ public class P02CreateAccount implements Packet {
     public String accountName;
     public byte[] keyHash;
 
+    public P02CreateAccount() {
+    }
+
+    public P02CreateAccount(String accountName, byte[] keyHash) {
+        this.accountName = accountName;
+        this.keyHash = keyHash;
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(accountName);

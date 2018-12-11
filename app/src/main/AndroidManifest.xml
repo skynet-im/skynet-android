@@ -29,6 +29,7 @@
         <activity
             android:name=".ui.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.CreateAccountActivity" />
     </application>
 
 </manifest>
