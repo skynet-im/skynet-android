@@ -1,7 +1,7 @@
 package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
-import de.vectordata.skynet.crypto.KeyProvider;
+import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;

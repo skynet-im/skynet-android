@@ -2,8 +2,8 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.crypt.AesStatic;
 import de.vectordata.libjvsl.util.PacketBuffer;
-import de.vectordata.skynet.crypto.KeyProvider;
-import de.vectordata.skynet.crypto.KeyStore;
+import de.vectordata.skynet.crypto.keys.KeyProvider;
+import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.OverrideAction;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;

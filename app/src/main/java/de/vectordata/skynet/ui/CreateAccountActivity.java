@@ -22,9 +22,9 @@ public class CreateAccountActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_account);
     }
 
-    private void createAccount(String accountName, byte[] password) {
+    private void createAccount(String accountName, byte[] keyHash) {
         SkynetContext.getCurrent().getNetworkManager()
-                .sendPacket(new P02CreateAccount(accountName, password))
+                .sendPacket(new P02CreateAccount(accountName, keyHash))
                 .waitForPacket(P03CreateAccountResponse.class, packet -> {
                     if (packet.errorCode == CreateAccountError.ACCOUNT_NAME_TAKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_account_name_taken);

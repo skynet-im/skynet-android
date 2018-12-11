@@ -1,7 +1,7 @@
 package de.vectordata.skynet.net;
 
-import de.vectordata.skynet.crypto.KeyProvider;
-import de.vectordata.skynet.crypto.KeyStore;
+import de.vectordata.skynet.crypto.keys.KeyProvider;
+import de.vectordata.skynet.crypto.keys.KeyStore;
 
 public class SkynetContext implements KeyProvider {
 
