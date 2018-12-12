@@ -21,4 +21,8 @@
         <item name="colorButtonNormal">#0094EE</item>
     </style>
 
+    <style name="TextInputLayoutWhite">
+        <item name="colorControlNormal">#ffffff</item>
+    </style>
+
 </resources>
