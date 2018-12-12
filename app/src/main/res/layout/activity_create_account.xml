@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/login_wallpaper" />
+        android:src="@drawable/wallpaper" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="72dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/skynet_icon"
         app:layout_constraintEnd_toStartOf="@+id/textView"
@@ -40,7 +40,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:textColorHint="#ffffff"
-        android:theme="@style/TextInputLayoutWhite"
+        android:theme="@style/AppTheme.TextInputLayoutLight"
         android:id="@+id/textInputLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
         android:layout_height="wrap_content"
         android:textColorHint="#ffffff"
         android:layout_width="match_parent"
-        android:theme="@style/TextInputLayoutWhite"
+        android:theme="@style/AppTheme.TextInputLayoutLight"
         android:layout_marginStart="64dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="64dp"
@@ -91,7 +91,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout3"
         android:textColorHint="#ffffff"
-        android:theme="@style/TextInputLayoutWhite"
+        android:theme="@style/AppTheme.TextInputLayoutLight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
@@ -119,7 +119,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
-        android:theme="@style/TextInputLayoutWhite"
+        android:theme="@style/AppTheme.TextInputLayoutLight"
         android:layout_marginEnd="64dp"
         app:layout_constraintBottom_toTopOf="@+id/button_login"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +138,7 @@
 
     <Button
         android:id="@+id/button_login"
-        style="@style/Skynet.Button.Colored"
+        style="@style/AppTheme.ColoredButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"

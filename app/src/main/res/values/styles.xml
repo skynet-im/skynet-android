@@ -13,16 +13,22 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.TransparentStatusBar" parent="AppTheme.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="AppTheme.BorderlessButton" parent="Widget.AppCompat.Button.Borderless.Colored" />
+
+    <style name="AppTheme.ColoredButton" parent="Widget.AppCompat.Button.Colored" />
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Skynet.Button.Colored" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">#0094EE</item>
-    </style>
-
-    <style name="TextInputLayoutWhite">
+    <style name="AppTheme.TextInputLayoutLight">
         <item name="colorControlNormal">#ffffff</item>
     </style>
+
 
 </resources>

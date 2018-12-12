@@ -10,6 +10,7 @@ import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.net.model.CreateAccountError;
 import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
+import de.vectordata.skynet.util.Activities;
 import de.vectordata.skynet.util.Dialogs;
 
 public class CreateAccountActivity extends SkynetActivity {
@@ -18,6 +19,8 @@ public class CreateAccountActivity extends SkynetActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
+        Activities.setStatusBarTranslucent(this);
+
         String email = ((EditText) findViewById(R.id.input_email)).getText().toString();
         String nickname = ((EditText) findViewById(R.id.input_nickname)).getText().toString();
         String password = ((EditText) findViewById(R.id.input_password)).getText().toString();
@@ -28,9 +31,7 @@ public class CreateAccountActivity extends SkynetActivity {
             return;
         }
 
-        findViewById(R.id.button_login).setOnClickListener(v -> HashProvider.buildHashesAsync(email, password, result -> {
-            createAccount(email, result.getKeyHash());
-        }));
+        findViewById(R.id.button_login).setOnClickListener(v -> HashProvider.buildHashesAsync(email, password, result -> createAccount(email, result.getKeyHash())));
     }
 
     private void createAccount(String accountName, byte[] keyHash) {

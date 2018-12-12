@@ -13,6 +13,7 @@ import de.vectordata.skynet.crypto.hash.HashResult;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
+import de.vectordata.skynet.util.Activities;
 import de.vectordata.skynet.util.Dialogs;
 
 public class LoginActivity extends SkynetActivity {
@@ -23,6 +24,8 @@ public class LoginActivity extends SkynetActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Activities.setStatusBarTranslucent(this);
+
         EditText emailInput = findViewById(R.id.input_email);
         EditText passwordInput = findViewById(R.id.input_password);
 
