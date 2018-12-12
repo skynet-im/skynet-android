@@ -14,7 +14,7 @@ import android.os.Bundle;
 
 import java.time.format.ResolverStyle;
 
-public class CreateAccountActivity extends AppCompatActivity {
+public class CreateAccountActivity extends SkynetActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -9,8 +9,9 @@ public class SkynetContext implements KeyProvider {
 
     private NetworkManager networkManager;
 
-    public SkynetContext() {
+    private SkynetContext() {
         networkManager = new NetworkManager(this);
+        networkManager.connect();
     }
 
     public NetworkManager getNetworkManager() {

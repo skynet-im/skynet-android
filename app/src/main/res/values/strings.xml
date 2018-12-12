@@ -19,6 +19,10 @@
     <string name="error_header_create_acc">Register error</string>
     <string name="error_account_name_taken">Sorry, this account name is already taken. Please try a different one.</string>
     <string name="error_account_name_invalid">Sorry, this account name is invalid. Please try a different one.</string>
+    <string name="warn_header_eol">End of life warning</string>
+    <string name="warn_can_upgrade">The version of Skynet you are currently using is reaching its end of life. We recommend updating to v%s.</string>
+    <string name="error_header_connect">Connection error</string>
+    <string name="error_must_upgrade">The version of Skynet you are currently is too old to connect. Please update to v%s.</string>
 
     <string name="success_header_create_acc">Account created</string>
     <string name="success_create_acc">Your account has been created successfully. To activate your account, please click on the link we sent you via email.</string>

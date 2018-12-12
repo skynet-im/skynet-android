@@ -11,6 +11,12 @@ public class P00ConnectionHandshake implements Packet {
     public String applicationIdentifier;
     public int versionCode;
 
+    public P00ConnectionHandshake(int protocolVersion, String applicationIdentifier, int versionCode) {
+        this.protocolVersion = protocolVersion;
+        this.applicationIdentifier = applicationIdentifier;
+        this.versionCode = versionCode;
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt32(protocolVersion);

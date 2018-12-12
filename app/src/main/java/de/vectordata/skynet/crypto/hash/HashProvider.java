@@ -25,13 +25,17 @@ public class HashProvider {
 
     public static void buildHashesAsync(String username, String password, HashResultCallback callback) {
         new Thread(() -> {
-            byte[] passwordBytes = getBytes(password);
-            byte[] saltBytes = sha256(getBytes(username));
-            byte[] argon2Data = Argon2.hash(TIME_COST, MEM_COST, PARALLELISM, passwordBytes, saltBytes, Argon2Type.ARGON2ID, Argon2Version.VERSION_13, 64);
+            byte[] argon2Data = argon2(username, password);
             KeyStore loopbackChannelKeys = KeyStore.from64ByteArray(argon2Data);
             byte[] keyHash = sha256(argon2Data);
             callback.onFinished(new HashResult(loopbackChannelKeys, keyHash));
         }).start();
+    }
+
+    private static byte[] argon2(String username, String password) {
+        byte[] passwordBytes = getBytes(password);
+        byte[] saltBytes = sha256(getBytes(username));
+        return Argon2.hash(TIME_COST, MEM_COST, PARALLELISM, passwordBytes, saltBytes, Argon2Type.ARGON2ID, Argon2Version.VERSION_13, 64);
     }
 
     private static byte[] sha256(byte[] buf) {

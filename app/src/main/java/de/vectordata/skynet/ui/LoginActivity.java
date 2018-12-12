@@ -15,10 +15,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends SkynetActivity {
 
     private static final String TAG = "LoginActivity";
 
@@ -48,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
             if (instanceIdResult == null) return;
             String token = instanceIdResult.getToken();
 
-            SkynetContext.getCurrent().getNetworkManager()
+            getSkynetContext().getNetworkManager()
                     .sendPacket(new P06CreateSession(accountName, result.getKeyHash(), token))
                     .waitForPacket(P07CreateSessionResponse.class, p -> {
                         if (p.errorCode == CreateSessionError.INVALID_FCM_TOKEN)
@@ -56,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                         else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
                             Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
                     });
-        });
+        })
     }
 
 }

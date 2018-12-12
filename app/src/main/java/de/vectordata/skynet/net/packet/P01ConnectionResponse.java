@@ -3,12 +3,12 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.ConnectionState;
+import de.vectordata.skynet.net.model.HandshakeState;
 import de.vectordata.skynet.net.packet.base.Packet;
 
 public class P01ConnectionResponse implements Packet {
 
-    public ConnectionState connectionState;
+    public HandshakeState handshakeState;
     public int latestVersionCode;
     public String latestVersion;
 
@@ -18,7 +18,7 @@ public class P01ConnectionResponse implements Packet {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        connectionState = ConnectionState.values()[buffer.readByte()];
+        handshakeState = HandshakeState.values()[buffer.readByte()];
         latestVersionCode = buffer.readInt32();
         latestVersion = buffer.readString();
     }

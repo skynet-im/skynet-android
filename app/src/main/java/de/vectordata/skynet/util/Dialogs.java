@@ -19,4 +19,12 @@ public class Dialogs {
                 .show();
     }
 
+    public static void showMessageBox(Context context, int titleRes, String content) {
+        new AlertDialog.Builder(context)
+                .setTitle(titleRes)
+                .setMessage(content)
+                .setPositiveButton(R.string.ok, null)
+                .show();
+    }
+
 }

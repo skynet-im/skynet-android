@@ -1,6 +1,6 @@
 package de.vectordata.skynet.net.model;
 
-public enum ConnectionState {
+public enum HandshakeState {
 
     VALID,
     CAN_UPGRADE,
