@@ -1,9 +1,9 @@
 package de.vectordata.skynet.ui;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.net.SkynetContext;
@@ -31,6 +31,10 @@ public class SkynetActivity extends AppCompatActivity {
 
     SkynetContext getSkynetContext() {
         return SkynetContext.getCurrent();
+    }
+
+    void startActivity(Class<? extends Activity> clazz) {
+        startActivity(new Intent(getApplicationContext(), clazz));
     }
 
 }

@@ -7,10 +7,15 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
-    <string name="input_email">email</string>
-    <string name="input_password">password</string>
+    <string name="input_email">Email</string>
+    <string name="input_nickname">Nickname</string>
+    <string name="input_password">Password</string>
+    <string name="input_password_confirm">Comfirm password</string>
 
     <string name="action_login">Log in</string>
+    <string name="action_create_account">Create account</string>
+
+    <string name="link_create_account">New to Skynet? Create an account now</string>
 
     <string name="error_header_login">Login error</string>
     <string name="error_firebase">Could not initialize messaging system. Please make sure you have Google Play Services installed.</string>
@@ -19,6 +24,7 @@
     <string name="error_header_create_acc">Register error</string>
     <string name="error_account_name_taken">Sorry, this account name is already taken. Please try a different one.</string>
     <string name="error_account_name_invalid">Sorry, this account name is invalid. Please try a different one.</string>
+    <string name="error_passwords_not_matching">The passwords you entered do not match.</string>
     <string name="warn_header_eol">End of life warning</string>
     <string name="warn_can_upgrade">The version of Skynet you are currently using is reaching its end of life. We recommend updating to v%s.</string>
     <string name="error_header_connect">Connection error</string>
@@ -45,5 +51,4 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="link_create_account">New to Skynet? Create an account now</string>
 </resources>

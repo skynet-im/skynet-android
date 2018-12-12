@@ -1,18 +1,16 @@
 package de.vectordata.skynet.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.EditText;
+
+import java.util.Objects;
+
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.net.model.CreateAccountError;
-import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
-import de.vectordata.skynet.net.response.ResponseHandler;
 import de.vectordata.skynet.util.Dialogs;
-
-import android.os.Bundle;
-
-import java.time.format.ResolverStyle;
 
 public class CreateAccountActivity extends SkynetActivity {
 
@@ -20,10 +18,23 @@ public class CreateAccountActivity extends SkynetActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
+        String email = ((EditText) findViewById(R.id.input_email)).getText().toString();
+        String nickname = ((EditText) findViewById(R.id.input_nickname)).getText().toString();
+        String password = ((EditText) findViewById(R.id.input_password)).getText().toString();
+        String passwordConfirm = ((EditText) findViewById(R.id.input_password_confirm)).getText().toString();
+
+        if (!Objects.equals(password, passwordConfirm)) {
+            Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_passwords_not_matching);
+            return;
+        }
+
+        findViewById(R.id.button_login).setOnClickListener(v -> HashProvider.buildHashesAsync(email, password, result -> {
+            createAccount(email, result.getKeyHash());
+        }));
     }
 
     private void createAccount(String accountName, byte[] keyHash) {
-        SkynetContext.getCurrent().getNetworkManager()
+        getSkynetContext().getNetworkManager()
                 .sendPacket(new P02CreateAccount(accountName, keyHash))
                 .waitForPacket(P03CreateAccountResponse.class, packet -> {
                     if (packet.errorCode == CreateAccountError.ACCOUNT_NAME_TAKEN)

@@ -1,23 +1,19 @@
 package de.vectordata.skynet.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.EditText;
+
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.crypto.hash.HashResult;
-import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.util.Dialogs;
-
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 
 public class LoginActivity extends SkynetActivity {
 
@@ -36,6 +32,7 @@ public class LoginActivity extends SkynetActivity {
         findViewById(R.id.button_login).setOnClickListener(v -> HashProvider.buildHashesAsync(username, password,
                 result -> login(emailInput.getText().toString(), result)
         ));
+        findViewById(R.id.link_create_account).setOnClickListener(v -> startActivity(CreateAccountActivity.class));
     }
 
     private void login(String accountName, HashResult result) {
@@ -57,7 +54,7 @@ public class LoginActivity extends SkynetActivity {
                         else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
                             Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
                     });
-        })
+        });
     }
 
 }

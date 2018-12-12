@@ -17,7 +17,6 @@ public class ResponseAwaiter {
     private List<AwaiterItem> awaiterItems = new CopyOnWriteArrayList<>();
     private Handler handler;
 
-
     public void initialize() {
         if (handler == null)
             handler = new Handler();
