@@ -35,12 +35,14 @@ public class NetworkManager implements VSLClientListener {
     }
 
     void connect() {
-        if (isConnected()) {
-            Log.v(TAG, "connect() called but already connected to server");
+        if (!shouldConnect()) {
+            Log.v(TAG, "connect() called but not disconnected from server");
             return;
         }
 
         Log.i(TAG, "Connecting to server...");
+        connectionState = ConnectionState.CONNECTING;
+
         responseAwaiter.initialize();
         packetHandler = new PacketHandler(responseAwaiter, skynetContext);
         vslClient = new VSLClient(Constants.PRODUCT_LATEST, Constants.PRODUCT_OLDEST);
@@ -48,8 +50,8 @@ public class NetworkManager implements VSLClientListener {
         vslClient.connect(Constants.SERVER_IP, Constants.SERVER_PORT, Constants.SERVER_KEY);
     }
 
-    private boolean isConnected() {
-        return connectionState == ConnectionState.CONNECTED;
+    private boolean shouldConnect() {
+        return connectionState == ConnectionState.DISCONNECTED;
     }
 
     public ConnectionState getConnectionState() {
