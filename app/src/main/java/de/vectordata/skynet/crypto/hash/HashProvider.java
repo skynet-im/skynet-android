@@ -10,6 +10,7 @@ import de.vectordata.libargon2.Argon2;
 import de.vectordata.libargon2.Argon2Type;
 import de.vectordata.libargon2.Argon2Version;
 import de.vectordata.skynet.crypto.keys.KeyStore;
+import de.vectordata.skynet.util.Callback;
 
 /**
  * Created by Twometer on 11.12.2018.
@@ -23,12 +24,12 @@ public class HashProvider {
     private static final int MEM_COST = 8192;
     private static final int PARALLELISM = 4;
 
-    public static void buildHashesAsync(String username, String password, HashResultCallback callback) {
+    public static void buildHashesAsync(String username, String password, Callback<KeyCollection> completed) {
         new Thread(() -> {
             byte[] argon2Data = argon2(username, password);
             KeyStore loopbackChannelKeys = KeyStore.from64ByteArray(argon2Data);
             byte[] keyHash = sha256(argon2Data);
-            callback.onFinished(new HashResult(loopbackChannelKeys, keyHash));
+            completed.onCallback(new KeyCollection(loopbackChannelKeys, keyHash));
         }).start();
     }
 

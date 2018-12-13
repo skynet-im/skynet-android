@@ -8,5 +8,7 @@ public enum ConnectionState {
     DISCONNECTED,
     CONNECTING,
     HANDSHAKING,
-    CONNECTED
+    AUTHENTICATING,
+    UNAUTHENTICATED,
+    AUTHENTICATED
 }

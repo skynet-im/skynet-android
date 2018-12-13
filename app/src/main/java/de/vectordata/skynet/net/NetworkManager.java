@@ -6,8 +6,13 @@ import android.util.Log;
 import de.vectordata.libjvsl.VSLClient;
 import de.vectordata.libjvsl.VSLClientListener;
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.auth.Authenticator;
+import de.vectordata.skynet.auth.Session;
+import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.net.listener.AuthenticationListener;
 import de.vectordata.skynet.net.listener.HandshakeListener;
 import de.vectordata.skynet.net.model.HandshakeState;
+import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.base.Packet;
@@ -24,9 +29,10 @@ public class NetworkManager implements VSLClientListener {
     private VSLClient vslClient;
     private PacketHandler packetHandler;
     private ResponseAwaiter responseAwaiter = new ResponseAwaiter();
-    private HandshakeListener handshakeListener;
-
     private ConnectionState connectionState;
+
+    private AuthenticationListener authenticationListener;
+    private HandshakeListener handshakeListener;
 
     private Handler handler = new Handler();
 
@@ -48,14 +54,6 @@ public class NetworkManager implements VSLClientListener {
         vslClient = new VSLClient(Constants.PRODUCT_LATEST, Constants.PRODUCT_OLDEST);
         vslClient.setListener(this);
         vslClient.connect(Constants.SERVER_IP, Constants.SERVER_PORT, Constants.SERVER_KEY);
-    }
-
-    private boolean shouldConnect() {
-        return connectionState == ConnectionState.DISCONNECTED;
-    }
-
-    public ConnectionState getConnectionState() {
-        return connectionState;
     }
 
     public ResponseAwaiter sendPacket(Packet packet) {
@@ -84,7 +82,8 @@ public class NetworkManager implements VSLClientListener {
                     } else
                         Log.i(TAG, "Successfully connected the server");
 
-                    connectionState = ConnectionState.CONNECTED;
+                    connectionState = ConnectionState.AUTHENTICATING;
+                    authenticate();
                 });
     }
 
@@ -104,8 +103,32 @@ public class NetworkManager implements VSLClientListener {
         this.handshakeListener = handshakeListener;
     }
 
+    public void setAuthenticationListener(AuthenticationListener authenticationListener) {
+        this.authenticationListener = authenticationListener;
+    }
+
+    public ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
     private void raiseHandshakeEvent(HandshakeState state, String newVersion) {
         if (handshakeListener != null)
             handshakeListener.onInvalidState(state, newVersion);
+    }
+
+    private boolean shouldConnect() {
+        return connectionState == ConnectionState.DISCONNECTED;
+    }
+
+    private void authenticate() {
+        Session session = StorageAccess.getSession();
+        if (session == null || !session.isAuthenticated()) {
+            connectionState = ConnectionState.UNAUTHENTICATED;
+            return;
+        }
+        Authenticator.authenticate(session, err -> {
+            if (err == RestoreSessionError.SUCCESS) connectionState = ConnectionState.AUTHENTICATED;
+            else if (authenticationListener != null) authenticationListener.onAuthFailed(err);
+        });
     }
 }

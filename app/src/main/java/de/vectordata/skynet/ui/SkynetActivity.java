@@ -6,8 +6,11 @@ import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.HandshakeState;
+import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.util.Dialogs;
 
 /**
@@ -21,12 +24,8 @@ public class SkynetActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getSkynetContext().getNetworkManager().setHandshakeListener((state, ver) -> {
-            if (state == HandshakeState.CAN_UPGRADE)
-                Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.warn_can_upgrade), ver));
-            else if (state == HandshakeState.MUST_UPGRADE)
-                Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.error_must_upgrade), ver));
-        });
+        StorageAccess.initialize(getApplicationContext());
+        registerDialogs();
     }
 
     SkynetContext getSkynetContext() {
@@ -37,4 +36,22 @@ public class SkynetActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), clazz));
     }
 
+    private void registerDialogs() {
+        NetworkManager manager = SkynetContext.getCurrent().getNetworkManager();
+
+        manager.setHandshakeListener((state, ver) -> {
+            if (state == HandshakeState.CAN_UPGRADE)
+                Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.warn_can_upgrade), ver));
+            else if (state == HandshakeState.MUST_UPGRADE)
+                Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.error_must_upgrade), ver));
+        });
+
+        manager.setAuthenticationListener((state) -> {
+            if (state == RestoreSessionError.INVALID_CREDENTIALS)
+                Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
+            else if (state == RestoreSessionError.INVALID_SESSION)
+                Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
+        });
+
+    }
 }

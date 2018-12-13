@@ -9,7 +9,7 @@ import com.google.firebase.iid.InstanceIdResult;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.crypto.hash.HashProvider;
-import de.vectordata.skynet.crypto.hash.HashResult;
+import de.vectordata.skynet.crypto.hash.KeyCollection;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
@@ -38,7 +38,7 @@ public class LoginActivity extends SkynetActivity {
         findViewById(R.id.link_create_account).setOnClickListener(v -> startActivity(CreateAccountActivity.class));
     }
 
-    private void login(String accountName, HashResult result) {
+    private void login(String accountName, KeyCollection result) {
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e(TAG, "Failed to get Firebase Token");

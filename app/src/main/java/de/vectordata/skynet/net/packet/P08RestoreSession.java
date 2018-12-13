@@ -13,7 +13,14 @@ public class P08RestoreSession implements Packet {
     public long accountId;
     public byte[] keyHash;
     public long sessionId;
-    public List<ChannelItem> channels = new ArrayList<>();
+    public List<ChannelItem> channels;
+
+    public P08RestoreSession(long accountId, byte[] keyHash, long sessionId, List<ChannelItem> channels) {
+        this.accountId = accountId;
+        this.keyHash = keyHash;
+        this.sessionId = sessionId;
+        this.channels = channels;
+    }
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
