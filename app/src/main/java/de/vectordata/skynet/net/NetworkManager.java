@@ -128,7 +128,10 @@ public class NetworkManager implements VSLClientListener {
         }
         Authenticator.authenticate(session, err -> {
             if (err == RestoreSessionError.SUCCESS) connectionState = ConnectionState.AUTHENTICATED;
-            else if (authenticationListener != null) authenticationListener.onAuthFailed(err);
+            else if (authenticationListener != null) {
+                connectionState = ConnectionState.UNAUTHENTICATED;
+                authenticationListener.onAuthFailed(err);
+            }
         });
     }
 }
