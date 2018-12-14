@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:layout_editor_absoluteY="81dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/image_avatar"
@@ -12,6 +14,8 @@
         android:layout_height="64dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
@@ -22,13 +26,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         android:ellipsize="end"
         android:singleLine="true"
         android:text="This is a chat message"
+        app:layout_constraintEnd_toStartOf="@+id/label_bubble"
         app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_goneMarginLeft="16dp"
         app:layout_constraintStart_toEndOf="@+id/image_state"
         app:layout_constraintTop_toBottomOf="@+id/label_title" />
 

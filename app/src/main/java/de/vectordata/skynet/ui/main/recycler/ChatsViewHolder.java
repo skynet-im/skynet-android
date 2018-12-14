@@ -52,5 +52,6 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
         bubble.setText(String.valueOf(item.getUnreadMessages()));
         message.setText(item.getContent());
         item.getMessageState().apply(messageState);
+        item.getMessageSide().apply(messageState);
     }
 }

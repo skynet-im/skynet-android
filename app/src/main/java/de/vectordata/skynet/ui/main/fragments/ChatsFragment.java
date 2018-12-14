@@ -15,6 +15,7 @@ import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
+import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.MessageState;
 
 /**
@@ -30,11 +31,12 @@ public class ChatsFragment extends Fragment {
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
 
         List<ChatsItem> dataset = new ArrayList<>();
-        dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 0, MessageState.DELIVERED));
-        dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 0, MessageState.DELIVERED));
-        dataset.add(new ChatsItem("What about making the header extremely long, so that it will overlap the date field", "This is a test message", DateTime.now(), 0, 0, MessageState.DELIVERED));
-        dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 5199912, MessageState.DELIVERED));
-        dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 123, MessageState.DELIVERED));
+        dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 0, MessageState.DELIVERED, MessageSide.RIGHT));
+        dataset.add(new ChatsItem("Message header", "This is a test message with unread messages", DateTime.now(), 0, 1, MessageState.SEEN, MessageSide.RIGHT));
+        dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 0, MessageState.SENDING, MessageSide.RIGHT));
+        dataset.add(new ChatsItem("What about making the header extremely long, so that it will overlap the date field", "This is a test message", DateTime.now(), 0, 0, MessageState.SENT, MessageSide.RIGHT));
+        dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 5199912, MessageState.DELIVERED, MessageSide.LEFT));
+        dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 123, MessageState.DELIVERED, MessageSide.LEFT));
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

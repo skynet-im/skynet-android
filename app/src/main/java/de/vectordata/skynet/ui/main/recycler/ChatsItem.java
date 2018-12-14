@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.main.recycler;
 
 import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.MessageState;
 
 /**
@@ -21,13 +22,16 @@ public class ChatsItem {
 
     private MessageState messageState;
 
-    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, MessageState messageState) {
+    private MessageSide messageSide;
+
+    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, MessageState messageState, MessageSide messageSide) {
         this.header = header;
         this.content = content;
         this.lastActiveDate = lastActiveDate;
         this.profileImageId = profileImageId;
         this.unreadMessages = unreadMessages;
         this.messageState = messageState;
+        this.messageSide = messageSide;
     }
 
     String getHeader() {
@@ -54,4 +58,7 @@ public class ChatsItem {
         return messageState;
     }
 
+    MessageSide getMessageSide() {
+        return messageSide;
+    }
 }
