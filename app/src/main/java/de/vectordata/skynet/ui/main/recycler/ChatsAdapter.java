@@ -8,6 +8,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.util.OnItemClickListener;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -16,6 +17,7 @@ import de.vectordata.skynet.R;
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
 
     private List<ChatsItem> dataset;
+    private OnItemClickListener itemClickListener;
 
     public ChatsAdapter(List<ChatsItem> dataset) {
         this.dataset = dataset;
@@ -31,12 +33,21 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ChatsViewHolder holder, int position) {
         ChatsItem item = dataset.get(position);
-        if (item != null)
+        if (item != null) {
             holder.configure(item);
+            holder.itemView.setOnClickListener(v -> {
+                if (itemClickListener != null)
+                    itemClickListener.onItemClick(position);
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    public void setItemClickListener(OnItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 }

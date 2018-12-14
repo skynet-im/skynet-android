@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui.main.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.ui.chat.ChatActivity;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
 import de.vectordata.skynet.ui.util.MessageSide;
@@ -40,7 +42,11 @@ public class ChatsFragment extends Fragment {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new ChatsAdapter(dataset));
+        ChatsAdapter adapter = new ChatsAdapter(dataset);
+        adapter.setItemClickListener(item -> {
+            getContext().startActivity(new Intent(getContext(), ChatActivity.class));
+        });
+        recyclerView.setAdapter(adapter);
 
         return rootView;
     }
