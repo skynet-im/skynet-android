@@ -2,6 +2,8 @@ package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
+import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -120,6 +122,9 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0BChannelMessage packet) {
+        Channel channel = StorageAccess.getDatabase().channelDao().getChannel(packet.channelId);
+        channel.setLatestMessage(packet.messageId);
+        StorageAccess.getDatabase().channelDao().updateChannels(channel);
         handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
