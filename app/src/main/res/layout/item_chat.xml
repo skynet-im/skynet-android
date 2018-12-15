@@ -30,12 +30,12 @@
         android:layout_marginBottom="8dp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="This is a chat message"
-        app:layout_constraintEnd_toStartOf="@+id/label_bubble"
         app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
-        app:layout_goneMarginLeft="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/label_bubble"
         app:layout_constraintStart_toEndOf="@+id/image_state"
-        app:layout_constraintTop_toBottomOf="@+id/label_title" />
+        app:layout_constraintTop_toBottomOf="@+id/label_title"
+        app:layout_goneMarginLeft="16dp"
+        tools:text="This is a chat message" />
 
     <ImageView
         android:id="@+id/image_state"
@@ -56,14 +56,14 @@
         android:layout_marginEnd="64dp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="Chat Title"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/label_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/image_avatar"
-        app:layout_constraintTop_toTopOf="@+id/image_avatar" />
+        app:layout_constraintTop_toTopOf="@+id/image_avatar"
+        tools:text="Chat Title" />
 
     <TextView
         android:id="@+id/label_date"
@@ -71,10 +71,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="12dp"
-        android:text="Wednesday"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Wednesday" />
 
     <TextView
         android:id="@+id/label_bubble"
@@ -87,11 +87,11 @@
         android:minWidth="22dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:text="1"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/label_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/image_avatar"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

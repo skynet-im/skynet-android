@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.vectordata.skynet.ui.chat.ChatActivity">
+    <item
+        android:id="@+id/action_search"
+        android:orderInCategory="100"
+        android:title="@string/action_search"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_wallpaper"
+        android:orderInCategory="100"
+        android:title="@string/action_wallpaper"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear_chat"
+        android:orderInCategory="100"
+        android:title="@string/action_clear_chat"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_block"
+        android:orderInCategory="100"
+        android:title="@string/action_block"
+        app:showAsAction="never" />
+</menu>

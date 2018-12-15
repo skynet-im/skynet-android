@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Skynet</string>
-    <string name="app_name_full">Skynet Messenger</string>
+    <string name="app_name" translatable="false">Skynet</string>
+    <string name="app_name_full" translatable="false">Skynet Messenger</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -10,11 +10,16 @@
     <string name="input_email">Email</string>
     <string name="input_nickname">Nickname</string>
     <string name="input_password">Password</string>
-    <string name="input_password_confirm">Comfirm password</string>
+    <string name="input_password_confirm">Confirm password</string>
     <string name="input_message">Type a message…</string>
 
     <string name="action_login">Log in</string>
     <string name="action_create_account">Create account</string>
+    <string name="action_search">Search</string>
+    <string name="action_wallpaper">Wallpaper</string>
+    <string name="action_clear_chat">Clear chat</string>
+    <string name="action_block">Block</string>
+    <string name="action_new_group">New group</string>
 
     <string name="link_create_account">New to Skynet? Create an account now</string>
 

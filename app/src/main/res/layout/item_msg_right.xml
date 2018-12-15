@@ -1,10 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="64dp"
-    android:layout_marginEnd="8dp"
     android:layout_marginTop="4dp"
+    android:layout_marginEnd="8dp"
     android:layout_marginBottom="4dp"
     android:gravity="end">
 
@@ -12,7 +13,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_message_left">
+        android:background="@drawable/bg_message_right">
 
         <ImageView
             android:id="@+id/image_state"
@@ -30,11 +31,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="06:44"
             android:textColor="@color/white"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="@+id/label_message"
-            app:layout_constraintEnd_toStartOf="@+id/image_state" />
+            app:layout_constraintEnd_toStartOf="@+id/image_state"
+            tools:text="06:44" />
 
         <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/label_message"
@@ -44,13 +45,13 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Hello this is a test"
             android:textColor="@color/white"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/label_time"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Hello this is a test" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
