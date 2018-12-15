@@ -2,6 +2,8 @@ package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
+import de.vectordata.skynet.net.model.CreateSessionError;
+import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
@@ -50,12 +52,14 @@ public class PacketHandler {
             new P01ConnectionResponse()
     };
 
-    private ResponseAwaiter responseAwaiter;
     private KeyProvider keyProvider;
+    private NetworkManager networkManager;
+    private ResponseAwaiter responseAwaiter;
 
-    public PacketHandler(ResponseAwaiter responseAwaiter, KeyProvider keyProvider) {
-        this.responseAwaiter = responseAwaiter;
+    public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager, ResponseAwaiter responseAwaiter) {
         this.keyProvider = keyProvider;
+        this.networkManager = networkManager;
+        this.responseAwaiter = responseAwaiter;
     }
 
     void handlePacket(byte id, byte[] payload) {
@@ -96,11 +100,17 @@ public class PacketHandler {
     }
 
     public void handlePacket(P07CreateSessionResponse packet) {
-
+        if (packet.errorCode == CreateSessionError.SUCCESS)
+            networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
+        else
+            networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
     }
 
     public void handlePacket(P09RestoreSessionResponse packet) {
-
+        if (packet.errorCode == RestoreSessionError.SUCCESS)
+            networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
+        else
+            networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
     }
 
     public void handlePacket(P0ACreateChannel packet) {

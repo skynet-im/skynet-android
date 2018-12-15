@@ -49,6 +49,8 @@ public class LoginActivity extends SkynetActivity {
             if (instanceIdResult == null) return;
             String token = instanceIdResult.getToken();
 
+            Log.i(TAG, "Firebase token: " + token);
+
             getSkynetContext().getNetworkManager()
                     .sendPacket(new P06CreateSession(accountName, result.getKeyHash(), token))
                     .waitForPacket(P07CreateSessionResponse.class, p -> {

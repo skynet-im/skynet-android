@@ -3,12 +3,9 @@ package de.vectordata.skynet.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.HandshakeState;
@@ -22,12 +19,6 @@ import de.vectordata.skynet.util.Dialogs;
 // This activity is a base class, so we don't register it in the manifest
 @SuppressLint("Registered")
 public class SkynetActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        StorageAccess.initialize(getApplicationContext());
-    }
 
     @Override
     protected void onResume() {
