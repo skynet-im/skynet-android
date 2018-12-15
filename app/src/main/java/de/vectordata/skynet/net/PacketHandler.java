@@ -1,9 +1,14 @@
 package de.vectordata.skynet.net;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelMessage;
+import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -118,13 +123,42 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0ACreateChannel packet) {
-
+        Channel channel = new Channel();
+        channel.setChannelId(packet.channelId);
+        channel.setChannelType(packet.channelType);
+        channel.setCounterpartId(packet.counterpartId);
+        StorageAccess.getDatabase().channelDao().insertChannels(channel);
     }
 
     public void handlePacket(P0BChannelMessage packet) {
         Channel channel = StorageAccess.getDatabase().channelDao().getChannel(packet.channelId);
-        channel.setLatestMessage(packet.messageId);
-        StorageAccess.getDatabase().channelDao().updateChannels(channel);
+        if (packet.messageId > channel.getLatestMessage()) {
+            channel.setLatestMessage(packet.messageId);
+            StorageAccess.getDatabase().channelDao().updateChannels(channel);
+        }
+
+        ChannelMessage channelMessage = new ChannelMessage();
+        channelMessage.setChannelId(packet.channelId);
+        channelMessage.setMessageId(packet.messageId);
+        channelMessage.setSenderId(packet.senderId);
+        channelMessage.setDispatchTime(packet.dispatchTime);
+        channelMessage.setMessageFlags(packet.messageFlags);
+        channelMessage.setFileId(packet.fileId);
+        channelMessage.setFileKey(packet.fileKey);
+        StorageAccess.getDatabase().channelMessageDao().insertChannelMessages(channelMessage);
+
+        List<Dependency> dependencies = new ArrayList<>();
+        for (P0BChannelMessage.Dependency in : packet.dependencies) {
+            Dependency out = new Dependency();
+            out.setSrcChannelId(packet.channelId);
+            out.setSrcMessageId(packet.messageId);
+            out.setDstChannelId(in.messageId);
+            out.setDstMessageId(in.messageId);
+            out.setDstAccountId(in.accountId);
+            dependencies.add(out);
+        }
+        StorageAccess.getDatabase().dependencyDao().insertDependencies(dependencies);
+
         handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 

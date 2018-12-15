@@ -126,7 +126,6 @@
     <orderEntry type="jdk" jdkName="Android API 28 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-messaging-17.3.4" level="project" />
-    <orderEntry type="library" name="Gradle: com.vanniktech:emoji-0.5.1" level="project" />
     <orderEntry type="library" name="Gradle: androidx.slidingpanelayout:slidingpanelayout-1.0.0" level="project" />
     <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata-2.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-16.0.1" level="project" />
@@ -162,6 +161,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.test.espresso:espresso-idling-resource-3.1.1-beta01" level="project" />
     <orderEntry type="library" name="Gradle: androidx.legacy:legacy-support-v4-1.0.0-rc01" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.sf.kxml:kxml2:2.3.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.vanniktech:emoji-0.6.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: androidx.constraintlayout:constraintlayout-2.0.0-alpha2" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-measurement-connector-17.0.1" level="project" />
     <orderEntry type="library" name="Gradle: androidx.activity:activity-1.0.0-alpha02" level="project" />
@@ -201,6 +201,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-library:1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.customview:customview-1.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.vanniktech:emoji-ios-0.6.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.room:room-migration:2.1.0-alpha03@jar" level="project" />
     <orderEntry type="library" name="Gradle: de.ruedigermoeller:fst:2.56@jar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.localbroadcastmanager:localbroadcastmanager-1.0.0" level="project" />
@@ -208,7 +209,6 @@
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-analytics-impl-16.2.4" level="project" />
     <orderEntry type="library" name="Gradle: androidx.print:print-1.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.vanniktech:emoji-ios-0.5.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-iid-17.0.4" level="project" />
   </component>
 </module>

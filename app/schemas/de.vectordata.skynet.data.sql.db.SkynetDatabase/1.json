@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1a6456eec27970896b0178419cc78c2e",
+    "identityHash": "ca1c96df3813c0f05b7905c0dbd80e11",
     "entities": [
       {
         "tableName": "channels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `channelType` INTEGER, `counterpartId` INTEGER NOT NULL, PRIMARY KEY(`channelId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `channelType` INTEGER, `counterpartId` INTEGER NOT NULL, `latestMessage` INTEGER NOT NULL, PRIMARY KEY(`channelId`))",
         "fields": [
           {
             "fieldPath": "channelId",
@@ -25,6 +25,12 @@
             "columnName": "counterpartId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "latestMessage",
+            "columnName": "latestMessage",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -35,11 +41,114 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "channelMessages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `senderId` INTEGER NOT NULL, `dispatchTime` INTEGER, `messageFlags` INTEGER NOT NULL, `fileId` INTEGER NOT NULL, `fileKey` BLOB, PRIMARY KEY(`channelId`, `messageId`))",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderId",
+            "columnName": "senderId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dispatchTime",
+            "columnName": "dispatchTime",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "messageFlags",
+            "columnName": "messageFlags",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileId",
+            "columnName": "fileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileKey",
+            "columnName": "fileKey",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "dependencies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`srcChannelId` INTEGER NOT NULL, `srcMessageId` INTEGER NOT NULL, `dstAccountId` INTEGER NOT NULL, `dstChannelId` INTEGER NOT NULL, `dstMessageId` INTEGER NOT NULL, PRIMARY KEY(`srcChannelId`, `srcMessageId`))",
+        "fields": [
+          {
+            "fieldPath": "srcChannelId",
+            "columnName": "srcChannelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "srcMessageId",
+            "columnName": "srcMessageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dstAccountId",
+            "columnName": "dstAccountId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dstChannelId",
+            "columnName": "dstChannelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dstMessageId",
+            "columnName": "dstMessageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "srcChannelId",
+            "srcMessageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
+    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1a6456eec27970896b0178419cc78c2e\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"ca1c96df3813c0f05b7905c0dbd80e11\")"
     ]
   }
 }
