@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <TextView
+    <com.vanniktech.emoji.EmojiTextView
         android:id="@+id/label_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
         app:layout_constraintTop_toTopOf="@+id/label_message"
         app:srcCompat="@drawable/ic_msg_sending" />
 
-    <TextView
+    <com.vanniktech.emoji.EmojiTextView
         android:id="@+id/label_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

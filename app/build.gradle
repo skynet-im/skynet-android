@@ -46,6 +46,7 @@ dependencies {
     implementation 'de.ruedigermoeller:fst:2.56'
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.vanniktech:emoji-ios:0.5.1'
 
     annotationProcessor 'androidx.room:room-compiler:2.1.0-alpha03'
     testImplementation 'androidx.room:room-testing:2.1.0-alpha03'

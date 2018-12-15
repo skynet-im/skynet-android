@@ -4,6 +4,8 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.ios.IosEmojiProvider;
 
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.net.SkynetContext;
@@ -17,5 +19,6 @@ public class SkynetApplication extends Application {
         StorageAccess.initialize(getApplicationContext());
         FirebaseApp.initializeApp(this);
         SkynetContext.getCurrent().getNetworkManager().connect();
+        EmojiManager.install(new IosEmojiProvider());
     }
 }

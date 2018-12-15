@@ -36,7 +36,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/label_message"
             app:layout_constraintEnd_toStartOf="@+id/image_state" />
 
-        <TextView
+        <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/label_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

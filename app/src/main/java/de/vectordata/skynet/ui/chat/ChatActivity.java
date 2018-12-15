@@ -1,6 +1,10 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
+
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiPopup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +35,17 @@ public class ChatActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new MessageAdapter(items));
+
+        EmojiEditText messageInput = findViewById(R.id.input_message);
+        ImageButton emojiToggleButton = findViewById(R.id.button_emoji);
+
+        EmojiPopup popup = EmojiPopup.Builder.fromRootView(findViewById(R.id.root_view))
+                .setOnEmojiPopupShownListener(() -> emojiToggleButton.setImageResource(R.drawable.ic_keyboard))
+                .setOnEmojiPopupDismissListener(() -> emojiToggleButton.setImageResource(R.drawable.ic_insert_emoji))
+                .build(messageInput);
+
+        emojiToggleButton.setOnClickListener(v -> popup.toggle());
+        messageInput.setOnClickListener(v -> popup.dismiss());
 
     }
 }
