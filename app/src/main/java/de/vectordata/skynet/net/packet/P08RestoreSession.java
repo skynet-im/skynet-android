@@ -49,7 +49,7 @@ public class P08RestoreSession implements Packet {
         return 0x08;
     }
 
-    public class ChannelItem {
+    public static class ChannelItem {
         public long channelId;
         public long lastMessageId;
 

@@ -158,4 +158,12 @@ public class NetworkManager implements VSLClientListener {
         this.connectionState = connectionState;
     }
 
+    void releaseCache() {
+        if (this.connectionState != ConnectionState.AUTHENTICATED)
+            return;
+        for (Packet packet : packetCache)
+            sendPacket(packet);
+        packetCache.clear();
+    }
+
 }

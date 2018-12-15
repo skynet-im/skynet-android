@@ -100,16 +100,18 @@ public class PacketHandler {
     }
 
     public void handlePacket(P07CreateSessionResponse packet) {
-        if (packet.errorCode == CreateSessionError.SUCCESS)
+        if (packet.errorCode == CreateSessionError.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
-        else
+            networkManager.releaseCache();
+        } else
             networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
     }
 
     public void handlePacket(P09RestoreSessionResponse packet) {
-        if (packet.errorCode == RestoreSessionError.SUCCESS)
+        if (packet.errorCode == RestoreSessionError.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
-        else
+            networkManager.releaseCache();
+        } else
             networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
     }
 

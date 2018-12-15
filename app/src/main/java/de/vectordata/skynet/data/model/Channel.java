@@ -18,6 +18,8 @@ public class Channel {
 
     private long counterpartId;
 
+    private long latestMessage;
+
     public long getChannelId() {
         return channelId;
     }
@@ -40,5 +42,13 @@ public class Channel {
 
     public void setCounterpartId(long counterpartId) {
         this.counterpartId = counterpartId;
+    }
+
+    public long getLatestMessage() {
+        return latestMessage;
+    }
+
+    public void setLatestMessage(long latestMessage) {
+        this.latestMessage = latestMessage;
     }
 }
