@@ -123,11 +123,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0ACreateChannel packet) {
-        Channel channel = new Channel();
-        channel.setChannelId(packet.channelId);
-        channel.setChannelType(packet.channelType);
-        channel.setCounterpartId(packet.counterpartId);
-        StorageAccess.getDatabase().channelDao().insertChannels(channel);
+        StorageAccess.getDatabase().channelDao().insertChannels(Channel.fromPacket(packet));
     }
 
     public void handlePacket(P0BChannelMessage packet) {
@@ -137,25 +133,11 @@ public class PacketHandler {
             StorageAccess.getDatabase().channelDao().updateChannels(channel);
         }
 
-        ChannelMessage channelMessage = new ChannelMessage();
-        channelMessage.setChannelId(packet.channelId);
-        channelMessage.setMessageId(packet.messageId);
-        channelMessage.setSenderId(packet.senderId);
-        channelMessage.setDispatchTime(packet.dispatchTime);
-        channelMessage.setMessageFlags(packet.messageFlags);
-        channelMessage.setFileId(packet.fileId);
-        channelMessage.setFileKey(packet.fileKey);
-        StorageAccess.getDatabase().channelMessageDao().insertChannelMessages(channelMessage);
+        StorageAccess.getDatabase().channelMessageDao().insertChannelMessages(ChannelMessage.fromPacket(packet));
 
         List<Dependency> dependencies = new ArrayList<>();
-        for (P0BChannelMessage.Dependency in : packet.dependencies) {
-            Dependency out = new Dependency();
-            out.setSrcChannelId(packet.channelId);
-            out.setSrcMessageId(packet.messageId);
-            out.setDstChannelId(in.messageId);
-            out.setDstMessageId(in.messageId);
-            out.setDstAccountId(in.accountId);
-            dependencies.add(out);
+        for (P0BChannelMessage.Dependency dependency : packet.dependencies) {
+            dependencies.add(Dependency.fromPacket(packet, dependency));
         }
         StorageAccess.getDatabase().dependencyDao().insertDependencies(dependencies);
 

@@ -6,6 +6,7 @@ import androidx.room.TypeConverters;
 
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
+import de.vectordata.skynet.net.packet.P0ACreateChannel;
 
 @Entity(tableName = "channels")
 public class Channel {
@@ -19,6 +20,14 @@ public class Channel {
     private long counterpartId;
 
     private long latestMessage;
+
+    public static Channel fromPacket(P0ACreateChannel packet) {
+        Channel channel = new Channel();
+        channel.channelId = packet.channelId;
+        channel.channelType = packet.channelType;
+        channel.counterpartId = packet.counterpartId;
+        return channel;
+    }
 
     public long getChannelId() {
         return channelId;

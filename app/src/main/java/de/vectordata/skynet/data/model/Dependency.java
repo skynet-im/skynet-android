@@ -1,8 +1,13 @@
 package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
-@Entity(tableName = "dependencies", primaryKeys = {"srcChannelId", "srcMessageId"})
+@Entity(tableName = "dependencies", primaryKeys = {"srcChannelId", "srcMessageId"}, foreignKeys = @ForeignKey(entity = ChannelMessage.class,
+        parentColumns = {"channelId", "srcChannelId"},
+        childColumns = {"messageId", "srcMessageId"},
+        onDelete = ForeignKey.CASCADE))
 public class Dependency {
 
     private long srcChannelId;
@@ -14,6 +19,16 @@ public class Dependency {
     private long dstChannelId;
 
     private long dstMessageId;
+
+    public static Dependency fromPacket(P0BChannelMessage packet, P0BChannelMessage.Dependency packetChild) {
+        Dependency dependency = new Dependency();
+        dependency.srcChannelId = packet.channelId;
+        dependency.srcMessageId = packet.messageId;
+        dependency.dstAccountId = packetChild.accountId;
+        dependency.dstChannelId = packetChild.channelId;
+        dependency.dstMessageId = packetChild.messageId;
+        return dependency;
+    }
 
     public long getSrcChannelId() {
         return srcChannelId;

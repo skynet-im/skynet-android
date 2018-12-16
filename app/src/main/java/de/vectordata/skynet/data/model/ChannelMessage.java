@@ -4,6 +4,7 @@ import androidx.room.Entity;
 import androidx.room.TypeConverters;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
+import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
 @Entity(tableName = "channelMessages", primaryKeys = {"channelId", "messageId"})
 public class ChannelMessage {
@@ -22,6 +23,18 @@ public class ChannelMessage {
     private long fileId;
 
     private byte[] fileKey;
+
+    public static ChannelMessage fromPacket(P0BChannelMessage packet) {
+        ChannelMessage message = new ChannelMessage();
+        message.channelId = packet.channelId;
+        message.messageId = packet.messageId;
+        message.senderId = packet.senderId;
+        message.dispatchTime = packet.dispatchTime;
+        message.messageFlags = packet.messageFlags;
+        message.fileId = packet.fileId;
+        message.fileKey = packet.fileKey;
+        return message;
+    }
 
     public long getChannelId() {
         return channelId;
