@@ -1,9 +1,8 @@
 package de.vectordata.skynet.data;
 
-import androidx.room.Room;
-
 import android.content.Context;
 
+import androidx.room.Room;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.file.ObjectCache;
 import de.vectordata.skynet.data.sql.db.SkynetDatabase;

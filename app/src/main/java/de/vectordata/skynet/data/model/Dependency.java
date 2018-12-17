@@ -5,9 +5,10 @@ import androidx.room.ForeignKey;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
 @Entity(tableName = "dependencies", primaryKeys = {"srcChannelId", "srcMessageId"}, foreignKeys = @ForeignKey(entity = ChannelMessage.class,
-        parentColumns = {"channelId", "srcChannelId"},
-        childColumns = {"messageId", "srcMessageId"},
-        onDelete = ForeignKey.CASCADE))
+        parentColumns = {"channelId", "messageId"},
+        childColumns = {"srcChannelId", "srcMessageId"},
+        onDelete = ForeignKey.CASCADE)
+)
 public class Dependency {
 
     private long srcChannelId;

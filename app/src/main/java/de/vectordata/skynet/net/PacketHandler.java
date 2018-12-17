@@ -8,8 +8,10 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
+import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.net.model.CreateSessionError;
+import de.vectordata.skynet.net.model.OverrideAction;
 import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
@@ -209,11 +211,14 @@ public class PacketHandler {
     }
 
     public void handlePacket(P20ChatMessage packet) {
-
+        StorageAccess.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(packet));
     }
 
     public void handlePacket(P21MessageOverride packet) {
-
+        ChatMessage message = StorageAccess.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.getParent().messageId);
+        if (packet.action == OverrideAction.DELETE) message.setText("\0");
+        else message.setText(packet.newText);
+        StorageAccess.getDatabase().chatMessageDao().update(message);
     }
 
     public void handlePacket(P22MessageReceived packet) {

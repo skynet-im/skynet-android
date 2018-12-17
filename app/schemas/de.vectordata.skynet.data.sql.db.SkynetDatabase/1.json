@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ca1c96df3813c0f05b7905c0dbd80e11",
+    "identityHash": "a550a4d0e053b67edf7b661014b61c1b",
     "entities": [
       {
         "tableName": "channels",
@@ -101,7 +101,7 @@
       },
       {
         "tableName": "dependencies",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`srcChannelId` INTEGER NOT NULL, `srcMessageId` INTEGER NOT NULL, `dstAccountId` INTEGER NOT NULL, `dstChannelId` INTEGER NOT NULL, `dstMessageId` INTEGER NOT NULL, PRIMARY KEY(`srcChannelId`, `srcMessageId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`srcChannelId` INTEGER NOT NULL, `srcMessageId` INTEGER NOT NULL, `dstAccountId` INTEGER NOT NULL, `dstChannelId` INTEGER NOT NULL, `dstMessageId` INTEGER NOT NULL, PRIMARY KEY(`srcChannelId`, `srcMessageId`), FOREIGN KEY(`srcChannelId`, `srcMessageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "srcChannelId",
@@ -142,13 +142,86 @@
           "autoGenerate": false
         },
         "indices": [],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "srcChannelId",
+              "srcMessageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chatMessages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `messageType` INTEGER, `text` TEXT, `quotedMessage` INTEGER NOT NULL, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageType",
+            "columnName": "messageType",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "quotedMessage",
+            "columnName": "quotedMessage",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"ca1c96df3813c0f05b7905c0dbd80e11\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a550a4d0e053b67edf7b661014b61c1b\")"
     ]
   }
 }
