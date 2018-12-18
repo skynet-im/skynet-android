@@ -6,15 +6,19 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 import de.vectordata.skynet.data.sql.converters.MessageTypeConverter;
 import de.vectordata.skynet.net.model.MessageType;
-import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.P24DaystreamMessage;
 
-@Entity(tableName = "chatMessages", foreignKeys = @ForeignKey(
+/**
+ * Created by Twometer on 18.12.2018.
+ * (c) 2018 Twometer
+ */
+@Entity(tableName = "daystreamMessages", foreignKeys = @ForeignKey(
         entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"channelId", "messageId"},
         onDelete = ForeignKey.CASCADE)
 )
-public class ChatMessage {
+public class DaystreamMessage {
 
     @PrimaryKey
     private long channelId;
@@ -27,17 +31,14 @@ public class ChatMessage {
 
     private String text;
 
-    private long quotedMessage;
-
     private boolean isEdited;
 
-    public static ChatMessage fromPacket(P20ChatMessage packet) {
-        ChatMessage message = new ChatMessage();
+    public static DaystreamMessage fromPacket(P24DaystreamMessage packet) {
+        DaystreamMessage message = new DaystreamMessage();
         message.channelId = packet.getParent().channelId;
         message.messageId = packet.getParent().messageId;
         message.messageType = packet.messageType;
         message.text = packet.text;
-        message.quotedMessage = packet.quotedMessage;
         return message;
     }
 
@@ -71,14 +72,6 @@ public class ChatMessage {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public long getQuotedMessage() {
-        return quotedMessage;
-    }
-
-    public void setQuotedMessage(long quotedMessage) {
-        this.quotedMessage = quotedMessage;
     }
 
     public boolean isEdited() {

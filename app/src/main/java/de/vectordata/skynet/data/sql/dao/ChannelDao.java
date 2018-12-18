@@ -16,22 +16,22 @@ import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 public interface ChannelDao {
 
     @Insert
-    void insertChannels(Channel... channels);
+    void insert(Channel... channels);
 
     @Delete
-    void removeChannels(Channel... channels);
+    void delete(Channel... channels);
 
     @Update
-    void updateChannels(Channel... channels);
+    void update(Channel... channels);
 
     @Query("SELECT * FROM channels WHERE channelId=:channelId")
-    Channel getChannel(long channelId);
+    Channel getById(long channelId);
 
     @TypeConverters(ChannelTypeConverter.class)
     @Query("SELECT * FROM channels WHERE channelType=:channelType")
-    Channel getChannelByType(ChannelType channelType);
+    Channel getByType(ChannelType channelType);
 
     @Query("SELECT * FROM channels")
-    List<Channel> getChannels();
+    List<Channel> getAll();
 
 }

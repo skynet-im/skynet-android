@@ -18,10 +18,10 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 @Channel(ChannelType.DIRECT)
 public class P1EGroupChannelUpdate extends ChannelMessagePacket {
 
-    long groupRevision;
-    List<Member> members = new ArrayList<>();
-    byte[] channelKey;
-    byte[] historyKey;
+    public long groupRevision;
+    public List<Member> members = new ArrayList<>();
+    public byte[] channelKey;
+    public byte[] historyKey;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {

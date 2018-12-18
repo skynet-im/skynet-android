@@ -1,15 +1,14 @@
 package de.vectordata.skynet.net;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.Dependency;
+import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.model.OverrideAction;
 import de.vectordata.skynet.net.model.RestoreSessionError;
@@ -125,23 +124,22 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0ACreateChannel packet) {
-        StorageAccess.getDatabase().channelDao().insertChannels(Channel.fromPacket(packet));
+        StorageAccess.getDatabase().channelDao().insert(Channel.fromPacket(packet));
     }
 
     public void handlePacket(P0BChannelMessage packet) {
-        Channel channel = StorageAccess.getDatabase().channelDao().getChannel(packet.channelId);
+        Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.channelId);
         if (packet.messageId > channel.getLatestMessage()) {
             channel.setLatestMessage(packet.messageId);
-            StorageAccess.getDatabase().channelDao().updateChannels(channel);
+            StorageAccess.getDatabase().channelDao().update(channel);
         }
 
-        StorageAccess.getDatabase().channelMessageDao().insertChannelMessages(ChannelMessage.fromPacket(packet));
+        StorageAccess.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(packet));
 
-        List<Dependency> dependencies = new ArrayList<>();
-        for (P0BChannelMessage.Dependency dependency : packet.dependencies) {
-            dependencies.add(Dependency.fromPacket(packet, dependency));
-        }
-        StorageAccess.getDatabase().dependencyDao().insertDependencies(dependencies);
+        Dependency[] dependencies = new Dependency[packet.dependencies.size()];
+        for (int i = 0; i < dependencies.length; i++)
+            dependencies[i] = Dependency.fromPacket(packet, packet.dependencies.get(i));
+        StorageAccess.getDatabase().dependencyDao().insert(dependencies);
 
         handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
@@ -215,10 +213,26 @@ public class PacketHandler {
     }
 
     public void handlePacket(P21MessageOverride packet) {
-        ChatMessage message = StorageAccess.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.getParent().messageId);
-        if (packet.action == OverrideAction.DELETE) message.setText("\0");
-        else message.setText(packet.newText);
-        StorageAccess.getDatabase().chatMessageDao().update(message);
+        Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.getParent().channelId);
+        if (channel.getChannelType() == ChannelType.PROFILE_DATA) {
+            DaystreamMessage message = StorageAccess.getDatabase().daystreamMessageDao().get(channel.getChannelId(), packet.messageId);
+            if (packet.action == OverrideAction.DELETE)
+                StorageAccess.getDatabase().daystreamMessageDao().delete(message);
+            else {
+                message.setText(packet.newText);
+                message.setEdited(true);
+                StorageAccess.getDatabase().daystreamMessageDao().update(message);
+            }
+        } else {
+            ChatMessage message = StorageAccess.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.messageId);
+            if (packet.action == OverrideAction.DELETE) message.setText("\0");
+            else {
+                message.setText(packet.newText);
+                message.setEdited(true);
+            }
+            StorageAccess.getDatabase().chatMessageDao().update(message);
+        }
+
     }
 
     public void handlePacket(P22MessageReceived packet) {
@@ -230,7 +244,8 @@ public class PacketHandler {
     }
 
     public void handlePacket(P24DaystreamMessage packet) {
-
+        DaystreamMessage message = DaystreamMessage.fromPacket(packet);
+        StorageAccess.getDatabase().daystreamMessageDao().insert(message);
     }
 
     public void handlePacket(P25Nickname packet) {

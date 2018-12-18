@@ -15,7 +15,7 @@ public class Authenticator {
 
     public static void authenticate(Session session, Callback<RestoreSessionError> callback) {
         List<P08RestoreSession.ChannelItem> channelItems = new ArrayList<>();
-        List<Channel> channels = StorageAccess.getDatabase().channelDao().getChannels();
+        List<Channel> channels = StorageAccess.getDatabase().channelDao().getAll();
         for (Channel channel : channels)
             channelItems.add(new P08RestoreSession.ChannelItem(channel.getChannelId(), channel.getLatestMessage()));
         SkynetContext.getCurrent()

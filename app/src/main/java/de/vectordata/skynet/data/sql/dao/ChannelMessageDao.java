@@ -8,6 +8,6 @@ import de.vectordata.skynet.data.model.ChannelMessage;
 public interface ChannelMessageDao {
 
     @Insert
-    void insertChannelMessages(ChannelMessage... messages);
+    void insert(ChannelMessage... messages);
 
 }

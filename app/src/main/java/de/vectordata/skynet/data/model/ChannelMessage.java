@@ -1,16 +1,25 @@
 package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
-@Entity(tableName = "channelMessages", primaryKeys = {"channelId", "messageId"})
+@Entity(tableName = "channelMessages", foreignKeys = @ForeignKey(
+        entity = Channel.class,
+        parentColumns = "channelId",
+        childColumns = "channelId",
+        onDelete = ForeignKey.CASCADE
+))
 public class ChannelMessage {
 
+    @PrimaryKey
     private long channelId;
 
+    @PrimaryKey
     private long messageId;
 
     private long senderId;
