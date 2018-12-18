@@ -24,4 +24,35 @@ public class ChannelKeypair {
 
     private byte[] privateKey;
 
+    public long getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(long channelId) {
+        this.channelId = channelId;
+    }
+
+    public KeyRole getKeyRole() {
+        return keyRole;
+    }
+
+    public void setKeyRole(KeyRole keyRole) {
+        this.keyRole = keyRole;
+    }
+
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public byte[] getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(byte[] privateKey) {
+        this.privateKey = privateKey;
+    }
 }

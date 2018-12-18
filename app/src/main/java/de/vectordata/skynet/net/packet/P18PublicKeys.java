@@ -18,12 +18,10 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 @Channel(ChannelType.LOOPBACK)
 public class P18PublicKeys extends ChannelMessagePacket {
 
-    public long accountId;
     public List<Key> keys = new ArrayList<>();
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeInt64(accountId);
         buffer.writeByte((byte) keys.size());
         for (Key key : keys) {
             buffer.writeByte((byte) key.format.ordinal());
@@ -35,7 +33,6 @@ public class P18PublicKeys extends ChannelMessagePacket {
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         keys.clear();
-        accountId = buffer.readInt64();
         byte count = buffer.readByte();
         for (int i = 0; i < count; i++) {
             keys.add(new Key(
