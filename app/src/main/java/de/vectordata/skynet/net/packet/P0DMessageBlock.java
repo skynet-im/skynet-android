@@ -28,7 +28,6 @@ public class P0DMessageBlock implements Packet {
 
     @Override
     public void handlePacket(PacketHandler handler) {
-        handler.handlePacket(this);
     }
 
     @Override

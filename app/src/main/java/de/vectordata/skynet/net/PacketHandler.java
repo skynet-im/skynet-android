@@ -23,7 +23,6 @@ import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
-import de.vectordata.skynet.net.packet.P0DMessageBlock;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P10RealTimeMessage;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
@@ -148,10 +147,6 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
-
-    }
-
-    public void handlePacket(P0DMessageBlock packet) {
 
     }
 
