@@ -1,33 +1,38 @@
 package de.vectordata.skynet.net.packet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.AsymmetricKey;
+import de.vectordata.skynet.net.model.KeyFormat;
 import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 @Channel(ChannelType.LOOPBACK)
 public class P17PrivateKeys extends ChannelMessagePacket {
-
-    public List<byte[]> keys = new ArrayList<>();
+    public AsymmetricKey signatureKey;
+    public AsymmetricKey derivationKey;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByte((byte) keys.size());
-        for (byte[] key : keys)
-            buffer.writeByteArray(key, true);
+        writeKey(signatureKey, buffer);
+        writeKey(derivationKey, buffer);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        keys.clear();
-        int count = buffer.readByte();
-        for (int i = 0; i < count; i++)
-            keys.add(buffer.readByteArray());
+        signatureKey = readKey(buffer);
+        derivationKey = readKey(buffer);
+    }
+
+    private void writeKey(AsymmetricKey key, PacketBuffer buffer) {
+        buffer.writeByte((byte) key.format.ordinal());
+        buffer.writeByteArray(key.key, true);
+    }
+
+    private AsymmetricKey readKey(PacketBuffer buffer) {
+        return new AsymmetricKey(KeyFormat.values()[buffer.readByte()], buffer.readByteArray());
     }
 
     @Override
