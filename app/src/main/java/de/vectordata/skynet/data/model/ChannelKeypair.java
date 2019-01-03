@@ -2,6 +2,10 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+import de.vectordata.skynet.data.sql.converters.KeyFormatConverter;
+import de.vectordata.skynet.data.sql.converters.KeyRoleConverter;
 import de.vectordata.skynet.net.model.KeyFormat;
 import de.vectordata.skynet.net.model.KeyRole;
 
@@ -17,14 +21,18 @@ import de.vectordata.skynet.net.model.KeyRole;
 ))
 public class ChannelKeypair {
 
+    @PrimaryKey
     private long channelId;
 
+    @TypeConverters(KeyRoleConverter.class)
     private KeyRole keyRole;
 
+    @TypeConverters(KeyFormatConverter.class)
     private KeyFormat publicKeyFormat;
 
     private byte[] publicKey;
 
+    @TypeConverters(KeyFormatConverter.class)
     private KeyFormat privateKeyFormat;
 
     private byte[] privateKey;

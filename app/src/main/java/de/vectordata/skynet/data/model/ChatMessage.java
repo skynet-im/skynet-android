@@ -2,7 +2,6 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 import de.vectordata.skynet.data.sql.converters.MessageTypeConverter;
 import de.vectordata.skynet.net.model.MessageType;
@@ -12,14 +11,13 @@ import de.vectordata.skynet.net.packet.P20ChatMessage;
         entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"channelId", "messageId"},
-        onDelete = ForeignKey.CASCADE)
+        onDelete = ForeignKey.CASCADE),
+        primaryKeys = {"channelId", "messageId"}
 )
 public class ChatMessage {
 
-    @PrimaryKey
     private long channelId;
 
-    @PrimaryKey
     private long messageId;
 
     @TypeConverters(MessageTypeConverter.class)
