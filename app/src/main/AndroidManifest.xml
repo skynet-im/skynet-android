@@ -20,7 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -28,6 +27,12 @@
             android:name=".ui.CreateAccountActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.chat.ChatActivity" />
+        <activity
+            android:name=".ui.AddContactActivity"
+            android:label="@string/activity_add_contact" />
+        <activity
+            android:name=".ui.NewGroupActivity"
+            android:label="@string/activity_new_group" />
     </application>
 
 </manifest>

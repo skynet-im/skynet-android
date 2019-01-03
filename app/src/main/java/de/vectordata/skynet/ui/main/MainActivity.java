@@ -1,6 +1,5 @@
 package de.vectordata.skynet.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,8 +13,10 @@ import java.util.Objects;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.ui.AddContactActivity;
 import de.vectordata.skynet.ui.CreateAccountActivity;
 import de.vectordata.skynet.ui.LoginActivity;
+import de.vectordata.skynet.ui.NewGroupActivity;
 import de.vectordata.skynet.ui.SkynetActivity;
 
 public class MainActivity extends SkynetActivity {
@@ -44,7 +45,7 @@ public class MainActivity extends SkynetActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            startActivity(new Intent(this, CreateAccountActivity.class));
+            startActivity(CreateAccountActivity.class);
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         });
@@ -62,8 +63,18 @@ public class MainActivity extends SkynetActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_add_contact) {
+            startActivity(AddContactActivity.class);
+            return true;
+        }
+
+        if (id == R.id.action_new_group) {
+            startActivity(NewGroupActivity.class);
+            return true;
+        }
+
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, LoginActivity.class));
+            startActivity(LoginActivity.class);
             return true;
         }
 

@@ -1,8 +1,8 @@
 package de.vectordata.skynet.ui;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
@@ -16,9 +16,7 @@ import de.vectordata.skynet.util.Dialogs;
  * Created by Twometer on 12.12.2018.
  * (c) 2018 Twometer
  */
-// This activity is a base class, so we don't register it in the manifest
-@SuppressLint("Registered")
-public class SkynetActivity extends AppCompatActivity {
+public abstract class SkynetActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
@@ -30,7 +28,7 @@ public class SkynetActivity extends AppCompatActivity {
         return SkynetContext.getCurrent();
     }
 
-    void startActivity(Class<? extends Activity> clazz) {
+    protected void startActivity(Class<? extends Activity> clazz) {
         startActivity(new Intent(getApplicationContext(), clazz));
     }
 
@@ -50,6 +48,14 @@ public class SkynetActivity extends AppCompatActivity {
             else if (state == RestoreSessionError.INVALID_SESSION)
                 Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
         });
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
