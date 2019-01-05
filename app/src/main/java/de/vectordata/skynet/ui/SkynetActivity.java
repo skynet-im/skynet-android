@@ -10,7 +10,7 @@ import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.HandshakeState;
 import de.vectordata.skynet.net.model.RestoreSessionError;
-import de.vectordata.skynet.util.Dialogs;
+import de.vectordata.skynet.ui.dialogs.Dialogs;
 
 /**
  * Created by Twometer on 12.12.2018.

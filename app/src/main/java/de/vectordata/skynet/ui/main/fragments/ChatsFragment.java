@@ -33,6 +33,7 @@ public class ChatsFragment extends Fragment {
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
 
         List<ChatsItem> dataset = new ArrayList<>();
+
         dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 0, MessageState.DELIVERED, MessageSide.RIGHT));
         dataset.add(new ChatsItem("Message header", "This is a test message with unread messages", DateTime.now(), 0, 1, MessageState.SEEN, MessageSide.RIGHT));
         dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 0, MessageState.SENDING, MessageSide.RIGHT));
@@ -43,9 +44,7 @@ public class ChatsFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ChatsAdapter adapter = new ChatsAdapter(dataset);
-        adapter.setItemClickListener(item -> {
-            getContext().startActivity(new Intent(getContext(), ChatActivity.class));
-        });
+        adapter.setItemClickListener(item -> getContext().startActivity(new Intent(getContext(), ChatActivity.class)));
         recyclerView.setAdapter(adapter);
 
         return rootView;

@@ -12,6 +12,7 @@
     <string name="input_password">Password</string>
     <string name="input_password_confirm">Confirm password</string>
     <string name="input_message">Type a message…</string>
+    <string name="input_search_user">Search user…</string>
 
     <string name="action_login">Log in</string>
     <string name="action_create_account">Create account</string>
@@ -50,6 +51,9 @@
 
     <string name="activity_add_contact">Add contact</string>
     <string name="activity_new_group">New group</string>
+
+    <string name="progress_header">Please wait</string>
+    <string name="progress_searching">Searching…</string>
 
     <string name="yesterday">Yesterday</string>
 </resources>

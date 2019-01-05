@@ -13,8 +13,8 @@ import de.vectordata.skynet.crypto.hash.KeyCollection;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
+import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.util.Activities;
-import de.vectordata.skynet.util.Dialogs;
 
 public class LoginActivity extends SkynetActivity {
 
@@ -38,7 +38,7 @@ public class LoginActivity extends SkynetActivity {
         findViewById(R.id.link_create_account).setOnClickListener(v -> startActivity(CreateAccountActivity.class));
     }
 
-    private void login(String accountName, KeyCollection result) {
+    private void login(String accountName, KeyCollection keys) {
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e(TAG, "Failed to get Firebase Token");
@@ -52,7 +52,7 @@ public class LoginActivity extends SkynetActivity {
             Log.i(TAG, "Firebase token: " + token);
 
             getSkynetContext().getNetworkManager()
-                    .sendPacket(new P06CreateSession(accountName, result.getKeyHash(), token))
+                    .sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
                     .waitForPacket(P07CreateSessionResponse.class, p -> {
                         if (p.errorCode == CreateSessionError.INVALID_FCM_TOKEN)
                             Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);

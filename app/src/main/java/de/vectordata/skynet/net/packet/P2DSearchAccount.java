@@ -9,6 +9,10 @@ public class P2DSearchAccount implements Packet {
 
     public String query;
 
+    public P2DSearchAccount(String query) {
+        this.query = query;
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(query);

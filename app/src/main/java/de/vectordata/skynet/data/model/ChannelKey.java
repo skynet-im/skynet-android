@@ -72,6 +72,14 @@ public class ChannelKey {
         this.messageId = messageId;
     }
 
+    public KeyType getKeyType() {
+        return keyType;
+    }
+
+    public void setKeyType(KeyType keyType) {
+        this.keyType = keyType;
+    }
+
     public KeyFormat getSignatureKeyFormat() {
         return signatureKeyFormat;
     }

@@ -10,8 +10,8 @@ import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.net.model.CreateAccountError;
 import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
+import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.util.Activities;
-import de.vectordata.skynet.util.Dialogs;
 
 public class CreateAccountActivity extends SkynetActivity {
 

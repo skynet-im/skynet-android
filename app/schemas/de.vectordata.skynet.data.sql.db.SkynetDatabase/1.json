@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "693e72831d7c64d03d0546a0c5555621",
+    "identityHash": "464d3df9550ac04c0f50e383b81a5e73",
     "entities": [
       {
         "tableName": "channels",
@@ -295,8 +295,8 @@
         ]
       },
       {
-        "tableName": "channelKeypairs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `keyRole` INTEGER, `publicKeyFormat` INTEGER, `publicKey` BLOB, `privateKeyFormat` INTEGER, `privateKey` BLOB, PRIMARY KEY(`channelId`), FOREIGN KEY(`channelId`) REFERENCES `channels`(`channelId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "tableName": "channelKeys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `keyType` INTEGER, `signatureKeyFormat` INTEGER, `signatureKey` BLOB, `derivationKeyFormat` INTEGER, `derivationKey` BLOB, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "channelId",
@@ -305,53 +305,62 @@
             "notNull": true
           },
           {
-            "fieldPath": "keyRole",
-            "columnName": "keyRole",
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keyType",
+            "columnName": "keyType",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "publicKeyFormat",
-            "columnName": "publicKeyFormat",
+            "fieldPath": "signatureKeyFormat",
+            "columnName": "signatureKeyFormat",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "publicKey",
-            "columnName": "publicKey",
+            "fieldPath": "signatureKey",
+            "columnName": "signatureKey",
             "affinity": "BLOB",
             "notNull": false
           },
           {
-            "fieldPath": "privateKeyFormat",
-            "columnName": "privateKeyFormat",
+            "fieldPath": "derivationKeyFormat",
+            "columnName": "derivationKeyFormat",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "privateKey",
-            "columnName": "privateKey",
+            "fieldPath": "derivationKey",
+            "columnName": "derivationKey",
             "affinity": "BLOB",
             "notNull": false
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "channelId"
+            "channelId",
+            "messageId"
           ],
           "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": [
           {
-            "table": "channels",
+            "table": "channelMessages",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "channelId"
+              "channelId",
+              "messageId"
             ],
             "referencedColumns": [
-              "channelId"
+              "channelId",
+              "messageId"
             ]
           }
         ]
@@ -360,7 +369,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"693e72831d7c64d03d0546a0c5555621\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"464d3df9550ac04c0f50e383b81a5e73\")"
     ]
   }
 }
