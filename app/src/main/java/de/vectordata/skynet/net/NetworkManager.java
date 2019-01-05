@@ -20,6 +20,7 @@ import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.Persistable;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 import de.vectordata.skynet.util.Constants;
 import de.vectordata.skynet.util.Version;
@@ -72,6 +73,9 @@ public class NetworkManager implements VSLClientListener {
             PacketBuffer buffer = new PacketBuffer();
             packet.writePacket(buffer, skynetContext);
             vslClient.sendPacket(packet.getId(), buffer.toArray());
+
+            if (packet instanceof Persistable)
+                ((Persistable) packet).writeToDatabase();
         }
         return responseAwaiter;
     }

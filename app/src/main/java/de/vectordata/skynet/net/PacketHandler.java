@@ -4,7 +4,6 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.Channel;
-import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
@@ -51,6 +50,7 @@ import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.Persistable;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
@@ -84,14 +84,17 @@ public class PacketHandler {
         if (packet == null)
             return;
 
+        packet.readPacket(new PacketBuffer(payload), keyProvider);
+
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
 
         if (packet instanceof RealtimeMessagePacket)
             ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
-        PacketBuffer buffer = new PacketBuffer(payload);
-        packet.readPacket(buffer, keyProvider);
+        if (packet instanceof Persistable)
+            ((Persistable) packet).writeToDatabase();
+
         packet.handlePacket(this);
         responseAwaiter.onPacket(packet);
     }
@@ -180,11 +183,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P17PrivateKeys packet) {
-        StorageAccess.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
+
     }
 
     public void handlePacket(P18PublicKeys packet) {
-        StorageAccess.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
+
     }
 
     public void handlePacket(P19KeypairReference packet) {
@@ -212,7 +215,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P20ChatMessage packet) {
-        StorageAccess.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(packet));
+
     }
 
     public void handlePacket(P21MessageOverride packet) {
@@ -246,8 +249,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P24DaystreamMessage packet) {
-        DaystreamMessage message = DaystreamMessage.fromPacket(packet);
-        StorageAccess.getDatabase().daystreamMessageDao().insert(message);
+
     }
 
     public void handlePacket(P25Nickname packet) {
