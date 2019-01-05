@@ -29,11 +29,11 @@ public class AddContactActivity extends SkynetActivity {
         findViewById(R.id.action_search).setOnClickListener(v -> {
             ProgressDialog progressDialog = Dialogs.showProgressDialog(this, R.string.progress_searching, true);
             SkynetContext.getCurrent().getNetworkManager().sendPacket(new P2DSearchAccount(searchInput.getText().toString()))
-                    .waitForPacket(P2ESearchAccountResponse.class, p -> {
+                    .waitForPacket(P2ESearchAccountResponse.class, p -> runOnUiThread(() -> {
                         if (progressDialog.isCancelled())
                             return;
                         progressDialog.dismiss();
-                    });
+                    }));
         });
     }
 

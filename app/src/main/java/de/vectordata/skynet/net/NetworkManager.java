@@ -13,6 +13,7 @@ import de.vectordata.skynet.auth.Authenticator;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.net.listener.AuthenticationListener;
+import de.vectordata.skynet.net.listener.ErrorListener;
 import de.vectordata.skynet.net.listener.HandshakeListener;
 import de.vectordata.skynet.net.model.HandshakeState;
 import de.vectordata.skynet.net.model.RestoreSessionError;
@@ -38,6 +39,7 @@ public class NetworkManager implements VSLClientListener {
 
     private AuthenticationListener authenticationListener;
     private HandshakeListener handshakeListener;
+    private ErrorListener errorListener;
 
     private List<Packet> packetCache = new ArrayList<>();
 
@@ -127,6 +129,8 @@ public class NetworkManager implements VSLClientListener {
         connectionState = ConnectionState.DISCONNECTED;
         Log.d(TAG, "Scheduling reconnect in 1 min");
         handler.postDelayed(this::connect, 60000);
+        if (errorListener != null)
+            errorListener.onConnectionFailed();
     }
 
     private void authenticate() {
@@ -152,6 +156,10 @@ public class NetworkManager implements VSLClientListener {
 
     public void setAuthenticationListener(AuthenticationListener authenticationListener) {
         this.authenticationListener = authenticationListener;
+    }
+
+    public void setErrorListener(ErrorListener errorListener) {
+        this.errorListener = errorListener;
     }
 
     public ConnectionState getConnectionState() {

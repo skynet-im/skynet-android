@@ -10,15 +10,19 @@ import com.google.firebase.iid.InstanceIdResult;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.crypto.hash.KeyCollection;
+import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
+import de.vectordata.skynet.ui.dialogs.ProgressDialog;
 import de.vectordata.skynet.util.Activities;
 
 public class LoginActivity extends SkynetActivity {
 
     private static final String TAG = "LoginActivity";
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +36,16 @@ public class LoginActivity extends SkynetActivity {
         String username = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        findViewById(R.id.button_login).setOnClickListener(v -> HashProvider.buildHashesAsync(username, password,
-                result -> login(emailInput.getText().toString(), result)
-        ));
+        findViewById(R.id.button_login).setOnClickListener(v -> {
+            progressDialog = Dialogs.showProgressDialog(this, R.string.progress_login_preparing, false);
+            HashProvider.buildHashesAsync(username, password,
+                    result -> firebaseAndLogin(emailInput.getText().toString(), result)
+            );
+        });
         findViewById(R.id.link_create_account).setOnClickListener(v -> startActivity(CreateAccountActivity.class));
     }
 
-    private void login(String accountName, KeyCollection keys) {
+    private void firebaseAndLogin(String accountName, KeyCollection keys) {
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e(TAG, "Failed to get Firebase Token");
@@ -50,16 +57,34 @@ public class LoginActivity extends SkynetActivity {
             String token = instanceIdResult.getToken();
 
             Log.i(TAG, "Firebase token: " + token);
-
-            getSkynetContext().getNetworkManager()
-                    .sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
-                    .waitForPacket(P07CreateSessionResponse.class, p -> {
-                        if (p.errorCode == CreateSessionError.INVALID_FCM_TOKEN)
-                            Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);
-                        else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
-                            Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
-                    });
+            login(accountName, keys, token);
         });
     }
 
+    private void login(String accountName, KeyCollection keys, String token) {
+        progressDialog.setMessage(R.string.progress_logging_in);
+        NetworkManager networkManager = getSkynetContext().getNetworkManager();
+        networkManager.connect();
+
+        networkManager.setErrorListener(() -> runOnUiThread(() -> {
+            progressDialog.dismiss();
+            Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_no_connection);
+            networkManager.setErrorListener(null);
+        }));
+
+        networkManager.sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
+                .waitForPacket(P07CreateSessionResponse.class, p -> {
+                    progressDialog.dismiss();
+                    if (p.errorCode == CreateSessionError.INVALID_FCM_TOKEN)
+                        Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);
+                    else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
+                        Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
+                });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
 }

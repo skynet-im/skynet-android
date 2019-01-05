@@ -29,6 +29,7 @@
     <string name="error_header_login">Login error</string>
     <string name="error_header_create_acc">Register error</string>
     <string name="error_header_connect">Connection error</string>
+    <string name="error_no_connection">Could not reach the Skynet servers. Please check your internet connection and try again.</string>
     <string name="error_firebase">Could not initialize messaging system. Please make sure you have Google Play Services installed.</string>
     <string name="error_firebase_token">Invalid firebase token.</string>
     <string name="error_invalid_credentials">Username or password incorrect. Please try again.</string>
@@ -54,6 +55,8 @@
 
     <string name="progress_header">Please wait</string>
     <string name="progress_searching">Searching…</string>
+    <string name="progress_login_preparing">Preparing login…</string>
+    <string name="progress_logging_in">Logging in…</string>
 
     <string name="yesterday">Yesterday</string>
 </resources>
