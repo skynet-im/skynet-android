@@ -4,18 +4,17 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.Channel;
-import de.vectordata.skynet.data.model.ChannelKeypair;
+import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.data.model.enums.ChannelType;
-import de.vectordata.skynet.net.model.AsymmetricKey;
 import de.vectordata.skynet.net.model.CreateSessionError;
-import de.vectordata.skynet.net.model.KeyRole;
 import de.vectordata.skynet.net.model.OverrideAction;
 import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
+import de.vectordata.skynet.net.packet.P02FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
@@ -31,7 +30,7 @@ import de.vectordata.skynet.net.packet.P15PasswordUpdate;
 import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
-import de.vectordata.skynet.net.packet.P19DerivedKey;
+import de.vectordata.skynet.net.packet.P19KeypairReference;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
 import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
 import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
@@ -129,6 +128,12 @@ public class PacketHandler {
         StorageAccess.getDatabase().channelDao().insert(Channel.fromPacket(packet));
     }
 
+    public void handlePacket(P02FCreateChannelResponse packet) {
+        Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.tempChannelId);
+        channel.setChannelId(packet.channelId);
+        StorageAccess.getDatabase().channelDao().update(channel);
+    }
+
     public void handlePacket(P0BChannelMessage packet) {
         Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.channelId);
         if (packet.messageId > channel.getLatestMessage()) {
@@ -175,34 +180,14 @@ public class PacketHandler {
     }
 
     public void handlePacket(P17PrivateKeys packet) {
-        StorageAccess.getDatabase().channelKeypairDao().upsert(createPrivateKey(packet.getParent().channelId, KeyRole.SIGNATURE, packet.signatureKey));
-        StorageAccess.getDatabase().channelKeypairDao().upsert(createPrivateKey(packet.getParent().channelId, KeyRole.DERIVATION, packet.derivationKey));
+        StorageAccess.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
     }
 
     public void handlePacket(P18PublicKeys packet) {
-        StorageAccess.getDatabase().channelKeypairDao().upsert(createPublicKey(packet.getParent().channelId, KeyRole.SIGNATURE, packet.signatureKey));
-        StorageAccess.getDatabase().channelKeypairDao().upsert(createPublicKey(packet.getParent().channelId, KeyRole.DERIVATION, packet.derivationKey));
+        StorageAccess.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
     }
 
-    private ChannelKeypair createPublicKey(long channelId, KeyRole keyRole, AsymmetricKey key) {
-        ChannelKeypair keypair = new ChannelKeypair();
-        keypair.setChannelId(channelId);
-        keypair.setKeyRole(keyRole);
-        keypair.setPublicKeyFormat(key.format);
-        keypair.setPublicKey(key.key);
-        return keypair;
-    }
-
-    private ChannelKeypair createPrivateKey(long channelId, KeyRole keyRole, AsymmetricKey key) {
-        ChannelKeypair keypair = new ChannelKeypair();
-        keypair.setChannelId(channelId);
-        keypair.setKeyRole(keyRole);
-        keypair.setPrivateKeyFormat(key.format);
-        keypair.setPrivateKey(key.key);
-        return keypair;
-    }
-
-    public void handlePacket(P19DerivedKey packet) {
+    public void handlePacket(P19KeypairReference packet) {
 
     }
 
@@ -250,7 +235,6 @@ public class PacketHandler {
             }
             StorageAccess.getDatabase().chatMessageDao().update(message);
         }
-
     }
 
     public void handlePacket(P22MessageReceived packet) {
@@ -297,4 +281,5 @@ public class PacketHandler {
     public void handlePacket(P2ESearchAccountResponse packet) {
 
     }
+
 }

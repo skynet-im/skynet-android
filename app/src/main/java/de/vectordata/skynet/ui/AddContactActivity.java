@@ -13,4 +13,5 @@ public class AddContactActivity extends SkynetActivity {
         setContentView(R.layout.activity_add_contact);
         Activities.enableUpButton(this);
     }
+
 }

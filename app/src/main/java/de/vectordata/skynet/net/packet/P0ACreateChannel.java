@@ -14,6 +14,10 @@ public class P0ACreateChannel implements Packet {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        buffer.writeInt64(channelId);
+        buffer.writeByte((byte) channelType.ordinal());
+        if (channelType == ChannelType.DIRECT)
+            buffer.writeInt64(counterpartId);
     }
 
     @Override

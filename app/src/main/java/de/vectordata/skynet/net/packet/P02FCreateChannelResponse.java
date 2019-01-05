@@ -3,20 +3,24 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.model.CreateChannelError;
+import de.vectordata.skynet.net.packet.base.Packet;
 
-public class P19DerivedKey extends ChannelMessagePacket {
+public class P02FCreateChannelResponse implements Packet {
 
-    public byte[] key;
+    public long tempChannelId;
+    public CreateChannelError errorCode;
+    public long channelId;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByteArray(key, true);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        key = buffer.readByteArray();
+        tempChannelId = buffer.readInt64();
+        errorCode = CreateChannelError.values()[buffer.readByte()];
+        channelId = buffer.readInt64();
     }
 
     @Override
@@ -26,6 +30,6 @@ public class P19DerivedKey extends ChannelMessagePacket {
 
     @Override
     public byte getId() {
-        return 0x19;
+        return 0x2F;
     }
 }
