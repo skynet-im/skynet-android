@@ -2,9 +2,9 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
+import de.vectordata.skynet.net.packet.P25Nickname;
 
-@Entity(tableName = "loopbackKeyNotifys", foreignKeys = @ForeignKey(
+@Entity(tableName = "nicknames", foreignKeys = @ForeignKey(
         entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"channelId", "messageId"},
@@ -12,20 +12,20 @@ import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
         onUpdate = ForeignKey.CASCADE),
         primaryKeys = {"channelId", "messageId"}
 )
-public class LoopbackKeyNotify {
+public class Nickname {
 
     private long channelId;
 
     private long messageId;
 
-    private byte[] key;
+    private String nickname;
 
-    public static LoopbackKeyNotify fromPacket(P16LoopbackKeyNotify packet) {
-        LoopbackKeyNotify notify = new LoopbackKeyNotify();
-        notify.channelId = packet.getParent().channelId;
-        notify.messageId = packet.getParent().messageId;
-        notify.key = packet.key;
-        return notify;
+    public static Nickname fromPacket(P25Nickname packet) {
+        Nickname nickname = new Nickname();
+        nickname.channelId = packet.getParent().channelId;
+        nickname.messageId = packet.getParent().messageId;
+        nickname.nickname = packet.nickname;
+        return nickname;
     }
 
     public long getChannelId() {
@@ -44,11 +44,11 @@ public class LoopbackKeyNotify {
         this.messageId = messageId;
     }
 
-    public byte[] getKey() {
-        return key;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setKey(byte[] key) {
-        this.key = key;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

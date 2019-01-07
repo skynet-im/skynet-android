@@ -9,7 +9,8 @@ import de.vectordata.skynet.net.packet.P0BChannelMessage;
 @Entity(tableName = "dependencies", foreignKeys = @ForeignKey(entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"srcChannelId", "srcMessageId"},
-        onDelete = ForeignKey.CASCADE),
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE),
         primaryKeys = {"srcChannelId", "srcMessageId"}
 )
 public class Dependency {

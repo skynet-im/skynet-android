@@ -7,7 +7,7 @@ import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.file.ObjectCache;
 import de.vectordata.skynet.data.sql.db.SkynetDatabase;
 
-public class StorageAccess {
+public class Storage {
 
     private static boolean initialized = false;
 

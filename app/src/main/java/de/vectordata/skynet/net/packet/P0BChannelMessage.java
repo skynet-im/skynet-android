@@ -8,10 +8,11 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
-import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 
@@ -30,6 +31,10 @@ public class P0BChannelMessage implements Packet {
     public byte[] contentPacket;
     public byte[] fileKey;
     public List<Dependency> dependencies = new ArrayList<>();
+
+    public boolean hasMessageFlag(byte flag) {
+        return (messageFlags & flag) != 0;
+    }
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -92,14 +97,14 @@ public class P0BChannelMessage implements Packet {
         return 0x0B;
     }
 
-    public void writeToDatabase() {
-        Channel channel = StorageAccess.getDatabase().channelDao().getById(channelId);
+    public void writeToDatabase(PacketDirection packetDirection) {
+        Channel channel = Storage.getDatabase().channelDao().getById(channelId);
         if (messageId > channel.getLatestMessage()) {
             channel.setLatestMessage(messageId);
-            StorageAccess.getDatabase().channelDao().update(channel);
+            Storage.getDatabase().channelDao().update(channel);
         }
-        StorageAccess.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
-        StorageAccess.getDatabase().dependencyDao().insert(de.vectordata.skynet.data.model.Dependency.arrayFromPacket(this, dependencies));
+        Storage.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
+        Storage.getDatabase().dependencyDao().insert(de.vectordata.skynet.data.model.Dependency.arrayFromPacket(this, dependencies));
     }
 
     public class Dependency {

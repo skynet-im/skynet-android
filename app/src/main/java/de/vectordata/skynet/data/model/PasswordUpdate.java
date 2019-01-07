@@ -8,7 +8,8 @@ import de.vectordata.skynet.net.packet.P15PasswordUpdate;
         entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"channelId", "messageId"},
-        onDelete = ForeignKey.CASCADE),
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE),
         primaryKeys = {"channelId", "messageId"}
 )
 public class PasswordUpdate {

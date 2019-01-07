@@ -3,6 +3,7 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
@@ -29,6 +30,6 @@ public class P22MessageReceived  extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase() {
+    public void writeToDatabase(PacketDirection packetDirection) {
     }
 }

@@ -14,7 +14,8 @@ import de.vectordata.skynet.net.packet.model.KeyFormat;
         entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"channelId", "messageId"},
-        onDelete = ForeignKey.CASCADE),
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE),
         primaryKeys = {"channelId", "messageId"}
 )
 public class ChannelKey {

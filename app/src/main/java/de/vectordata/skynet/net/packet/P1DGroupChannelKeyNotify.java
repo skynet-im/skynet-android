@@ -2,14 +2,13 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.GroupChannelKeyNotify;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.annotation.Flags;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 
-@Flags(MessageFlags.NO_SENDER_SYNC)
 public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
 
     public long channelId;
@@ -41,7 +40,9 @@ public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase() {
-        StorageAccess.getDatabase().groupChannelKeyNotifyDao().insert(GroupChannelKeyNotify.fromPacket(this));
+    public void writeToDatabase(PacketDirection packetDirection) {
+        if (packetDirection == PacketDirection.SEND && getParent().hasMessageFlag(MessageFlags.NO_SENDER_SYNC))
+            return;
+        Storage.getDatabase().groupChannelKeyNotifyDao().insert(GroupChannelKeyNotify.fromPacket(this));
     }
 }

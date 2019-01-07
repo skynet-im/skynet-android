@@ -4,9 +4,10 @@ import de.vectordata.libjvsl.crypt.AesStatic;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
-import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageType;
 
@@ -46,7 +47,7 @@ public class P20ChatMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase() {
-        StorageAccess.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this));
+    public void writeToDatabase(PacketDirection packetDirection) {
+        Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this));
     }
 }

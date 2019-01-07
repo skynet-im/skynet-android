@@ -11,7 +11,7 @@ import de.vectordata.libjvsl.VSLClientListener;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.auth.Authenticator;
 import de.vectordata.skynet.auth.Session;
-import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.net.listener.AuthenticationListener;
 import de.vectordata.skynet.net.listener.ErrorListener;
 import de.vectordata.skynet.net.listener.HandshakeListener;
@@ -131,7 +131,7 @@ public class NetworkManager implements VSLClientListener {
     }
 
     private void authenticate() {
-        Session session = StorageAccess.getSession();
+        Session session = Storage.getSession();
         if (session == null || !session.isAuthenticated()) {
             connectionState = ConnectionState.UNAUTHENTICATED;
             return;

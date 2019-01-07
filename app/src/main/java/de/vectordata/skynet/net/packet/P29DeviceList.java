@@ -6,12 +6,15 @@ import java.util.List;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
+import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.data.model.Device;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 public class P29DeviceList extends ChannelMessagePacket {
 
-    public List<Device> devices = new ArrayList<>();
+    public List<PDevice> devices = new ArrayList<>();
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -22,7 +25,7 @@ public class P29DeviceList extends ChannelMessagePacket {
         devices.clear();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++)
-            devices.add(new Device(buffer.readInt64(), buffer.readDate(), buffer.readString()));
+            devices.add(new PDevice(buffer.readInt64(), buffer.readDate(), buffer.readString()));
     }
 
     @Override
@@ -36,15 +39,20 @@ public class P29DeviceList extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase() {
+    public void writeToDatabase(PacketDirection packetDirection) {
+        Storage.getDatabase().deviceListDao().clear();
+        Device[] devices = new Device[this.devices.size()];
+        for (int i = 0; i < devices.length; i++)
+            devices[i] = Device.fromPacket(this.devices.get(i));
+        Storage.getDatabase().deviceListDao().insert(devices);
     }
 
-    public class Device {
+    public class PDevice {
         public long sessionId;
         public DateTime creationTime;
         public String applicationIdentifier;
 
-        public Device(long sessionId, DateTime creationTime, String applicationIdentifier) {
+        public PDevice(long sessionId, DateTime creationTime, String applicationIdentifier) {
             this.sessionId = sessionId;
             this.creationTime = creationTime;
             this.applicationIdentifier = applicationIdentifier;

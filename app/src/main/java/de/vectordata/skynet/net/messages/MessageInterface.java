@@ -3,7 +3,9 @@ package de.vectordata.skynet.net.messages;
 import java.util.Random;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P10RealTimeMessage;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -21,6 +23,10 @@ public class MessageInterface {
         this.skynetContext = skynetContext;
     }
 
+    public ResponseAwaiter sendChannelMessage(Channel channel, ChannelMessageConfig config, ChannelMessagePacket packet) {
+        return sendChannelMessage(channel.getChannelId(), config, packet);
+    }
+
     public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
         PacketBuffer buffer = new PacketBuffer();
         packet.writePacket(buffer, skynetContext);
@@ -35,8 +41,8 @@ public class MessageInterface {
         container.fileKey = config.getFileKey();
         container.dependencies = config.getDependencies();
 
-        container.writeToDatabase();
-        packet.writeToDatabase();
+        container.writeToDatabase(PacketDirection.SEND);
+        packet.writeToDatabase(PacketDirection.SEND);
 
         return skynetContext.getNetworkManager().sendPacket(container);
     }

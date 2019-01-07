@@ -3,7 +3,7 @@ package de.vectordata.skynet.auth;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P08RestoreSession;
@@ -15,7 +15,7 @@ public class Authenticator {
 
     public static void authenticate(Session session, Callback<RestoreSessionError> callback) {
         List<P08RestoreSession.ChannelItem> channelItems = new ArrayList<>();
-        List<Channel> channels = StorageAccess.getDatabase().channelDao().getAll();
+        List<Channel> channels = Storage.getDatabase().channelDao().getAll();
         for (Channel channel : channels)
             channelItems.add(new P08RestoreSession.ChannelItem(channel.getChannelId(), channel.getLatestMessage()));
         SkynetContext.getCurrent()

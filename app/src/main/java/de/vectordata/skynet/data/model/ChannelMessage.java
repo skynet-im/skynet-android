@@ -11,7 +11,8 @@ import de.vectordata.skynet.net.packet.P0BChannelMessage;
         entity = Channel.class,
         parentColumns = "channelId",
         childColumns = "channelId",
-        onDelete = ForeignKey.CASCADE), primaryKeys = {"channelId", "messageId"})
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE), primaryKeys = {"channelId", "messageId"})
 public class ChannelMessage {
 
     private long channelId;

@@ -1,5 +1,6 @@
 package de.vectordata.skynet.net.packet.base;
 
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
 public abstract class ChannelMessagePacket implements Packet {
@@ -14,6 +15,6 @@ public abstract class ChannelMessagePacket implements Packet {
         this.parent = parent;
     }
 
-    public abstract void writeToDatabase();
+    public abstract void writeToDatabase(PacketDirection packetDirection);
 
 }

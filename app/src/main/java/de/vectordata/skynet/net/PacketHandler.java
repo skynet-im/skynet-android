@@ -2,13 +2,14 @@ package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.model.ConnectionState;
+import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P02FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
@@ -81,7 +82,7 @@ public class PacketHandler {
 
         if (packet instanceof ChannelMessagePacket) {
             ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
-            ((ChannelMessagePacket) packet).writeToDatabase();
+            ((ChannelMessagePacket) packet).writeToDatabase(PacketDirection.RECEIVE);
         } else if (packet instanceof RealtimeMessagePacket)
             ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
@@ -118,24 +119,24 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0ACreateChannel packet) {
-        StorageAccess.getDatabase().channelDao().insert(Channel.fromPacket(packet));
+        Storage.getDatabase().channelDao().insert(Channel.fromPacket(packet));
     }
 
     public void handlePacket(P02FCreateChannelResponse packet) {
-        Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.tempChannelId);
+        Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
         channel.setChannelId(packet.channelId);
-        StorageAccess.getDatabase().channelDao().update(channel);
+        Storage.getDatabase().channelDao().update(channel);
     }
 
     public void handlePacket(P0BChannelMessage packet) {
-        packet.writeToDatabase();
+        packet.writeToDatabase(PacketDirection.RECEIVE);
         handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
-        ChannelMessage message = StorageAccess.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
+        ChannelMessage message = Storage.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
         message.setMessageId(packet.messageId);
-        StorageAccess.getDatabase().channelMessageDao().update(message);
+        Storage.getDatabase().channelMessageDao().update(message);
     }
 
     public void handlePacket(P0FSyncFinished packet) {
@@ -201,24 +202,24 @@ public class PacketHandler {
     }
 
     public void handlePacket(P21MessageOverride packet) {
-        Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.getParent().channelId);
+        Channel channel = Storage.getDatabase().channelDao().getById(packet.getParent().channelId);
         if (channel.getChannelType() == ChannelType.PROFILE_DATA) {
-            DaystreamMessage message = StorageAccess.getDatabase().daystreamMessageDao().get(channel.getChannelId(), packet.messageId);
+            DaystreamMessage message = Storage.getDatabase().daystreamMessageDao().get(channel.getChannelId(), packet.messageId);
             if (packet.action == OverrideAction.DELETE)
-                StorageAccess.getDatabase().daystreamMessageDao().delete(message);
+                Storage.getDatabase().daystreamMessageDao().delete(message);
             else {
                 message.setText(packet.newText);
                 message.setEdited(true);
-                StorageAccess.getDatabase().daystreamMessageDao().update(message);
+                Storage.getDatabase().daystreamMessageDao().update(message);
             }
         } else {
-            ChatMessage message = StorageAccess.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.messageId);
+            ChatMessage message = Storage.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.messageId);
             if (packet.action == OverrideAction.DELETE) message.setText("\0");
             else {
                 message.setText(packet.newText);
                 message.setEdited(true);
             }
-            StorageAccess.getDatabase().chatMessageDao().update(message);
+            Storage.getDatabase().chatMessageDao().update(message);
         }
     }
 
