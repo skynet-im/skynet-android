@@ -7,11 +7,8 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
-import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.data.model.enums.ChannelType;
-import de.vectordata.skynet.net.model.CreateSessionError;
-import de.vectordata.skynet.net.model.OverrideAction;
-import de.vectordata.skynet.net.model.RestoreSessionError;
+import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P02FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
@@ -50,16 +47,13 @@ import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
-import de.vectordata.skynet.net.packet.base.Persistable;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
+import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.net.packet.model.OverrideAction;
+import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
-
-    private static final Packet[] REGISTERED_PACKETS = new Packet[]{
-            null,
-            new P01ConnectionResponse()
-    };
 
     private KeyProvider keyProvider;
     private NetworkManager networkManager;
@@ -76,24 +70,20 @@ public class PacketHandler {
     }
 
     private void handlePacket(byte id, byte[] payload, Packet parent) {
-        int uId = id & 0xFF;
-        if (uId >= REGISTERED_PACKETS.length)
+        if (!PacketRegistry.isValidId(id))
             return;
 
-        Packet packet = REGISTERED_PACKETS[id];
+        Packet packet = PacketRegistry.getPacket(id);
         if (packet == null)
             return;
 
         packet.readPacket(new PacketBuffer(payload), keyProvider);
 
-        if (packet instanceof ChannelMessagePacket)
+        if (packet instanceof ChannelMessagePacket) {
             ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
-
-        if (packet instanceof RealtimeMessagePacket)
+            ((ChannelMessagePacket) packet).writeToDatabase();
+        } else if (packet instanceof RealtimeMessagePacket)
             ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
-
-        if (packet instanceof Persistable)
-            ((Persistable) packet).writeToDatabase();
 
         packet.handlePacket(this);
         responseAwaiter.onPacket(packet);
@@ -138,24 +128,14 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0BChannelMessage packet) {
-        Channel channel = StorageAccess.getDatabase().channelDao().getById(packet.channelId);
-        if (packet.messageId > channel.getLatestMessage()) {
-            channel.setLatestMessage(packet.messageId);
-            StorageAccess.getDatabase().channelDao().update(channel);
-        }
-
-        StorageAccess.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(packet));
-
-        Dependency[] dependencies = new Dependency[packet.dependencies.size()];
-        for (int i = 0; i < dependencies.length; i++)
-            dependencies[i] = Dependency.fromPacket(packet, packet.dependencies.get(i));
-        StorageAccess.getDatabase().dependencyDao().insert(dependencies);
-
+        packet.writeToDatabase();
         handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
-
+        ChannelMessage message = StorageAccess.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
+        message.setMessageId(packet.messageId);
+        StorageAccess.getDatabase().channelMessageDao().update(message);
     }
 
     public void handlePacket(P0FSyncFinished packet) {
@@ -165,6 +145,8 @@ public class PacketHandler {
     public void handlePacket(P10RealTimeMessage packet) {
         handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
+
+    ////////////////////// Channel messages //////////////////////
 
     public void handlePacket(P13QueueMailAddressChange packet) {
 
@@ -272,6 +254,7 @@ public class PacketHandler {
 
     }
 
+    ////////////////////// Real time messages //////////////////////
     public void handlePacket(P2BOnlineState packet) {
 
     }

@@ -1,4 +1,4 @@
-package de.vectordata.skynet.net;
+package de.vectordata.skynet.net.model;
 
 /**
  * Created by Twometer on 12.12.2018.

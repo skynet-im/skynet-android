@@ -1,7 +1,7 @@
 package de.vectordata.skynet.data.sql.converters;
 
 import androidx.room.TypeConverter;
-import de.vectordata.skynet.net.model.KeyFormat;
+import de.vectordata.skynet.net.packet.model.KeyFormat;
 
 public class KeyFormatConverter {
 

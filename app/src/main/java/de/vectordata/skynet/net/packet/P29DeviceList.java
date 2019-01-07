@@ -35,6 +35,10 @@ public class P29DeviceList extends ChannelMessagePacket {
         return 0x29;
     }
 
+    @Override
+    public void writeToDatabase() {
+    }
+
     public class Device {
         public long sessionId;
         public DateTime creationTime;

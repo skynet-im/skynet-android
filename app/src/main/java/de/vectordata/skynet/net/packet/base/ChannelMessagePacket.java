@@ -13,4 +13,7 @@ public abstract class ChannelMessagePacket implements Packet {
     public void setParent(P0BChannelMessage parent) {
         this.parent = parent;
     }
+
+    public abstract void writeToDatabase();
+
 }

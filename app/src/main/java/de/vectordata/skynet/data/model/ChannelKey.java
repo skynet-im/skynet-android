@@ -6,9 +6,9 @@ import androidx.room.TypeConverters;
 import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.data.sql.converters.KeyFormatConverter;
 import de.vectordata.skynet.data.sql.converters.KeyTypeConverter;
-import de.vectordata.skynet.net.model.KeyFormat;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
+import de.vectordata.skynet.net.packet.model.KeyFormat;
 
 @Entity(tableName = "channelKeys", foreignKeys = @ForeignKey(
         entity = ChannelMessage.class,
@@ -38,6 +38,8 @@ public class ChannelKey {
 
     public static ChannelKey fromPacket(P17PrivateKeys packet) {
         ChannelKey channelKey = new ChannelKey();
+        channelKey.channelId = packet.getParent().channelId;
+        channelKey.messageId = packet.getParent().messageId;
         channelKey.keyType = KeyType.PRIVATE;
         channelKey.signatureKeyFormat = packet.signatureKey.format;
         channelKey.signatureKey = packet.signatureKey.key;
@@ -48,6 +50,8 @@ public class ChannelKey {
 
     public static ChannelKey fromPacket(P18PublicKeys packet) {
         ChannelKey channelKey = new ChannelKey();
+        channelKey.channelId = packet.getParent().channelId;
+        channelKey.messageId = packet.getParent().messageId;
         channelKey.keyType = KeyType.PUBLIC;
         channelKey.signatureKeyFormat = packet.signatureKey.format;
         channelKey.signatureKey = packet.signatureKey.key;

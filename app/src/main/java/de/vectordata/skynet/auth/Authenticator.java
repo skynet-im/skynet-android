@@ -6,9 +6,9 @@ import java.util.List;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.model.RestoreSessionError;
 import de.vectordata.skynet.net.packet.P08RestoreSession;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
+import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.util.Callback;
 
 public class Authenticator {

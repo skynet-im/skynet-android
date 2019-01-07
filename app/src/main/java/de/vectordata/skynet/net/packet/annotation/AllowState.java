@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.vectordata.skynet.net.ConnectionState;
+import de.vectordata.skynet.net.model.ConnectionState;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

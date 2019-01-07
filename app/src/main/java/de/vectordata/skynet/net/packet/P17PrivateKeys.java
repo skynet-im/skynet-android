@@ -6,14 +6,14 @@ import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.AsymmetricKey;
-import de.vectordata.skynet.net.model.KeyFormat;
 import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.base.Persistable;
+import de.vectordata.skynet.net.packet.model.AsymmetricKey;
+import de.vectordata.skynet.net.packet.model.KeyFormat;
 
 @Channel(ChannelType.LOOPBACK)
-public class P17PrivateKeys extends ChannelMessagePacket implements Persistable {
+public class P17PrivateKeys extends ChannelMessagePacket {
+
     public AsymmetricKey signatureKey;
     public AsymmetricKey derivationKey;
 
@@ -52,4 +52,5 @@ public class P17PrivateKeys extends ChannelMessagePacket implements Persistable 
     public void writeToDatabase() {
         StorageAccess.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(this));
     }
+
 }

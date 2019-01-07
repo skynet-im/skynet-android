@@ -4,8 +4,8 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.TypeConverters;
 import de.vectordata.skynet.data.sql.converters.MessageTypeConverter;
-import de.vectordata.skynet.net.model.MessageType;
 import de.vectordata.skynet.net.packet.P24DaystreamMessage;
+import de.vectordata.skynet.net.packet.model.MessageType;
 
 /**
  * Created by Twometer on 18.12.2018.

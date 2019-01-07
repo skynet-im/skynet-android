@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "464d3df9550ac04c0f50e383b81a5e73",
+    "identityHash": "351fe1349e1bab046fce44520da8fad5",
     "entities": [
       {
         "tableName": "channels",
@@ -364,12 +364,265 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "mailAddresses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `mailAddress` TEXT, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mailAddress",
+            "columnName": "mailAddress",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "passwordUpdates",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `keyHash` BLOB, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keyHash",
+            "columnName": "keyHash",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "loopbackKeyNotifys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `key` BLOB, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "directChannelCustomizations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `customNickname` TEXT, `profileImageShape` INTEGER, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customNickname",
+            "columnName": "customNickname",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "profileImageShape",
+            "columnName": "profileImageShape",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "groupChannelKeyNotifys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `groupChannelId` INTEGER NOT NULL, `newKey` BLOB, `historyKey` BLOB, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupChannelId",
+            "columnName": "groupChannelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "newKey",
+            "columnName": "newKey",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "historyKey",
+            "columnName": "historyKey",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"464d3df9550ac04c0f50e383b81a5e73\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"351fe1349e1bab046fce44520da8fad5\")"
     ]
   }
 }

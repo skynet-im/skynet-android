@@ -8,9 +8,12 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
+import de.vectordata.skynet.data.StorageAccess;
+import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.MessageFlags;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 public class P0BChannelMessage implements Packet {
 
@@ -71,7 +74,8 @@ public class P0BChannelMessage implements Packet {
         byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
         PacketBuffer decryptedBuffer = new PacketBuffer(decryptedData);
         contentPacket = decryptedBuffer.readByteArray();
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0) fileKey = decryptedBuffer.readByteArray();
+        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
+            fileKey = decryptedBuffer.readByteArray();
 
         int dependencyCount = buffer.readUInt16();
         for (int i = 0; i < dependencyCount; i++)
@@ -86,6 +90,16 @@ public class P0BChannelMessage implements Packet {
     @Override
     public byte getId() {
         return 0x0B;
+    }
+
+    public void writeToDatabase() {
+        Channel channel = StorageAccess.getDatabase().channelDao().getById(channelId);
+        if (messageId > channel.getLatestMessage()) {
+            channel.setLatestMessage(messageId);
+            StorageAccess.getDatabase().channelDao().update(channel);
+        }
+        StorageAccess.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
+        StorageAccess.getDatabase().dependencyDao().insert(de.vectordata.skynet.data.model.Dependency.arrayFromPacket(this, dependencies));
     }
 
     public class Dependency {

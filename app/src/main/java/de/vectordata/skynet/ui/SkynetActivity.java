@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.model.HandshakeState;
-import de.vectordata.skynet.net.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.HandshakeState;
+import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 
 /**

@@ -3,9 +3,9 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.MessageFlags;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 @Flags(MessageFlags.LOOPBACK)
 public class P2ABackgroundImage extends ChannelMessagePacket {
@@ -25,5 +25,9 @@ public class P2ABackgroundImage extends ChannelMessagePacket {
     @Override
     public byte getId() {
         return 0x2A;
+    }
+
+    @Override
+    public void writeToDatabase() {
     }
 }

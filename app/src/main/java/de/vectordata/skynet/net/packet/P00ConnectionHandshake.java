@@ -2,8 +2,8 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.net.ConnectionState;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
 import de.vectordata.skynet.net.packet.base.Packet;
 

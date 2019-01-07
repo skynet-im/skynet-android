@@ -7,11 +7,10 @@ import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.MessageType;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.base.Persistable;
+import de.vectordata.skynet.net.packet.model.MessageType;
 
-public class P20ChatMessage extends ChannelMessagePacket implements Persistable {
+public class P20ChatMessage extends ChannelMessagePacket {
 
     public MessageType messageType;
     public String text;

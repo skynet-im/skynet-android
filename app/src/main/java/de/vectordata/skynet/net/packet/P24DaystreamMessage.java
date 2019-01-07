@@ -8,13 +8,12 @@ import de.vectordata.skynet.data.StorageAccess;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.MessageType;
 import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.base.Persistable;
+import de.vectordata.skynet.net.packet.model.MessageType;
 
 @Channel(ChannelType.PROFILE_DATA)
-public class P24DaystreamMessage extends ChannelMessagePacket implements Persistable {
+public class P24DaystreamMessage extends ChannelMessagePacket {
 
     public MessageType messageType;
     public String text;

@@ -31,4 +31,8 @@ public class P1BDirectChannelUpdate extends ChannelMessagePacket {
     public byte getId() {
         return 0x1B;
     }
+
+    @Override
+    public void writeToDatabase() {
+    }
 }

@@ -9,10 +9,10 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.MessageFlags;
 import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 @Flags(MessageFlags.UNENCRYPTED)
 @Channel(ChannelType.DIRECT)
@@ -59,6 +59,10 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
     @Override
     public byte getId() {
         return 0x1E;
+    }
+
+    @Override
+    public void writeToDatabase() {
     }
 
     public class Member {

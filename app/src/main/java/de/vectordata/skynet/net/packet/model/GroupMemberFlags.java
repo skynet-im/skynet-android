@@ -1,4 +1,4 @@
-package de.vectordata.skynet.net.model;
+package de.vectordata.skynet.net.packet.model;
 
 public interface GroupMemberFlags {
     byte NONE = 0;

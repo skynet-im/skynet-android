@@ -1,5 +1,7 @@
 package de.vectordata.skynet.data.model;
 
+import java.util.List;
+
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
@@ -22,7 +24,14 @@ public class Dependency {
 
     private long dstMessageId;
 
-    public static Dependency fromPacket(P0BChannelMessage packet, P0BChannelMessage.Dependency packetChild) {
+    public static Dependency[] arrayFromPacket(P0BChannelMessage packet, List<P0BChannelMessage.Dependency> children) {
+        Dependency[] dependencies = new Dependency[children.size()];
+        for (int i = 0; i < children.size(); i++)
+            dependencies[i] = fromPacket(packet, children.get(i));
+        return dependencies;
+    }
+
+    private static Dependency fromPacket(P0BChannelMessage packet, P0BChannelMessage.Dependency packetChild) {
         Dependency dependency = new Dependency();
         dependency.srcChannelId = packet.channelId;
         dependency.srcMessageId = packet.messageId;

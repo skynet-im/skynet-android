@@ -1,6 +1,6 @@
 package de.vectordata.skynet.net.listener;
 
-import de.vectordata.skynet.net.model.HandshakeState;
+import de.vectordata.skynet.net.packet.model.HandshakeState;
 
 /**
  * Created by Twometer on 12.12.2018.

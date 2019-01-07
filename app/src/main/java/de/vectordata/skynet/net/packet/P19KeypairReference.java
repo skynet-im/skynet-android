@@ -24,4 +24,8 @@ public class P19KeypairReference extends ChannelMessagePacket {
     public byte getId() {
         return 0x19;
     }
+
+    @Override
+    public void writeToDatabase() {
+    }
 }

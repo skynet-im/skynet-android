@@ -5,8 +5,8 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.OverrideAction;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.model.OverrideAction;
 
 public class P21MessageOverride extends ChannelMessagePacket {
 
@@ -43,5 +43,9 @@ public class P21MessageOverride extends ChannelMessagePacket {
     @Override
     public byte getId() {
         return 0x21;
+    }
+
+    @Override
+    public void writeToDatabase() {
     }
 }
