@@ -5,7 +5,9 @@ public class TaskProgress {
     private int value;
     private boolean indeterminate;
 
-    public TaskProgress() {
+    public static final TaskProgress INDETERMINATE = new TaskProgress();
+
+    private TaskProgress() {
         this.value = -1;
         this.indeterminate = true;
     }

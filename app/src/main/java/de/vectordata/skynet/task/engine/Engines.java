@@ -1,14 +1,14 @@
 package de.vectordata.skynet.task.engine;
 
 
-public class EngineManager {
+public class Engines {
 
-    private static EngineManager instance = new EngineManager();
+    private static Engines instance = new Engines();
 
     private TaskingEngine regularQueue;
     private TaskingEngine fileQueue;
 
-    public static EngineManager getInstance() {
+    public static Engines getInstance() {
         return instance;
     }
 

@@ -1,9 +1,13 @@
 package de.vectordata.skynet.task.model;
+
 import java.util.Random;
 
+import de.vectordata.skynet.task.engine.Engines;
 import de.vectordata.skynet.task.engine.TaskingEngine;
 
 public abstract class Task {
+
+    private static Random idRandom = new Random();
 
     private long id;
     private TaskState state;
@@ -11,8 +15,8 @@ public abstract class Task {
 
     private TaskingEngine engine;
 
-    public Task() {
-        id = (new Random()).nextLong();
+    Task() {
+        id = idRandom.nextLong();
     }
 
     public long getId() {
@@ -31,7 +35,7 @@ public abstract class Task {
 
     public final void init(TaskingEngine engine) {
         this.engine = engine;
-        this.progress = new TaskProgress();
+        this.progress = TaskProgress.INDETERMINATE;
         setState(TaskState.RUNNING);
     }
 
@@ -47,6 +51,26 @@ public abstract class Task {
             this.progress = taskProgress;
             engine.onTaskUpdated(this);
         }
+    }
+
+    protected void fail() {
+        setState(TaskState.FAILED);
+    }
+
+    protected void success() {
+        setState(TaskState.SUCCESS);
+    }
+
+    protected void sleep() {
+        setState(TaskState.SLEEPING);
+    }
+
+    protected void wakeUp() {
+        setState(TaskState.RUNNING);
+    }
+
+    protected Engines getEngines() {
+        return Engines.getInstance();
     }
 
 }

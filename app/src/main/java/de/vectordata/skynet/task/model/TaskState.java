@@ -8,6 +8,6 @@ public enum TaskState {
     SUCCESS;
 
     public boolean isFinished() {
-        return ordinal() == FAILED.ordinal() || ordinal() == SUCCESS.ordinal();
+        return this == FAILED || this == SUCCESS;
     }
 }

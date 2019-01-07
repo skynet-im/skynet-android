@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.vectordata.skynet.task.model.Task;
-import de.vectordata.skynet.task.model.TaskCallback;
+import de.vectordata.skynet.task.model.TaskHandle;
 import de.vectordata.skynet.task.model.TaskState;
 
 
@@ -19,27 +19,21 @@ public class TaskingEngine {
     private Queue<Task> pendingTasks = new ConcurrentLinkedQueue<>();
     private List<Task> runningTasks = new CopyOnWriteArrayList<>();
 
-    private List<TaskCallback> callbacks = new CopyOnWriteArrayList<>();
+    private List<TaskHandle<? extends Task>> handles = new CopyOnWriteArrayList<>();
 
     private String name;
 
-    public TaskingEngine(String name) {
+    TaskingEngine(String name) {
         this.name = "[" + name + "] ";
     }
 
-    public long scheduleTask(Task task) {
+    public <T extends Task> TaskHandle<T> scheduleTask(T task) {
         Log.d(TAG, name + "Task scheduled: " + task.getClass().getSimpleName());
         pendingTasks.offer(task);
         update();
-        return task.getId();
-    }
-
-    public void addCallback(TaskCallback callback) {
-        callbacks.add(callback);
-    }
-
-    public void removeCallback(TaskCallback callback) {
-        callbacks.remove(callback);
+        TaskHandle<T> handle = new TaskHandle<>(task.getId(), (Class<T>) task.getClass());
+        handles.add(handle);
+        return handle;
     }
 
     public void onTaskUpdated(Task task) {
@@ -49,7 +43,11 @@ public class TaskingEngine {
             Log.d(TAG, name + "Removed " + task.getClass().getSimpleName() + " from running tasks");
             update();
         }
-        for (TaskCallback callback : callbacks) callback.onTaskUpdate(task);
+        for (TaskHandle handle : handles)
+            if (handle.getTaskId() == task.getId() && handle.getTaskClass() == task.getClass() && (!handle.hasCondition() || handle.getCondition() == task.getState())) {
+                if (handle.getCallback() != null) handle.getCallback().onTaskUpdate(task);
+                if (task.getState().isFinished()) handles.remove(handle);
+            }
     }
 
     private void update() {
