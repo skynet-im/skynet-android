@@ -17,6 +17,8 @@ public class MessageInterface {
 
     private static final Random idRandom = new Random();
 
+    private static final int PACKET_VERSION = 1;
+
     private SkynetContext skynetContext;
 
     public MessageInterface(SkynetContext skynetContext) {
@@ -34,9 +36,11 @@ public class MessageInterface {
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
         container.messageId = newId();
+        container.packetVersion = PACKET_VERSION;
         container.messageFlags = config.getMessageFlags();
         container.fileId = config.getFileId();
         container.contentPacketId = packet.getId();
+        container.contentPacketVersion = PACKET_VERSION;
         container.contentPacket = buffer.toArray();
         container.fileKey = config.getFileKey();
         container.dependencies = config.getDependencies();
