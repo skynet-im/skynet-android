@@ -9,7 +9,8 @@ import android.widget.ImageView;
  */
 public enum MessageSide {
     LEFT,
-    RIGHT;
+    RIGHT,
+    CENTER;
 
     public void apply(ImageView view) {
         if (this == LEFT)

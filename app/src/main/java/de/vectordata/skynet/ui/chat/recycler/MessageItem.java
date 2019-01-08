@@ -21,6 +21,10 @@ public class MessageItem {
         this.messageSide = messageSide;
     }
 
+    public static MessageItem newSystemMessage(String content) {
+        return new MessageItem(content, null, MessageState.SYSTEM, MessageSide.CENTER);
+    }
+
     String getContent() {
         return content;
     }

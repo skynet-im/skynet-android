@@ -22,7 +22,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        int layout = viewType == 0 ? R.layout.item_msg_left : R.layout.item_msg_right;
+        MessageSide messageSide = MessageSide.values()[viewType];
+        int layout = 0;
+        if (messageSide == MessageSide.LEFT) layout = R.layout.item_msg_left;
+        else if (messageSide == MessageSide.CENTER) layout = R.layout.item_msg_center;
+        else if (messageSide == MessageSide.RIGHT) layout = R.layout.item_msg_right;
         return new MessageViewHolder(inflater.inflate(layout, parent, false));
     }
 
@@ -36,7 +40,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     @Override
     public int getItemViewType(int position) {
         MessageItem item = dataset.get(position);
-        return item.getMessageSide() == MessageSide.LEFT ? 0 : 1;
+        return item.getMessageSide().ordinal();
     }
 
     @Override

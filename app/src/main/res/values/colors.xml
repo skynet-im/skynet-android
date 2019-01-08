@@ -4,8 +4,6 @@
     <color name="colorPrimaryDark">#0d273d</color>
     <color name="colorAccent">#FFAB40</color>
 
-    <color name="messageBubble">#1565c0</color>
-
     <color name="white">#ffffffff</color>
     <color name="black">#000000</color>
     <color name="lightGray">#eaeaef</color>

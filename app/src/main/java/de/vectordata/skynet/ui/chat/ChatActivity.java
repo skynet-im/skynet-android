@@ -34,6 +34,7 @@ public class ChatActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
 
         List<MessageItem> items = new ArrayList<>();
+        items.add(MessageItem.newSystemMessage("TODAY"));
         items.add(new MessageItem("This is a test", DateTime.now(), MessageState.SEEN, MessageSide.LEFT));
         items.add(new MessageItem("This is a test", DateTime.now(), MessageState.SEEN, MessageSide.RIGHT));
         items.add(new MessageItem("This is a very long test of a very long message and is this a very long sentence that makes no sense at all but can be used for testing.", DateTime.now(), MessageState.SEEN, MessageSide.RIGHT));
