@@ -57,6 +57,7 @@
     <string name="progress_searching">Searching…</string>
     <string name="progress_login_preparing">Preparing login…</string>
     <string name="progress_logging_in">Logging in…</string>
+    <string name="progress_creating_account">Creating account…</string>
 
     <string name="yesterday">Yesterday</string>
 </resources>

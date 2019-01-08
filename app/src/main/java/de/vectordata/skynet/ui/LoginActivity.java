@@ -85,6 +85,7 @@ public class LoginActivity extends SkynetActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        progressDialog.dismiss();
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 }

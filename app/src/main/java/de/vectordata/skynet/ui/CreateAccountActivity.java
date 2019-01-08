@@ -11,9 +11,12 @@ import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.model.CreateAccountError;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
+import de.vectordata.skynet.ui.dialogs.ProgressDialog;
 import de.vectordata.skynet.util.Activities;
 
 public class CreateAccountActivity extends SkynetActivity {
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +38,13 @@ public class CreateAccountActivity extends SkynetActivity {
     }
 
     private void createAccount(String accountName, byte[] keyHash) {
+        runOnUiThread(() ->
+                progressDialog = Dialogs.showProgressDialog(this, R.string.progress_creating_account, false)
+        );
         getSkynetContext().getNetworkManager()
                 .sendPacket(new P02CreateAccount(accountName, keyHash))
                 .waitForPacket(P03CreateAccountResponse.class, packet -> {
+                    progressDialog.dismiss();
                     if (packet.errorCode == CreateAccountError.ACCOUNT_NAME_TAKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_account_name_taken);
                     else if (packet.errorCode == CreateAccountError.INVALID_ACCOUNT_NAME)
@@ -45,5 +52,12 @@ public class CreateAccountActivity extends SkynetActivity {
                     else if (packet.errorCode == CreateAccountError.SUCCESS)
                         Dialogs.showMessageBox(this, R.string.success_header_create_acc, R.string.success_create_acc);
                 });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 }

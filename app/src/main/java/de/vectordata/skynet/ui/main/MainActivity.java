@@ -5,7 +5,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Objects;
@@ -14,10 +13,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.AddContactActivity;
-import de.vectordata.skynet.ui.CreateAccountActivity;
 import de.vectordata.skynet.ui.LoginActivity;
 import de.vectordata.skynet.ui.NewGroupActivity;
 import de.vectordata.skynet.ui.SkynetActivity;
+import de.vectordata.skynet.ui.main.fab.FabController;
+import de.vectordata.skynet.ui.main.fab.FabState;
 
 public class MainActivity extends SkynetActivity {
 
@@ -44,12 +44,14 @@ public class MainActivity extends SkynetActivity {
         Objects.requireNonNull(tabLayout.getTabAt(1)).select();
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            startActivity(CreateAccountActivity.class);
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        });
+        FabController.with(fab)
+                .addState(new FabState(R.drawable.ic_person_add, v -> startActivity(AddContactActivity.class)))
+                .addState(FabState.invisible())
+                .addState(new FabState(R.drawable.ic_add_a_photo_black_24dp, v -> {
 
+                }))
+                .setInitialState(1)
+                .attach(tabLayout);
     }
 
 
