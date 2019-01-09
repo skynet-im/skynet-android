@@ -46,6 +46,7 @@ import de.vectordata.skynet.net.packet.P2ABackgroundImage;
 import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
+import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
@@ -264,8 +265,12 @@ public class PacketHandler {
 
     }
 
+    ////////////////////// On demand packets //////////////////////
     public void handlePacket(P2ESearchAccountResponse packet) {
 
     }
 
+    public void handlePacket(P31FileUploadResponse packet) {
+
+    }
 }
