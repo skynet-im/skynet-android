@@ -1,7 +1,6 @@
 package de.vectordata.skynet.net;
 
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
-import de.vectordata.skynet.net.packet.P02FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
@@ -36,6 +35,7 @@ import de.vectordata.skynet.net.packet.P2ABackgroundImage;
 import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
+import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.base.Packet;
 
 class PacketRegistry {
@@ -49,7 +49,7 @@ class PacketRegistry {
         register(new P07CreateSessionResponse());
         register(new P09RestoreSessionResponse());
         register(new P0ACreateChannel());
-        register(new P02FCreateChannelResponse());
+        register(new P2FCreateChannelResponse());
         register(new P0BChannelMessage());
         register(new P0CChannelMessageResponse());
         register(new P0FSyncFinished());

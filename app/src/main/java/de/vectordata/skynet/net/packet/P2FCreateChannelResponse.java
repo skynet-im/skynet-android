@@ -6,7 +6,7 @@ import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.CreateChannelError;
 
-public class P02FCreateChannelResponse implements Packet {
+public class P2FCreateChannelResponse implements Packet {
 
     public long tempChannelId;
     public CreateChannelError errorCode;

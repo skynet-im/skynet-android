@@ -11,7 +11,6 @@ import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
-import de.vectordata.skynet.net.packet.P02FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
@@ -46,6 +45,7 @@ import de.vectordata.skynet.net.packet.P2ABackgroundImage;
 import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
+import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
@@ -123,7 +123,7 @@ public class PacketHandler {
         Storage.getDatabase().channelDao().insert(Channel.fromPacket(packet));
     }
 
-    public void handlePacket(P02FCreateChannelResponse packet) {
+    public void handlePacket(P2FCreateChannelResponse packet) {
         Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
         channel.setChannelId(packet.channelId);
         Storage.getDatabase().channelDao().update(channel);
