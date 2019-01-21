@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.ECDH;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -141,7 +142,15 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0FSyncFinished packet) {
-
+        boolean hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(ChannelType.LOOPBACK) != 0;
+        if (!hasKeys) {
+            ECDH.KeyMaterial material = ECDH.generateKeypair();
+            /*SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(
+                    Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK),
+                    new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED),
+                    new P18PublicKeys()
+            )*/
+        }
     }
 
     public void handlePacket(P10RealTimeMessage packet) {
