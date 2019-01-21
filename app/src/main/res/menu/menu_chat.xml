@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="de.vectordata.skynet.ui.chat.ChatActivity">
+    tools:context="de.vectordata.skynet.ui.chat.ChatActivityDirect">
     <item
         android:id="@+id/action_search"
         android:orderInCategory="100"

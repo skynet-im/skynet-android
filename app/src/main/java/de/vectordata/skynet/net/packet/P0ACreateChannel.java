@@ -10,12 +10,14 @@ public class P0ACreateChannel implements Packet {
 
     public long channelId;
     public ChannelType channelType;
+    public long ownerId;
     public long counterpartId;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(channelId);
         buffer.writeByte((byte) channelType.ordinal());
+        buffer.writeInt64(ownerId);
         if (channelType == ChannelType.DIRECT)
             buffer.writeInt64(counterpartId);
     }
@@ -24,6 +26,7 @@ public class P0ACreateChannel implements Packet {
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         channelId = buffer.readInt64();
         channelType = ChannelType.values()[buffer.readByte()];
+        ownerId = buffer.readInt64();
         if (channelType == ChannelType.DIRECT)
             counterpartId = buffer.readInt64();
     }

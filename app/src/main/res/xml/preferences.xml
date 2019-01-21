@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/pref_header_customize">
+
+        <ListPreference
+            android:defaultValue="default"
+            android:entries="@array/pref_color_theme_keys"
+            android:entryValues="@array/pref_color_theme_values"
+            android:summary="%s"
+            app:key="colorTheme"
+            app:title="@string/pref_color_theme" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:key="animations"
+            app:title="@string/pref_animations" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:key="sounds"
+            app:title="@string/pref_sounds" />
+
+        <SwitchPreferenceCompat
+            app:key="enterToSend"
+            app:summary="@string/pref_enter_to_send_summary"
+            app:title="@string/pref_enter_to_send" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_notifications">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:key="notifications"
+            app:title="@string/pref_notifications" />
+
+        <RingtonePreference
+            android:dependency="notifications"
+            android:ringtoneType="notification"
+            app:key="ringtone"
+            app:title="@string/pref_ringtone" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notifications"
+            app:key="vibrate"
+            app:title="@string/pref_vibrate" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notifications"
+            app:key="statusLed"
+            app:title="@string/pref_status_led" />
+
+        <ColorPickerPreference
+            android:defaultValue="#FF00FF00"
+            android:dependency="statusLed"
+            app:key="statusLedColor"
+            app:title="@string/pref_status_led_color" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_info">
+        <Preference
+            app:key="version"
+            app:summary="0.8.0 (build 55)"
+            app:title="@string/pref_version" />
+        <Preference
+            app:key="licenses"
+            app:summary="@string/pref_licenses_summary"
+            app:title="@string/pref_licenses" />
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

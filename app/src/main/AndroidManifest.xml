@@ -26,13 +26,16 @@
         <activity
             android:name=".ui.CreateAccountActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.chat.ChatActivity" />
+        <activity android:name=".ui.chat.ChatActivityDirect" />
         <activity
             android:name=".ui.AddContactActivity"
             android:label="@string/activity_add_contact" />
         <activity
             android:name=".ui.NewGroupActivity"
             android:label="@string/activity_new_group" />
+        <activity
+            android:name=".ui.PreferencesActivity"
+            android:label="@string/activity_preferences" />
     </application>
 
 </manifest>

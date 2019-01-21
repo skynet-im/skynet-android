@@ -24,7 +24,7 @@ public abstract class SkynetActivity extends AppCompatActivity {
         registerDialogs();
     }
 
-    SkynetContext getSkynetContext() {
+    protected SkynetContext getSkynetContext() {
         return SkynetContext.getCurrent();
     }
 

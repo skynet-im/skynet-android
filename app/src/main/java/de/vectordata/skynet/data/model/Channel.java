@@ -3,6 +3,8 @@ package de.vectordata.skynet.data.model;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+import de.vectordata.skynet.auth.Session;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
@@ -16,6 +18,8 @@ public class Channel {
     @TypeConverters(ChannelTypeConverter.class)
     private ChannelType channelType;
 
+    private long ownerId;
+
     private long counterpartId;
 
     private long latestMessage;
@@ -24,6 +28,7 @@ public class Channel {
         Channel channel = new Channel();
         channel.channelId = packet.channelId;
         channel.channelType = packet.channelType;
+        channel.ownerId = packet.ownerId;
         channel.counterpartId = packet.counterpartId;
         return channel;
     }
@@ -44,6 +49,14 @@ public class Channel {
         this.channelType = channelType;
     }
 
+    public long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
+    }
+
     public long getCounterpartId() {
         return counterpartId;
     }
@@ -58,5 +71,12 @@ public class Channel {
 
     public void setLatestMessage(long latestMessage) {
         this.latestMessage = latestMessage;
+    }
+
+    public long getOther() {
+        if (channelType != ChannelType.DIRECT)
+            throw new IllegalStateException("getOther() can only be called on a direct channel");
+        Session session = Storage.getSession();
+        return session.getAccountId() == ownerId ? counterpartId : ownerId;
     }
 }

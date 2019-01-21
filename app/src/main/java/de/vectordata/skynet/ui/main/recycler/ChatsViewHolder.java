@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Random;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
@@ -52,7 +54,8 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
         message.setText(item.getContent());
-        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getHeader(), 128, 128)
+        //long other = Storage.getDatabase().channelDao().getById(item.getChannelId()).getOther();
+        DefaultProfileImage.create(item.getHeader().substring(0, 1), (new Random().nextInt()), 128, 128)
                 .loadInto(avatar);
         item.getMessageState().apply(messageState);
         item.getMessageSide().apply(messageState);

@@ -8,8 +8,10 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.crypto.hash.KeyCollection;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
@@ -72,6 +74,8 @@ public class LoginActivity extends SkynetActivity {
             networkManager.setErrorListener(null);
         }));
 
+        Session session = new Session(keys);
+
         networkManager.sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
                 .waitForPacket(P07CreateSessionResponse.class, p -> {
                     progressDialog.dismiss();
@@ -79,6 +83,11 @@ public class LoginActivity extends SkynetActivity {
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);
                     else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
+                    else if (p.errorCode == CreateSessionError.SUCCESS) {
+                        session.setSessionId(p.sessionId);
+                        session.setAccountId(p.accountId);
+                        Storage.setSession(session);
+                    }
                 });
     }
 

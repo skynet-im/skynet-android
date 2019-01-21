@@ -13,8 +13,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.AddContactActivity;
-import de.vectordata.skynet.ui.LoginActivity;
 import de.vectordata.skynet.ui.NewGroupActivity;
+import de.vectordata.skynet.ui.PreferencesActivity;
 import de.vectordata.skynet.ui.SkynetActivity;
 import de.vectordata.skynet.ui.main.fab.FabController;
 import de.vectordata.skynet.ui.main.fab.FabState;
@@ -76,7 +76,7 @@ public class MainActivity extends SkynetActivity {
         }
 
         if (id == R.id.action_settings) {
-            startActivity(LoginActivity.class);
+            startActivity(PreferencesActivity.class);
             return true;
         }
 

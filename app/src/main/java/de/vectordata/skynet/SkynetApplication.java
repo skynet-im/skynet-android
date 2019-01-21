@@ -21,4 +21,5 @@ public class SkynetApplication extends Application {
         SkynetContext.getCurrent().getNetworkManager().connect();
         EmojiManager.install(new IosEmojiProvider());
     }
+
 }

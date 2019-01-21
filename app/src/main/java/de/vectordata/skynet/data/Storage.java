@@ -15,12 +15,15 @@ public class Storage {
     private static ObjectCache<Session> sessionCache;
 
     public static SkynetDatabase getDatabase() {
-
         return skynetDatabase;
     }
 
     public static Session getSession() {
         return sessionCache.get();
+    }
+
+    public static void setSession(Session session) {
+        sessionCache.set(session);
     }
 
     public static void initialize(Context context) {

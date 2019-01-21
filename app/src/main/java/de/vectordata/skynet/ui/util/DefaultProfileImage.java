@@ -9,8 +9,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.widget.ImageView;
 
-import de.vectordata.libjvsl.crypt.Hash;
-
 public class DefaultProfileImage {
 
     private static final int[] COLORS = {
@@ -33,15 +31,8 @@ public class DefaultProfileImage {
 
     private Bitmap bitmap;
 
-    private static int getColorFor(String accountName) {
-        byte[] hash = Hash.sha256(accountName);
-        long h = 0;
-        for (byte b : hash) h = 31 * h + b;
-        return COLORS[(int) (Math.abs(h) % COLORS.length)];
-    }
-
-    public static DefaultProfileImage create(String initials, String accountName, int width, int height) {
-        int color = getColorFor(accountName);
+    public static DefaultProfileImage create(String initials, long accountId, int width, int height) {
+        int color = COLORS[(int) Math.abs(accountId % COLORS.length)];
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();

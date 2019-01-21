@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import androidx.fragment.app.Fragment;
@@ -15,7 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.ui.chat.ChatActivity;
+import de.vectordata.skynet.ui.chat.ChatActivityBase;
+import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
 import de.vectordata.skynet.ui.util.MessageSide;
@@ -35,18 +35,23 @@ public class ChatsFragment extends Fragment {
 
         List<ChatsItem> dataset = new ArrayList<>();
 
-        dataset.add(new ChatsItem("Philipp", "Kannst du mir bei Informatik helfen?", DateTime.now(), 0, 2));
-        dataset.add(new ChatsItem("Lea \uD83D\uDC96", "Hey wie geht's? :)", ago(0, 1, 0), 0, 1));
-        dataset.add(new ChatsItem("Daniel", "Im Protokoll haben wir noch ein Problem, können wir da nacher drüber reden", ago(0, 8, 0), 0, MessageSide.RIGHT, MessageState.SENT, 0));
-        dataset.add(new ChatsItem("Jan", "Am Wochenende Lan Party?", ago(3, 8, 1), 0, 0));
-        dataset.add(new ChatsItem("Timon", "Ich muss mal dringend neuen RAM kaufen...", ago(5, 8, 0), 0, MessageSide.RIGHT, MessageState.SEEN, 0));
-        dataset.add(new ChatsItem("Max", "Wann geht dein Flieger?", ago(24, 8, 1), 0, MessageSide.RIGHT , MessageState.SENT, 0));
-        dataset.add(new ChatsItem("Test", "Test", ago(48, 8, 1), 0, MessageSide.RIGHT , MessageState.SENT, 0));
+        dataset.add(new ChatsItem("Philipp", "Kannst du mir bei Informatik helfen?", DateTime.now(), 0, 2, 0));
+        dataset.add(new ChatsItem("Lea \uD83D\uDC96", "Hey wie geht's? :)", ago(0, 1, 0), 0, 1, 1));
+        dataset.add(new ChatsItem("Daniel", "Im Protokoll haben wir noch ein Problem, können wir da nacher drüber reden", ago(0, 8, 0), 0, MessageSide.RIGHT, MessageState.SENT, 0, 2));
+        dataset.add(new ChatsItem("Jan", "Am Wochenende Lan Party?", ago(3, 8, 1), 0, 0, 3));
+        dataset.add(new ChatsItem("Timon", "Ich muss mal dringend neuen RAM kaufen...", ago(5, 8, 0), 0, MessageSide.RIGHT, MessageState.SEEN, 0, 4));
+        dataset.add(new ChatsItem("Max", "Wann geht dein Flieger?", ago(24, 8, 1), 0, MessageSide.RIGHT, MessageState.SENT, 0, 5));
+        dataset.add(new ChatsItem("Test", "Test", ago(48, 8, 1), 0, MessageSide.RIGHT, MessageState.SENT, 0, 6));
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ChatsAdapter adapter = new ChatsAdapter(dataset);
-        adapter.setItemClickListener(item -> getContext().startActivity(new Intent(getContext(), ChatActivity.class)));
+        adapter.setItemClickListener(idx -> {
+            ChatsItem item = dataset.get(idx);
+            Intent intent = new Intent(getContext(), ChatActivityDirect.class);
+            intent.putExtra(ChatActivityBase.EXTRA_CHANNEL_ID, item.getChannelId());
+            getContext().startActivity(intent);
+        });
         recyclerView.setAdapter(adapter);
 
         return rootView;

@@ -28,8 +28,8 @@ public interface ChannelDao {
     Channel getById(long channelId);
 
     @TypeConverters(ChannelTypeConverter.class)
-    @Query("SELECT * FROM channels WHERE channelType=:channelType")
-    Channel getByType(ChannelType channelType);
+    @Query("SELECT * FROM channels WHERE ownerId=:ownerId AND channelType=:channelType")
+    Channel getByType(long ownerId, ChannelType channelType);
 
     @Query("SELECT * FROM channels")
     List<Channel> getAll();

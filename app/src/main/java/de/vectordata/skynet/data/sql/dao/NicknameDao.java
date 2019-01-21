@@ -22,4 +22,7 @@ public interface NicknameDao {
     @Query("SELECT * FROM nicknames WHERE channelId=:channelId AND messageId=:messageId")
     Nickname get(long channelId, long messageId);
 
+    @Query("SELECT * FROM nicknames WHERE channelId=:channelId ORDER BY messageId DESC LIMIT 1")
+    Nickname last(long channelId);
+
 }

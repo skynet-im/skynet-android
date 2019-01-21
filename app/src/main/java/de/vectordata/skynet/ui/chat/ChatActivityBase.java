@@ -10,43 +10,27 @@ import android.widget.TextView;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
-import de.vectordata.skynet.ui.chat.recycler.MessageItem;
-import de.vectordata.skynet.ui.util.MessageSide;
-import de.vectordata.skynet.ui.util.MessageState;
+import de.vectordata.skynet.ui.SkynetActivity;
 
-public class ChatActivity extends AppCompatActivity {
+/**
+ * Created by Twometer on 21.01.2019.
+ * (c) 2019 Twometer
+ */
+public abstract class ChatActivityBase extends SkynetActivity {
+
+    public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.chat.channelId";
+
+    protected RecyclerView recyclerView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-
-        List<MessageItem> items = new ArrayList<>();
-        items.add(MessageItem.newSystemMessage("YESTERDAY"));
-        items.add(new MessageItem("Hi", ago(16, 55, 0), MessageState.SEEN, MessageSide.RIGHT));
-        items.add(MessageItem.newSystemMessage("TODAY"));
-        items.add(new MessageItem("Eyy moin", ago(16, 45, 0), MessageState.SEEN, MessageSide.LEFT));
-        items.add(new MessageItem("Lass uns mal ne Runde zocken, ich will meine neue Grafikkarte ausprobieren \uD83D\uDE02", ago(16, 45, 0), MessageState.SEEN, MessageSide.RIGHT));
-        items.add(new MessageItem("Ne mann ich geh jetzt ins Bett, morgen dann", ago(16, 40, 0), MessageState.SEEN, MessageSide.LEFT));
-        items.add(new MessageItem("Mhh okay, ich kann aber morgen erst nachmittags.", ago(16, 39, 0), MessageState.SEEN, MessageSide.RIGHT));
-        items.add(new MessageItem("Jetzt könnte ich", ago(0, 59, 0), MessageState.SEEN, MessageSide.RIGHT));
-        items.add(new MessageItem("Okay komm online, jetzt bin ich am PC", ago(0, 39, 0), MessageState.SEEN, MessageSide.LEFT));
-        items.add(new MessageItem("Sehr gut", ago(0, 35, 0), MessageState.SENT, MessageSide.RIGHT));
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new MessageAdapter(items));
 
         EmojiEditText messageInput = findViewById(R.id.input_message);
         ImageButton emojiToggleButton = findViewById(R.id.button_emoji);
@@ -58,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
 
         emojiToggleButton.setOnClickListener(v -> popup.toggle());
         messageInput.setOnClickListener(v -> popup.dismiss());
-
+        initialize();
         setupActionBar();
     }
 
@@ -86,16 +70,15 @@ public class ChatActivity extends AppCompatActivity {
         ImageView avatar = customView.findViewById(R.id.image_avatar);
         TextView nickname = customView.findViewById(R.id.label_nickname);
         TextView onlineState = customView.findViewById(R.id.label_online_state);
-        nickname.setText("Jan");
-        onlineState.setText("last seen today 4:13 PM");
+        configureActionBar(avatar, nickname, onlineState);
 
         Toolbar parent = (Toolbar) customView.getParent();
         parent.setPadding(0, 0, 0, 0);
         parent.setContentInsetsAbsolute(0, 0);
     }
 
-    private DateTime ago(int hr, int min, int sec) {
-        return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
-    }
+    public abstract void initialize();
+
+    public abstract void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState);
 
 }

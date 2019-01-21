@@ -10,9 +10,7 @@ public class Session {
 
     private KeyCollection sessionKeys;
 
-    public Session(long accountId, long sessionId, KeyCollection sessionKeys) {
-        this.accountId = accountId;
-        this.sessionId = sessionId;
+    public Session(KeyCollection sessionKeys) {
         this.sessionKeys = sessionKeys;
     }
 
@@ -26,6 +24,14 @@ public class Session {
 
     public KeyCollection getSessionKeys() {
         return sessionKeys;
+    }
+
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
     public boolean isAuthenticated() {

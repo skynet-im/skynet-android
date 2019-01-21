@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "743f6899c918027562d4f8a558d5de12",
+    "identityHash": "18e3b11f91cc157f916ec1187f7bfc47",
     "entities": [
       {
         "tableName": "channels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `channelType` INTEGER, `counterpartId` INTEGER NOT NULL, `latestMessage` INTEGER NOT NULL, PRIMARY KEY(`channelId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `channelType` INTEGER, `ownerId` INTEGER NOT NULL, `counterpartId` INTEGER NOT NULL, `latestMessage` INTEGER NOT NULL, PRIMARY KEY(`channelId`))",
         "fields": [
           {
             "fieldPath": "channelId",
@@ -19,6 +19,12 @@
             "columnName": "channelType",
             "affinity": "INTEGER",
             "notNull": false
+          },
+          {
+            "fieldPath": "ownerId",
+            "columnName": "ownerId",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "counterpartId",
@@ -795,7 +801,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"743f6899c918027562d4f8a558d5de12\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"18e3b11f91cc157f916ec1187f7bfc47\")"
     ]
   }
 }
