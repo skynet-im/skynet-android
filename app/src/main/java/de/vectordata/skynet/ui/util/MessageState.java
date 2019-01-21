@@ -13,7 +13,8 @@ public enum MessageState {
     SENT,
     DELIVERED,
     SEEN,
-    SYSTEM;
+    SYSTEM,
+    NONE;
 
     public void apply(ImageView imageView) {
         if (this == SENDING)

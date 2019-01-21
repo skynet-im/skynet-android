@@ -34,11 +34,16 @@ public class ChatActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
 
         List<MessageItem> items = new ArrayList<>();
+        items.add(MessageItem.newSystemMessage("YESTERDAY"));
+        items.add(new MessageItem("Hi", ago(16, 55, 0), MessageState.SEEN, MessageSide.RIGHT));
         items.add(MessageItem.newSystemMessage("TODAY"));
-        items.add(new MessageItem("This is a test", DateTime.now(), MessageState.SEEN, MessageSide.LEFT));
-        items.add(new MessageItem("This is a test", DateTime.now(), MessageState.SEEN, MessageSide.RIGHT));
-        items.add(new MessageItem("This is a very long test of a very long message and is this a very long sentence that makes no sense at all but can be used for testing.", DateTime.now(), MessageState.SEEN, MessageSide.RIGHT));
-        items.add(new MessageItem("This is a very long test of a very long message and is this a very long sentence that makes no sense at all but can be used for testing.", DateTime.now(), MessageState.SEEN, MessageSide.LEFT));
+        items.add(new MessageItem("Eyy moin", ago(16, 45, 0), MessageState.SEEN, MessageSide.LEFT));
+        items.add(new MessageItem("Lass uns mal ne Runde zocken, ich will meine neue Grafikkarte ausprobieren \uD83D\uDE02", ago(16, 45, 0), MessageState.SEEN, MessageSide.RIGHT));
+        items.add(new MessageItem("Ne mann ich geh jetzt ins Bett, morgen dann", ago(16, 40, 0), MessageState.SEEN, MessageSide.LEFT));
+        items.add(new MessageItem("Mhh okay, ich kann aber morgen erst nachmittags.", ago(16, 39, 0), MessageState.SEEN, MessageSide.RIGHT));
+        items.add(new MessageItem("Jetzt könnte ich", ago(0, 59, 0), MessageState.SEEN, MessageSide.RIGHT));
+        items.add(new MessageItem("Okay komm online, jetzt bin ich am PC", ago(0, 39, 0), MessageState.SEEN, MessageSide.LEFT));
+        items.add(new MessageItem("Sehr gut", ago(0, 35, 0), MessageState.SENT, MessageSide.RIGHT));
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new MessageAdapter(items));
@@ -81,11 +86,16 @@ public class ChatActivity extends AppCompatActivity {
         ImageView avatar = customView.findViewById(R.id.image_avatar);
         TextView nickname = customView.findViewById(R.id.label_nickname);
         TextView onlineState = customView.findViewById(R.id.label_online_state);
-        nickname.setText("Twometer");
-        onlineState.setText("online");
+        nickname.setText("Jan");
+        onlineState.setText("last seen today 4:13 PM");
 
         Toolbar parent = (Toolbar) customView.getParent();
         parent.setPadding(0, 0, 0, 0);
         parent.setContentInsetsAbsolute(0, 0);
     }
+
+    private DateTime ago(int hr, int min, int sec) {
+        return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
+    }
+
 }

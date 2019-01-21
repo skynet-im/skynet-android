@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import androidx.fragment.app.Fragment;
@@ -34,12 +35,13 @@ public class ChatsFragment extends Fragment {
 
         List<ChatsItem> dataset = new ArrayList<>();
 
-        dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 0, MessageState.DELIVERED, MessageSide.RIGHT));
-        dataset.add(new ChatsItem("Message header", "This is a test message with unread messages", DateTime.now(), 0, 1, MessageState.SEEN, MessageSide.RIGHT));
-        dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 0, MessageState.SENDING, MessageSide.RIGHT));
-        dataset.add(new ChatsItem("What about making the header extremely long, so that it will overlap the date field", "This is a test message", DateTime.now(), 0, 0, MessageState.SENT, MessageSide.RIGHT));
-        dataset.add(new ChatsItem("Message header", "This is a test message", DateTime.now(), 0, 5199912, MessageState.DELIVERED, MessageSide.LEFT));
-        dataset.add(new ChatsItem("Message header", "This is a very long test message so that i can see if this will look good even if there is a long message like this in the box", DateTime.now(), 0, 123, MessageState.DELIVERED, MessageSide.LEFT));
+        dataset.add(new ChatsItem("Philipp", "Kannst du mir bei Informatik helfen?", DateTime.now(), 0, 2));
+        dataset.add(new ChatsItem("Lea \uD83D\uDC96", "Hey wie geht's? :)", ago(0, 1, 0), 0, 1));
+        dataset.add(new ChatsItem("Daniel", "Im Protokoll haben wir noch ein Problem, können wir da nacher drüber reden", ago(0, 8, 0), 0, MessageSide.RIGHT, MessageState.SENT, 0));
+        dataset.add(new ChatsItem("Jan", "Am Wochenende Lan Party?", ago(3, 8, 1), 0, 0));
+        dataset.add(new ChatsItem("Timon", "Ich muss mal dringend neuen RAM kaufen...", ago(5, 8, 0), 0, MessageSide.RIGHT, MessageState.SEEN, 0));
+        dataset.add(new ChatsItem("Max", "Wann geht dein Flieger?", ago(24, 8, 1), 0, MessageSide.RIGHT , MessageState.SENT, 0));
+        dataset.add(new ChatsItem("Test", "Test", ago(48, 8, 1), 0, MessageSide.RIGHT , MessageState.SENT, 0));
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -48,6 +50,10 @@ public class ChatsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         return rootView;
+    }
+
+    private DateTime ago(int hr, int min, int sec) {
+        return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
     }
 
 }

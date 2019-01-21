@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.ui.util.DefaultProfileImage;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -51,6 +52,8 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
         message.setText(item.getContent());
+        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getHeader(), 128, 128)
+                .loadInto(avatar);
         item.getMessageState().apply(messageState);
         item.getMessageSide().apply(messageState);
     }

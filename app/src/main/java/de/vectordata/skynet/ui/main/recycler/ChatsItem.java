@@ -24,7 +24,17 @@ public class ChatsItem {
 
     private MessageSide messageSide;
 
-    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, MessageState messageState, MessageSide messageSide) {
+    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages) {
+        this.header = header;
+        this.content = content;
+        this.lastActiveDate = lastActiveDate;
+        this.profileImageId = profileImageId;
+        this.unreadMessages = unreadMessages;
+        this.messageState = MessageState.NONE;
+        this.messageSide = MessageSide.LEFT;
+    }
+
+    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, MessageSide messageSide, MessageState messageState, int unreadMessages) {
         this.header = header;
         this.content = content;
         this.lastActiveDate = lastActiveDate;
