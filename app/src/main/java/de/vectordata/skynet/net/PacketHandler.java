@@ -1,7 +1,7 @@
 package de.vectordata.skynet.net;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
-import de.vectordata.skynet.crypto.ECDH;
+import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -9,6 +9,7 @@ import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -51,7 +52,10 @@ import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
+import de.vectordata.skynet.net.packet.model.AsymmetricKey;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.net.packet.model.KeyFormat;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.OverrideAction;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
@@ -144,12 +148,25 @@ public class PacketHandler {
     public void handlePacket(P0FSyncFinished packet) {
         boolean hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(ChannelType.LOOPBACK) != 0;
         if (!hasKeys) {
-            ECDH.KeyMaterial material = ECDH.generateKeypair();
-            /*SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(
-                    Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK),
+            EC.KeyMaterial signature = EC.generateKeypair();
+            EC.KeyMaterial derivation = EC.generateKeypair();
+            if (signature == null || derivation == null)
+                return;
+            Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
+            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(loopbackChannel,
+                    new ChannelMessageConfig(),
+                    new P17PrivateKeys(
+                            new AsymmetricKey(KeyFormat.JAVA, signature.getPrivateKey()),
+                            new AsymmetricKey(KeyFormat.JAVA, derivation.getPrivateKey())
+                    )
+            );
+            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(loopbackChannel,
                     new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED),
-                    new P18PublicKeys()
-            )*/
+                    new P18PublicKeys(
+                            new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
+                            new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
+                    )
+            );
         }
     }
 

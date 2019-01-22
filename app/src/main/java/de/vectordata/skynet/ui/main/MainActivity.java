@@ -12,7 +12,10 @@ import java.util.Objects;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.auth.Session;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.ui.AddContactActivity;
+import de.vectordata.skynet.ui.LoginActivity;
 import de.vectordata.skynet.ui.NewGroupActivity;
 import de.vectordata.skynet.ui.PreferencesActivity;
 import de.vectordata.skynet.ui.SkynetActivity;
@@ -27,6 +30,9 @@ public class MainActivity extends SkynetActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Session session = Storage.getSession();
+        if (session == null) startActivity(LoginActivity.class);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

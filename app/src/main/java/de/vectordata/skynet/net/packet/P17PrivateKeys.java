@@ -18,6 +18,14 @@ public class P17PrivateKeys extends ChannelMessagePacket {
     public AsymmetricKey signatureKey;
     public AsymmetricKey derivationKey;
 
+    public P17PrivateKeys(AsymmetricKey signatureKey, AsymmetricKey derivationKey) {
+        this.signatureKey = signatureKey;
+        this.derivationKey = derivationKey;
+    }
+
+    public P17PrivateKeys() {
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         writeKey(signatureKey, buffer);

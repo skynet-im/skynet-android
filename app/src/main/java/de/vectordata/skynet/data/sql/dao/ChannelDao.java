@@ -34,4 +34,8 @@ public interface ChannelDao {
     @Query("SELECT * FROM channels")
     List<Channel> getAll();
 
+    @TypeConverters(ChannelTypeConverter.class)
+    @Query("SELECT * FROM channels WHERE channelType=:channelType")
+    List<Channel> getAllOfType(ChannelType channelType);
+
 }

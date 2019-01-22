@@ -16,18 +16,21 @@ public class ChannelMessageConfig {
 
     private List<P0BChannelMessage.Dependency> dependencies = new ArrayList<>();
 
-    public void addFlag(byte messageFlags) {
-        messageFlags |= messageFlags;
+    public ChannelMessageConfig addFlag(byte messageFlags) {
+        this.messageFlags |= messageFlags;
+        return this;
     }
 
-    public void setAttachedFile(long fileId, byte[] fileKey) {
+    public ChannelMessageConfig setAttachedFile(long fileId, byte[] fileKey) {
         this.fileId = fileId;
         this.fileKey = fileKey;
         addFlag(MessageFlags.FILE_ATTACHED);
+        return this;
     }
 
-    public void addDependency(P0BChannelMessage.Dependency dependency) {
+    public ChannelMessageConfig addDependency(P0BChannelMessage.Dependency dependency) {
         dependencies.add(dependency);
+        return this;
     }
 
     byte getMessageFlags() {

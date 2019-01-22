@@ -4,9 +4,11 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.TypeConverters;
 import androidx.room.Update;
 import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 
 @Dao
 public interface ChannelKeyDao {
@@ -23,6 +25,7 @@ public interface ChannelKeyDao {
     @Query("SELECT * FROM channelKeys WHERE channelId=:channelId AND messageId=:messageId")
     ChannelKey get(long channelId, long messageId);
 
+    @TypeConverters(ChannelTypeConverter.class)
     @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelType=:type")
     int hasKeys(ChannelType type);
 

@@ -20,6 +20,14 @@ public class P18PublicKeys extends ChannelMessagePacket {
     public AsymmetricKey signatureKey;
     public AsymmetricKey derivationKey;
 
+    public P18PublicKeys(AsymmetricKey signatureKey, AsymmetricKey derivationKey) {
+        this.signatureKey = signatureKey;
+        this.derivationKey = derivationKey;
+    }
+
+    public P18PublicKeys() {
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         writeKey(signatureKey, buffer);
