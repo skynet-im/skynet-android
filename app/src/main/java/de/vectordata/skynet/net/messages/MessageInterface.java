@@ -46,6 +46,7 @@ public class MessageInterface {
         container.dependencies = config.getDependencies();
 
         container.writeToDatabase(PacketDirection.SEND);
+        packet.setParent(container);
         packet.writeToDatabase(PacketDirection.SEND);
 
         return skynetContext.getNetworkManager().sendPacket(container);

@@ -2,6 +2,7 @@ package de.vectordata.skynet.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,6 +19,14 @@ public class Dialogs {
                 .setTitle(titleRes)
                 .setMessage(contentRes)
                 .setPositiveButton(R.string.ok, null)
+                .show();
+    }
+
+    public static void showMessageBox(Context context, int titleRes, int contentRes, DialogInterface.OnClickListener listener) {
+        new AlertDialog.Builder(context)
+                .setTitle(titleRes)
+                .setMessage(contentRes)
+                .setPositiveButton(R.string.ok, listener)
                 .show();
     }
 

@@ -1,8 +1,10 @@
 package de.vectordata.skynet.auth;
 
+import java.io.Serializable;
+
 import de.vectordata.skynet.crypto.hash.KeyCollection;
 
-public class Session {
+public class Session implements Serializable {
 
     private long accountId;
 
@@ -35,6 +37,6 @@ public class Session {
     }
 
     public boolean isAuthenticated() {
-        return accountId == 0 || sessionId == 0 || sessionKeys == null;
+        return !(accountId == 0 || sessionId == 0 || sessionKeys == null);
     }
 }

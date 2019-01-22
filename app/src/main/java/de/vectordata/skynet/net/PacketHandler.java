@@ -1,5 +1,7 @@
 package de.vectordata.skynet.net;
 
+import android.util.Log;
+
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
@@ -61,6 +63,8 @@ import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
+
+    private static final String TAG = "PacketHandler";
 
     private KeyProvider keyProvider;
     private NetworkManager networkManager;
@@ -148,6 +152,7 @@ public class PacketHandler {
     public void handlePacket(P0FSyncFinished packet) {
         boolean hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(ChannelType.LOOPBACK) != 0;
         if (!hasKeys) {
+            Log.d(TAG, "No loopback keys found, generating...");
             EC.KeyMaterial signature = EC.generateKeypair();
             EC.KeyMaterial derivation = EC.generateKeypair();
             if (signature == null || derivation == null)

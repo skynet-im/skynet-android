@@ -42,16 +42,17 @@ public class P0BChannelMessage implements Packet {
         buffer.writeInt64(channelId);
         buffer.writeInt64(messageId);
         buffer.writeByte(messageFlags);
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0) buffer.writeInt64(fileId);
+        if (hasMessageFlag(MessageFlags.FILE_ATTACHED)) buffer.writeInt64(fileId);
         buffer.writeByte(contentPacketId);
         buffer.writeByte(contentPacketVersion);
 
-        KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
-        PacketBuffer encryptedBuffer = new PacketBuffer();
-        encryptedBuffer.writeByteArray(contentPacket, true);
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
-            encryptedBuffer.writeByteArray(fileKey, true);
-        AesStatic.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+        if (hasMessageFlag(MessageFlags.UNENCRYPTED)) writeContents(buffer);
+        else {
+            KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
+            PacketBuffer encryptedBuffer = new PacketBuffer();
+            writeContents(encryptedBuffer);
+            AesStatic.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+        }
 
         buffer.writeUInt16(dependencies.size());
         for (Dependency dependency : dependencies) {
@@ -59,6 +60,12 @@ public class P0BChannelMessage implements Packet {
             buffer.writeInt64(dependency.channelId);
             buffer.writeInt64(dependency.messageId);
         }
+    }
+
+    private void writeContents(PacketBuffer buffer) {
+        buffer.writeByteArray(contentPacket, true);
+        if (hasMessageFlag(MessageFlags.FILE_ATTACHED))
+            buffer.writeByteArray(fileKey, true);
     }
 
     @Override

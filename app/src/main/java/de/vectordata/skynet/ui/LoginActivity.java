@@ -35,10 +35,10 @@ public class LoginActivity extends SkynetActivity {
         EditText emailInput = findViewById(R.id.input_email);
         EditText passwordInput = findViewById(R.id.input_password);
 
-        String username = emailInput.getText().toString();
-        String password = passwordInput.getText().toString();
-
         findViewById(R.id.button_login).setOnClickListener(v -> {
+            String username = emailInput.getText().toString();
+            String password = passwordInput.getText().toString();
+
             progressDialog = Dialogs.showProgressDialog(this, R.string.progress_login_preparing, false);
             HashProvider.buildHashesAsync(username, password,
                     result -> firebaseAndLogin(emailInput.getText().toString(), result)
@@ -87,6 +87,7 @@ public class LoginActivity extends SkynetActivity {
                         session.setSessionId(p.sessionId);
                         session.setAccountId(p.accountId);
                         Storage.setSession(session);
+                        finish();
                     }
                 });
     }

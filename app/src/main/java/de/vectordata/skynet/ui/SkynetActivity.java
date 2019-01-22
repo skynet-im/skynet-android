@@ -35,19 +35,19 @@ public abstract class SkynetActivity extends AppCompatActivity {
     private void registerDialogs() {
         NetworkManager manager = SkynetContext.getCurrent().getNetworkManager();
 
-        manager.setHandshakeListener((state, ver) -> {
+        manager.setHandshakeListener((state, ver) -> runOnUiThread(() -> {
             if (state == HandshakeState.CAN_UPGRADE)
                 Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.warn_can_upgrade), ver));
             else if (state == HandshakeState.MUST_UPGRADE)
                 Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.error_must_upgrade), ver));
-        });
+        }));
 
-        manager.setAuthenticationListener((state) -> {
+        manager.setAuthenticationListener((state) -> runOnUiThread(() -> {
             if (state == RestoreSessionError.INVALID_CREDENTIALS)
                 Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
             else if (state == RestoreSessionError.INVALID_SESSION)
                 Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
-        });
+        }));
     }
 
     @Override

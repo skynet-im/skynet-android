@@ -19,8 +19,10 @@ public class P01ConnectionResponse implements Packet {
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         handshakeState = HandshakeState.values()[buffer.readByte()];
-        latestVersionCode = buffer.readInt32();
-        latestVersion = buffer.readString();
+        if (handshakeState != HandshakeState.VALID) {
+            latestVersionCode = buffer.readInt32();
+            latestVersion = buffer.readString();
+        }
     }
 
     @Override

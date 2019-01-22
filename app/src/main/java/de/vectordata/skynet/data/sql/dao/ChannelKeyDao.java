@@ -8,7 +8,9 @@ import androidx.room.TypeConverters;
 import androidx.room.Update;
 import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
+import de.vectordata.skynet.data.sql.converters.KeyTypeConverter;
 
 @Dao
 public interface ChannelKeyDao {
@@ -29,7 +31,8 @@ public interface ChannelKeyDao {
     @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelType=:type")
     int hasKeys(ChannelType type);
 
-    @Query("SELECT * FROM channelKeys WHERE channelId=:channelId ORDER BY messageId DESC LIMIT 1")
-    ChannelKey getLast(long channelId);
+    @TypeConverters(KeyTypeConverter.class)
+    @Query("SELECT * FROM channelKeys WHERE channelId=:channelId AND keyType=:keyType ORDER BY messageId DESC LIMIT 1")
+    ChannelKey getLast(long channelId, KeyType keyType);
 
 }

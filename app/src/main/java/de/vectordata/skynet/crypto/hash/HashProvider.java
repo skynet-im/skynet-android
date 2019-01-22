@@ -3,6 +3,7 @@ package de.vectordata.skynet.crypto.hash;
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -50,13 +51,19 @@ public class HashProvider {
         }
     }
 
-    private static byte[] getBytes(String str) {
+    public static byte[] sha512(byte[] buf) {
         try {
-            return str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            digest.update(buf);
+            return digest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "Failed to compute SHA-512 hash", e);
+            return null;
         }
-        return null;
+    }
+
+    private static byte[] getBytes(String str) {
+        return str.getBytes(StandardCharsets.UTF_8);
     }
 
 }

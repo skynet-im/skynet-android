@@ -94,7 +94,7 @@ public class NetworkManager implements VSLClientListener {
         sendPacket(new P00ConnectionHandshake(Version.PROTOCOL_VERSION, Version.APPLICATION_IDENTIFIER, Version.VERSION_CODE))
                 .waitForPacket(P01ConnectionResponse.class, p -> {
                     if (p.handshakeState == HandshakeState.MUST_UPGRADE) {
-                        Log.e(TAG, "Server rejected connection: version too old");
+                        Log.e(TAG, "Server rejected connection: version too old, update to " + p.latestVersionCode);
                         raiseHandshakeEvent(HandshakeState.MUST_UPGRADE, p.latestVersion);
                         connectionState = ConnectionState.DISCONNECTED;
                         return;
@@ -113,6 +113,7 @@ public class NetworkManager implements VSLClientListener {
 
     @Override
     public void onPacketReceived(byte id, byte[] payload) {
+        Log.d(TAG, "Received packet " + id);
         packetHandler.handlePacket(id, payload);
     }
 

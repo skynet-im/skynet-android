@@ -1,8 +1,10 @@
 package de.vectordata.skynet.crypto.keys;
 
+import java.io.Serializable;
+
 import de.vectordata.libjvsl.util.Util;
 
-public class KeyStore {
+public class KeyStore implements Serializable {
 
     private byte[] aesKey;
     private byte[] hmacKey;

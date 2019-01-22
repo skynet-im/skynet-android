@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 
 import java.util.Objects;
@@ -24,34 +25,36 @@ public class CreateAccountActivity extends SkynetActivity {
         setContentView(R.layout.activity_create_account);
         Activities.setStatusBarTranslucent(this);
 
-        String email = ((EditText) findViewById(R.id.input_email)).getText().toString();
-        String nickname = ((EditText) findViewById(R.id.input_nickname)).getText().toString();
-        String password = ((EditText) findViewById(R.id.input_password)).getText().toString();
-        String passwordConfirm = ((EditText) findViewById(R.id.input_password_confirm)).getText().toString();
+        EditText email = findViewById(R.id.input_email);
+        EditText nickname = findViewById(R.id.input_nickname);
+        EditText password = findViewById(R.id.input_password);
+        EditText passwordConfirm = findViewById(R.id.input_password_confirm);
 
-        if (!Objects.equals(password, passwordConfirm)) {
-            Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_passwords_not_matching);
-            return;
-        }
-
-        findViewById(R.id.button_login).setOnClickListener(v -> HashProvider.buildHashesAsync(email, password, result -> createAccount(email, result.getKeyHash())));
+        findViewById(R.id.button_login).setOnClickListener(v -> {
+            if (!Objects.equals(password.getText().toString(), passwordConfirm.getText().toString())) {
+                Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_passwords_not_matching);
+                return;
+            }
+            HashProvider.buildHashesAsync(email.getText().toString(), password.getText().toString(), result -> createAccount(email.getText().toString(), result.getKeyHash()));
+        });
     }
 
     private void createAccount(String accountName, byte[] keyHash) {
         runOnUiThread(() ->
                 progressDialog = Dialogs.showProgressDialog(this, R.string.progress_creating_account, false)
         );
+        Log.d("CreateAccountActivity", "Creating user with " + accountName + " and " + keyHash.length);
         getSkynetContext().getNetworkManager()
                 .sendPacket(new P02CreateAccount(accountName, keyHash))
-                .waitForPacket(P03CreateAccountResponse.class, packet -> {
+                .waitForPacket(P03CreateAccountResponse.class, packet -> runOnUiThread(() -> {
                     progressDialog.dismiss();
                     if (packet.errorCode == CreateAccountError.ACCOUNT_NAME_TAKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_account_name_taken);
                     else if (packet.errorCode == CreateAccountError.INVALID_ACCOUNT_NAME)
                         Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_account_name_invalid);
                     else if (packet.errorCode == CreateAccountError.SUCCESS)
-                        Dialogs.showMessageBox(this, R.string.success_header_create_acc, R.string.success_create_acc);
-                });
+                        Dialogs.showMessageBox(this, R.string.success_header_create_acc, R.string.success_create_acc, (x, y) -> finish());
+                }));
     }
 
     @Override
