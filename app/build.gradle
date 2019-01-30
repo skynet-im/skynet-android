@@ -4,7 +4,6 @@ apply plugin: 'com.google.gms.google-services'
 repositories {
     maven { url 'https://skynet-messenger.com/artifactory-gradle/' }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    maven { url "https://jitpack.io" }
 }
 
 android {
@@ -51,6 +50,7 @@ dependencies {
     implementation 'com.takisoft.preferencex:preferencex:1.0.0-alpha2'
     implementation 'com.takisoft.preferencex:preferencex-ringtone:1.0.0-alpha2'
     implementation 'com.takisoft.preferencex:preferencex-colorpicker:1.0.0-alpha2'
+    implementation 'de.psdev.licensesdialog:licensesdialog:2.0.0'
 
     annotationProcessor 'androidx.room:room-compiler:2.1.0-alpha04'
     testImplementation 'androidx.room:room-testing:2.1.0-alpha04'

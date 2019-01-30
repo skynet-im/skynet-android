@@ -4,11 +4,14 @@ import android.os.Bundle;
 
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import androidx.annotation.Nullable;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
+import de.psdev.licensesdialog.LicensesDialog;
+import de.vectordata.skynet.BuildConfig;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.util.Activities;
@@ -40,6 +43,18 @@ public class PreferencesActivity extends ThemedActivity {
                 Objects.requireNonNull(getActivity()).recreate();
                 return true;
             });
+
+            findPreference("licenses").setOnPreferenceClickListener(preference -> {
+                new LicensesDialog.Builder(Objects.requireNonNull(getContext()))
+                        .setTitle(R.string.pref_licenses)
+                        .setNotices(R.raw.licenses)
+                        .setIncludeOwnLicense(true)
+                        .build()
+                        .show();
+                return true;
+            });
+
+            findPreference("version").setSummary(String.format(Locale.getDefault(), "%s (build %d)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
         }
     }
 

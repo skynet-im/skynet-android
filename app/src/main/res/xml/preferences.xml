@@ -59,12 +59,13 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_header_info">
         <Preference
-            app:key="version"
-            app:summary="0.8.0 (build 55)"
-            app:title="@string/pref_version" />
-        <Preference
             app:key="licenses"
             app:summary="@string/pref_licenses_summary"
             app:title="@string/pref_licenses" />
+        <Preference
+            app:enabled="false"
+            app:key="version"
+            app:summary="%version%"
+            app:title="@string/pref_version" />
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

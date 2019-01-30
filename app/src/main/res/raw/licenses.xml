@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<notices>
+    <notice>
+        <name>Emoji</name>
+        <url>https://github.com/vanniktech/Emoji</url>
+        <copyright>Copyright (C) 2016 Vanniktech - Niklas Baudy</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>preferencex-android</name>
+        <url>https://github.com/takisoft/preferencex-android</url>
+        <copyright>Copyright Takisoft</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>fast-serialization</name>
+        <url>https://github.com/RuedigerMoeller/fast-serialization</url>
+        <copyright>Copyright 2012-2014 Ruediger Moeller</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+</notices>
