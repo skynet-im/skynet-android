@@ -7,8 +7,7 @@
             android:defaultValue="default"
             android:entries="@array/pref_color_theme_keys"
             android:entryValues="@array/pref_color_theme_values"
-            android:summary="%s"
-            app:key="colorTheme"
+            app:key="color_theme"
             app:title="@string/pref_color_theme" />
 
         <SwitchPreferenceCompat
@@ -22,7 +21,7 @@
             app:title="@string/pref_sounds" />
 
         <SwitchPreferenceCompat
-            app:key="enterToSend"
+            app:key="enter_to_send"
             app:summary="@string/pref_enter_to_send_summary"
             app:title="@string/pref_enter_to_send" />
     </PreferenceCategory>
@@ -48,13 +47,13 @@
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:dependency="notifications"
-            app:key="statusLed"
+            app:key="status_led"
             app:title="@string/pref_status_led" />
 
         <ColorPickerPreference
             android:defaultValue="#FF00FF00"
-            android:dependency="statusLed"
-            app:key="statusLedColor"
+            android:dependency="status_led"
+            app:key="status_led_color"
             app:title="@string/pref_status_led_color" />
 
     </PreferenceCategory>

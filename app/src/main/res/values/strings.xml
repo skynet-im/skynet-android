@@ -61,26 +61,6 @@
     <string name="progress_logging_in">Logging in…</string>
     <string name="progress_creating_account">Creating account…</string>
 
-    <string-array name="pref_color_theme_keys">
-        <item>Default</item>
-        <item>Light</item>
-        <item>Dark</item>
-        <item>Blue</item>
-        <item>Red</item>
-        <item>Green</item>
-        <item>Pink</item>
-    </string-array>
-
-    <string-array name="pref_color_theme_values" translatable="false">
-        <item>default</item>
-        <item>light</item>
-        <item>dark</item>
-        <item>blue</item>
-        <item>red</item>
-        <item>green</item>
-        <item>pink</item>
-    </string-array>
-
     <string name="pref_header_customize">Customize</string>
     <string name="pref_color_theme">Color theme</string>
     <string name="pref_animations">Animations</string>

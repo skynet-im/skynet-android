@@ -15,13 +15,13 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.ui.SkynetActivity;
+import de.vectordata.skynet.ui.base.ThemedActivity;
 
 /**
  * Created by Twometer on 21.01.2019.
  * (c) 2019 Twometer
  */
-public abstract class ChatActivityBase extends SkynetActivity {
+public abstract class ChatActivityBase extends ThemedActivity {
 
     public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.chat.channelId";
 

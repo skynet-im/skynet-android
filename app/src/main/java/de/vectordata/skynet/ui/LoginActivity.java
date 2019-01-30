@@ -16,6 +16,7 @@ import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.ui.base.SkynetActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.dialogs.ProgressDialog;
 import de.vectordata.skynet.util.Activities;

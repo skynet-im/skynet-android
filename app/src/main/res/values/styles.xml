@@ -1,22 +1,103 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!-- Main themes -->
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="AppTheme.Light">
+        <item name="colorPrimary">#DFDFDF</item>
+        <item name="colorPrimaryDark">#B4B4B4</item>
+        <item name="colorAccent">#009688</item>
+    </style>
+
+    <style name="AppTheme.Dark">
+        <item name="colorPrimary">#212121</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorAccent">#FFA726</item>
+        <!-- TODO Dark theme does not really work yet. -->
+        <item name="android:windowBackground">@android:color/background_dark</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorPrimary">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textColorSecondary">?android:attr/textColorSecondaryInverse</item>
+    </style>
+
+    <style name="AppTheme.Blue">
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryDark">#1E88E5</item>
+        <item name="colorAccent">#66BB6A</item>
+    </style>
+
+    <style name="AppTheme.Red">
+        <item name="colorPrimary">#F44336</item>
+        <item name="colorPrimaryDark">#E53935</item>
+        <item name="colorAccent">#4CAF50</item>
+    </style>
+
+    <style name="AppTheme.Green">
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorPrimaryDark">#388E3C</item>
+        <item name="colorAccent">#E91E63</item>
+    </style>
+
+    <style name="AppTheme.Purple">
+        <item name="colorPrimary">#673AB7</item>
+        <item name="colorPrimaryDark">#512DA8</item>
+        <item name="colorAccent">#FF8F00</item>
+    </style>
+
+    <style name="AppTheme.Pink">
+        <item name="colorPrimary">#FF8BB4</item>
+        <item name="colorPrimaryDark">#EE82A9</item>
+        <item name="colorAccent">#A82CFF</item>
+    </style>
+
+    <!-- Helper styles for activities that modify the action bar -->
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.TransparentStatusBar" parent="AppTheme.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
+    <style name="AppTheme.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="AppTheme.Dark.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Blue.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Red.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Green.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Purple.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Pink.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Widget styles -->
 
     <style name="AppTheme.BorderlessButton" parent="Widget.AppCompat.Button.Borderless.Colored" />
 

@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui.chat;
 
+import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,11 +20,14 @@ import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.MessageState;
+import de.vectordata.skynet.util.Handlers;
 
 public class ChatActivityDirect extends ChatActivityBase {
 
     private Channel directChannel;
     private Channel profileDataChannel;
+
+    private Handler databaseHandler = Handlers.createOnThread("DatabaseThread");
 
     @Override
     public void initialize() {
@@ -31,9 +35,13 @@ public class ChatActivityDirect extends ChatActivityBase {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         long channelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
-        directChannel = Storage.getDatabase().channelDao().getById(channelId);
-        profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getOther(), ChannelType.PROFILE_DATA);
-        List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
+        databaseHandler.post(() -> {
+            directChannel = Storage.getDatabase().channelDao().getById(channelId);
+            if (directChannel != null) {
+                profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getOther(), ChannelType.PROFILE_DATA);
+                List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
+            }
+        });
 
         List<MessageItem> items = new ArrayList<>();
         items.add(MessageItem.newSystemMessage("YESTERDAY"));
@@ -52,6 +60,8 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     @Override
     public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
+        if (profileDataChannel == null)
+            return;
         String nicknameVal = Storage.getDatabase().nicknameDao().last(profileDataChannel.getChannelId()).getNickname();
 
         nickname.setText(nicknameVal);

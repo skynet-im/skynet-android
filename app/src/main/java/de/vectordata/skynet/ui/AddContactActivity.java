@@ -9,11 +9,12 @@ import de.vectordata.skynet.R;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P2DSearchAccount;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
+import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.dialogs.ProgressDialog;
 import de.vectordata.skynet.util.Activities;
 
-public class AddContactActivity extends SkynetActivity {
+public class AddContactActivity extends ThemedActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

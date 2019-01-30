@@ -18,11 +18,11 @@ import de.vectordata.skynet.ui.AddContactActivity;
 import de.vectordata.skynet.ui.LoginActivity;
 import de.vectordata.skynet.ui.NewGroupActivity;
 import de.vectordata.skynet.ui.PreferencesActivity;
-import de.vectordata.skynet.ui.SkynetActivity;
+import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.main.fab.FabController;
 import de.vectordata.skynet.ui.main.fab.FabState;
 
-public class MainActivity extends SkynetActivity {
+public class MainActivity extends ThemedActivity {
 
     private static final String TAG = "MainActivity";
 
@@ -87,6 +87,11 @@ public class MainActivity extends SkynetActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected boolean hasCustomToolbar() {
+        return true;
     }
 
 }

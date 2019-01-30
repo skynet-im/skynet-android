@@ -8,7 +8,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.util.OnItemClickListener;
+import de.vectordata.skynet.ui.util.OnItemClickListener;
 
 /**
  * Created by Twometer on 14.12.2018.

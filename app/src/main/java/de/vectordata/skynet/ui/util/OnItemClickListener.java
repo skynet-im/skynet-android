@@ -1,4 +1,4 @@
-package de.vectordata.skynet.util;
+package de.vectordata.skynet.ui.util;
 
 public interface OnItemClickListener {
 

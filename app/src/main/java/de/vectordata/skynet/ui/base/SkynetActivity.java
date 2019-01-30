@@ -1,4 +1,4 @@
-package de.vectordata.skynet.ui;
+package de.vectordata.skynet.ui.base;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -58,4 +58,5 @@ public abstract class SkynetActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
