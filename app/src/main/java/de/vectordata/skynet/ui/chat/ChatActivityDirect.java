@@ -16,6 +16,10 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.listener.PacketListener;
+import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
@@ -73,6 +77,8 @@ public class ChatActivityDirect extends ChatActivityBase {
         messageItems.add(new MessageItem("Sehr gut", ago(0, 35, 0), MessageState.SENT, MessageSide.RIGHT));
 
         recyclerView.setAdapter(adapter);
+
+        SkynetContext.getCurrent().getNetworkManager().setPacketListener(new PacketHandler());
     }
 
     @Override
@@ -90,4 +96,27 @@ public class ChatActivityDirect extends ChatActivityBase {
     private DateTime ago(int hr, int min, int sec) {
         return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
     }
+
+    /**
+     * Updates the current activity with
+     * new messages / message changes
+     */
+    private class PacketHandler implements PacketListener {
+
+        @Override
+        public void onPacket(Packet packet) {
+            long myAccountId = Storage.getSession().getAccountId();
+
+            if (packet instanceof P20ChatMessage) {
+                P20ChatMessage chatMessage = (P20ChatMessage) packet;
+                MessageState messageState = /* TODO */ MessageState.SENDING;
+                MessageSide messageSide = chatMessage.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
+                messageItems.add(new MessageItem(chatMessage.text, chatMessage.getParent().dispatchTime, messageState, messageSide));
+                runOnUiThread(() -> adapter.notifyItemInserted(messageItems.size() - 1));
+            }
+
+        }
+
+    }
+
 }

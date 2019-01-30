@@ -11,6 +11,7 @@ import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.model.PacketDirection;
@@ -70,6 +71,8 @@ public class PacketHandler {
     private NetworkManager networkManager;
     private ResponseAwaiter responseAwaiter;
 
+    private PacketListener packetListener;
+
     public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager, ResponseAwaiter responseAwaiter) {
         this.keyProvider = keyProvider;
         this.networkManager = networkManager;
@@ -98,6 +101,12 @@ public class PacketHandler {
 
         packet.handlePacket(this);
         responseAwaiter.onPacket(packet);
+        if (packetListener != null)
+            packetListener.onPacket(packet);
+    }
+
+    void setPacketListener(PacketListener packetListener) {
+        this.packetListener = packetListener;
     }
 
     public void handlePacket(P01ConnectionResponse packet) {

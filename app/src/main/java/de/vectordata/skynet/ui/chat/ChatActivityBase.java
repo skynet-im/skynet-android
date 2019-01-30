@@ -13,7 +13,6 @@ import com.vanniktech.emoji.EmojiPopup;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 
@@ -24,8 +23,6 @@ import de.vectordata.skynet.ui.base.ThemedActivity;
 public abstract class ChatActivityBase extends ThemedActivity {
 
     public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.chat.channelId";
-
-    protected RecyclerView recyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

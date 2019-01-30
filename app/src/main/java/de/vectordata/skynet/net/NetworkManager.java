@@ -15,6 +15,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.net.listener.AuthenticationListener;
 import de.vectordata.skynet.net.listener.ErrorListener;
 import de.vectordata.skynet.net.listener.HandshakeListener;
+import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -158,6 +159,10 @@ public class NetworkManager implements VSLClientListener {
 
     public void setErrorListener(ErrorListener errorListener) {
         this.errorListener = errorListener;
+    }
+
+    public void setPacketListener(PacketListener packetListener) {
+        this.packetHandler.setPacketListener(packetListener);
     }
 
     public ConnectionState getConnectionState() {
