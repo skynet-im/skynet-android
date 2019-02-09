@@ -36,6 +36,7 @@
     <string name="error_invalid_credentials">Username or password incorrect. Please try again.</string>
     <string name="error_invalid_credentials_restore">We could not restore your session, maybe you have changed your password. Please log in again.</string>
     <string name="error_invalid_session">Your session store was corrupted. Please log in again.</string>
+    <string name="error_unconfirmed_account">Your account is not yet confirmed. Please click on the link we sent you via email to confirm your account.</string>
     <string name="error_account_name_taken">Sorry, this account name is already taken. Please try a different one.</string>
     <string name="error_account_name_invalid">Sorry, this account name is invalid. Please try a different one.</string>
     <string name="error_passwords_not_matching">The passwords you entered do not match.</string>

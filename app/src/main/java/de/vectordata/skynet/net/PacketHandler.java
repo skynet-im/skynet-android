@@ -99,6 +99,8 @@ public class PacketHandler {
         } else if (packet instanceof RealtimeMessagePacket)
             ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
+        Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
+
         packet.handlePacket(this);
         responseAwaiter.onPacket(packet);
         if (packetListener != null)

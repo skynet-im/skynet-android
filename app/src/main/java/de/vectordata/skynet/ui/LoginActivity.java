@@ -78,19 +78,21 @@ public class LoginActivity extends SkynetActivity {
         Session session = new Session(keys);
 
         networkManager.sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
-                .waitForPacket(P07CreateSessionResponse.class, p -> {
+                .waitForPacket(P07CreateSessionResponse.class, p -> runOnUiThread(() -> {
                     progressDialog.dismiss();
                     if (p.errorCode == CreateSessionError.INVALID_FCM_TOKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);
                     else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
+                    else if(p.errorCode == CreateSessionError.UNCONFIRMED_ACCOUNT)
+                        Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_unconfirmed_account);
                     else if (p.errorCode == CreateSessionError.SUCCESS) {
                         session.setSessionId(p.sessionId);
                         session.setAccountId(p.accountId);
                         Storage.setSession(session);
                         finish();
                     }
-                });
+                }));
     }
 
     @Override

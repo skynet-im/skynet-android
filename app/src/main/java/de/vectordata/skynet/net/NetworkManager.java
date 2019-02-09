@@ -75,6 +75,7 @@ public class NetworkManager implements VSLClientListener {
         else {
             PacketBuffer buffer = new PacketBuffer();
             packet.writePacket(buffer, skynetContext);
+            Log.d(TAG, "Sending packet 0x" + Integer.toHexString(packet.getId()));
             vslClient.sendPacket(packet.getId(), buffer.toArray());
         }
         return responseAwaiter;

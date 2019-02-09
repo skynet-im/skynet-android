@@ -1,5 +1,8 @@
 package de.vectordata.skynet.net.packet;
 
+import android.os.Message;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,7 @@ public class P0BChannelMessage implements Packet {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+
         buffer.writeByte(packetVersion);
         buffer.writeInt64(channelId);
         buffer.writeInt64(messageId);
@@ -45,7 +49,7 @@ public class P0BChannelMessage implements Packet {
         if (hasMessageFlag(MessageFlags.FILE_ATTACHED)) buffer.writeInt64(fileId);
         buffer.writeByte(contentPacketId);
         buffer.writeByte(contentPacketVersion);
-
+        Log.d("P0BChannelMessage", String.format("Writing channel Message with content id %s: unencrypted=%s fileAttached=%s", contentPacketId, hasMessageFlag(MessageFlags.UNENCRYPTED), hasMessageFlag(MessageFlags.FILE_ATTACHED)));
         if (hasMessageFlag(MessageFlags.UNENCRYPTED)) writeContents(buffer);
         else {
             KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
@@ -68,6 +72,12 @@ public class P0BChannelMessage implements Packet {
             buffer.writeByteArray(fileKey, true);
     }
 
+    private void readContents(PacketBuffer packetBuffer) {
+        contentPacket = packetBuffer.readByteArray();
+        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
+            fileKey = packetBuffer.readByteArray();
+    }
+
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         dependencies.clear();
@@ -78,16 +88,15 @@ public class P0BChannelMessage implements Packet {
         skipCount = buffer.readInt64();
         dispatchTime = buffer.readDate();
         messageFlags = buffer.readByte();
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0) fileId = buffer.readInt64();
+        if (hasMessageFlag(MessageFlags.FILE_ATTACHED)) fileId = buffer.readInt64();
         contentPacketId = buffer.readByte();
         contentPacketVersion = buffer.readByte();
 
-        KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
-        byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
-        PacketBuffer decryptedBuffer = new PacketBuffer(decryptedData);
-        contentPacket = decryptedBuffer.readByteArray();
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
-            fileKey = decryptedBuffer.readByteArray();
+        if (!hasMessageFlag(MessageFlags.UNENCRYPTED)) {
+            KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
+            byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            readContents(new PacketBuffer(decryptedData));
+        } else readContents(buffer);
 
         int dependencyCount = buffer.readUInt16();
         for (int i = 0; i < dependencyCount; i++)
