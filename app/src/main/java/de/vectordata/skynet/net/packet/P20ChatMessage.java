@@ -17,6 +17,15 @@ public class P20ChatMessage extends ChannelMessagePacket {
     public String text;
     public long quotedMessage;
 
+    public P20ChatMessage(MessageType messageType, String text, long quotedMessage) {
+        this.messageType = messageType;
+        this.text = text;
+        this.quotedMessage = quotedMessage;
+    }
+
+    public P20ChatMessage() {
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);

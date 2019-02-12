@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vanniktech.emoji.EmojiEditText;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +20,11 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.listener.PacketListener;
+import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
+import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
@@ -65,7 +70,7 @@ public class ChatActivityDirect extends ChatActivityBase {
         adapter = new MessageAdapter(messageItems);
 
         // This is test data for UI demonstration purposes
-        messageItems.add(MessageItem.newSystemMessage("YESTERDAY"));
+        /*messageItems.add(MessageItem.newSystemMessage("YESTERDAY"));
         messageItems.add(new MessageItem("Hi", ago(16, 55, 0), MessageState.SEEN, MessageSide.RIGHT));
         messageItems.add(MessageItem.newSystemMessage("TODAY"));
         messageItems.add(new MessageItem("Eyy moin", ago(16, 45, 0), MessageState.SEEN, MessageSide.LEFT));
@@ -74,11 +79,18 @@ public class ChatActivityDirect extends ChatActivityBase {
         messageItems.add(new MessageItem("Mhh okay, ich kann aber morgen erst nachmittags.", ago(16, 39, 0), MessageState.SEEN, MessageSide.RIGHT));
         messageItems.add(new MessageItem("Jetzt könnte ich", ago(0, 59, 0), MessageState.SEEN, MessageSide.RIGHT));
         messageItems.add(new MessageItem("Okay komm online, jetzt bin ich am PC", ago(0, 39, 0), MessageState.SEEN, MessageSide.LEFT));
-        messageItems.add(new MessageItem("Sehr gut", ago(0, 35, 0), MessageState.SENT, MessageSide.RIGHT));
+        messageItems.add(new MessageItem("Sehr gut", ago(0, 35, 0), MessageState.SENT, MessageSide.RIGHT));*/
 
         recyclerView.setAdapter(adapter);
 
         SkynetContext.getCurrent().getNetworkManager().setPacketListener(new PacketHandler());
+
+        EmojiEditText editText = findViewById(R.id.input_message);
+        findViewById(R.id.button_send).setOnClickListener(v -> {
+            P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, editText.getText().toString(), 0);
+            // TODO: Remove the unencrypted flag (this is just for testing)
+            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(directChannel, new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED), packet);
+        });
     }
 
     @Override
