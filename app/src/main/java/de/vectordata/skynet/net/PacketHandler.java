@@ -2,14 +2,18 @@ package de.vectordata.skynet.net;
 
 import android.util.Log;
 
+import java.util.List;
+
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
+import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
@@ -225,7 +229,12 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1BDirectChannelUpdate packet) {
-
+        /*long me = Storage.getSession().getAccountId();
+        P0BChannelMessage parent = packet.getParent();
+        P0BChannelMessage.Dependency keypairReferenceDependency = parent.getDependency(d -> d.accountId == me);
+        List<Dependency> dependencies = Storage.getDatabase().dependencyDao().getDependencies(keypairReferenceDependency.channelId, keypairReferenceDependency.messageId);
+        ChannelKey privateKey;
+        ChannelKey publicKey;*/
     }
 
     public void handlePacket(P1CDirectChannelCustomization packet) {

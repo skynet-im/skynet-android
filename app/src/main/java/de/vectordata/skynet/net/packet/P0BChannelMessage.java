@@ -5,6 +5,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+
+import javax.crypto.spec.DESedeKeySpec;
 
 import de.vectordata.libjvsl.crypt.AesStatic;
 import de.vectordata.libjvsl.util.PacketBuffer;
@@ -18,6 +21,7 @@ import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
+import de.vectordata.skynet.util.Selector;
 
 public class P0BChannelMessage implements Packet {
 
@@ -133,5 +137,12 @@ public class P0BChannelMessage implements Packet {
             this.channelId = channelId;
             this.messageId = messageId;
         }
+    }
+
+    public Dependency getDependency(Selector<Dependency> selector) {
+        for (Dependency dep : dependencies)
+            if (selector.test(dep))
+                return dep;
+        return null;
     }
 }

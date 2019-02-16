@@ -13,6 +13,16 @@ public class P0ACreateChannel implements Packet {
     public long ownerId;
     public long counterpartId;
 
+    public P0ACreateChannel() {
+    }
+
+    public P0ACreateChannel(long channelId, ChannelType channelType, long ownerId, long counterpartId) {
+        this.channelId = channelId;
+        this.channelType = channelType;
+        this.ownerId = ownerId;
+        this.counterpartId = counterpartId;
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(channelId);

@@ -67,7 +67,7 @@ public class MessageInterface {
         return skynetContext.getNetworkManager().sendPacket(container);
     }
 
-    private long newId() {
+    public static long newId() {
         long id;
         do id = idRandom.nextLong(); while (id == 0);
         if (id > 0) id = -id;
