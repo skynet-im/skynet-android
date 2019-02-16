@@ -44,9 +44,14 @@ public class ChatsFragment extends Fragment {
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatsItem> items = new ArrayList<>();
             for (Channel channel : channels) {
-                ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId(), 1).get(0);
-                ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
-                ChatsItem item = new ChatsItem(Long.toHexString(channel.getOther()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, 0, channelMessage.getChannelId());
+                List<ChatMessage> latestMessages = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId(), 1);
+                ChatsItem item;
+                if (latestMessages.size() > 0) {
+                    ChatMessage latestMessage = latestMessages.get(0);
+                    ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
+                    item = new ChatsItem(Long.toHexString(channel.getOther()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, 0, channel.getChannelId());
+                } else
+                    item = new ChatsItem(Long.toHexString(channel.getOther()), "No content", DateTime.now(), 0, 0, channel.getChannelId());
                 items.add(item);
             }
             getActivity().runOnUiThread(() -> {

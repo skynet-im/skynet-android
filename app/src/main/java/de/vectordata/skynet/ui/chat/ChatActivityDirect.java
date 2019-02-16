@@ -23,7 +23,6 @@ import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.base.Packet;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
@@ -89,7 +88,9 @@ public class ChatActivityDirect extends ChatActivityBase {
         findViewById(R.id.button_send).setOnClickListener(v -> {
             P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, editText.getText().toString(), 0);
             // TODO: Remove the unencrypted flag (this is just for testing)
-            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(directChannel, new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED), packet);
+            databaseHandler.post(() -> {
+                SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(directChannel, new ChannelMessageConfig(), packet);
+            });
         });
     }
 

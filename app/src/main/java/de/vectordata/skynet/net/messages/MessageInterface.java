@@ -30,9 +30,6 @@ public class MessageInterface {
     }
 
     public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        PacketBuffer buffer = new PacketBuffer();
-        packet.writePacket(buffer, skynetContext);
-
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
         container.messageId = newId();
@@ -41,9 +38,13 @@ public class MessageInterface {
         container.fileId = config.getFileId();
         container.contentPacketId = packet.getId();
         container.contentPacketVersion = PACKET_VERSION;
-        container.contentPacket = buffer.toArray();
         container.fileKey = config.getFileKey();
         container.dependencies = config.getDependencies();
+
+        PacketBuffer buffer = new PacketBuffer();
+        packet.setParent(container);
+        packet.writePacket(buffer, skynetContext);
+        container.contentPacket = buffer.toArray();
 
         container.writeToDatabase(PacketDirection.SEND);
         packet.setParent(container);

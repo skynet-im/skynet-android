@@ -2,18 +2,14 @@ package de.vectordata.skynet.net;
 
 import android.util.Log;
 
-import java.util.List;
-
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
-import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
-import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
@@ -95,13 +91,15 @@ public class PacketHandler {
         if (packet == null)
             return;
 
+        if (packet instanceof ChannelMessagePacket)
+            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
+        else if (packet instanceof RealtimeMessagePacket)
+            ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
+
         packet.readPacket(new PacketBuffer(payload), keyProvider);
 
-        if (packet instanceof ChannelMessagePacket) {
-            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
+        if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).writeToDatabase(PacketDirection.RECEIVE);
-        } else if (packet instanceof RealtimeMessagePacket)
-            ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
         Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
 
