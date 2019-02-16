@@ -1,4 +1,4 @@
-package de.vectordata.skynet.ui.util;
+package de.vectordata.skynet.data.model.enums;
 
 import android.widget.ImageView;
 

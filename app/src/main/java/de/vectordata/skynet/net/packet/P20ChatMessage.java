@@ -58,5 +58,6 @@ public class P20ChatMessage extends ChannelMessagePacket {
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
         Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this));
+        System.out.println("Chat message writing to db");
     }
 }

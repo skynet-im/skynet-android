@@ -18,9 +18,11 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
+import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
@@ -28,7 +30,6 @@ import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.MessageSide;
-import de.vectordata.skynet.ui.util.MessageState;
 import de.vectordata.skynet.util.Handlers;
 
 public class ChatActivityDirect extends ChatActivityBase {
@@ -39,12 +40,16 @@ public class ChatActivityDirect extends ChatActivityBase {
     private Handler databaseHandler = Handlers.createOnThread("DatabaseThread");
 
     List<MessageItem> messageItems;
+
+    private RecyclerView recyclerView;
     private MessageAdapter adapter;
 
     @Override
     public void initialize() {
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        messageItems = new ArrayList<>();
 
         long channelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
         long myAccountId = Storage.getSession().getAccountId();
@@ -54,32 +59,25 @@ public class ChatActivityDirect extends ChatActivityBase {
 
             profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getOther(), ChannelType.PROFILE_DATA);
 
-            List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
+            List<ChatMessage> messagesx = Storage.getDatabase().chatMessageDao().query(channelId);
+            for (ChatMessage x : messagesx)
+                System.out.println("MESSAGE => " + x.getMessageId() + "; " + x.getText());
+
+            List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryAfter(channelId, directChannel.getLatestMessage() - 50);
             for (ChatMessage message : messages) {
                 ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
-                MessageState messageState = /* TODO */ MessageState.SENDING;
+                MessageState messageState = message.getMessageState();
                 MessageSide messageSide = parent.getSenderId() == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-                messageItems.add(new MessageItem(message.getText(), parent.getDispatchTime(), messageState, messageSide));
+                messageItems.add(new MessageItem(message.getMessageId(), message.getText(), parent.getDispatchTime(), messageState, messageSide));
             }
 
-            runOnUiThread(adapter::notifyDataSetChanged);
+            runOnUiThread(() -> {
+                adapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(messageItems.size() - 1);
+            });
         });
 
-        messageItems = new ArrayList<>();
         adapter = new MessageAdapter(messageItems);
-
-        // This is test data for UI demonstration purposes
-        /*messageItems.add(MessageItem.newSystemMessage("YESTERDAY"));
-        messageItems.add(new MessageItem("Hi", ago(16, 55, 0), MessageState.SEEN, MessageSide.RIGHT));
-        messageItems.add(MessageItem.newSystemMessage("TODAY"));
-        messageItems.add(new MessageItem("Eyy moin", ago(16, 45, 0), MessageState.SEEN, MessageSide.LEFT));
-        messageItems.add(new MessageItem("Lass uns mal ne Runde zocken, ich will meine neue Grafikkarte ausprobieren \uD83D\uDE02", ago(16, 45, 0), MessageState.SEEN, MessageSide.RIGHT));
-        messageItems.add(new MessageItem("Ne mann ich geh jetzt ins Bett, morgen dann", ago(16, 40, 0), MessageState.SEEN, MessageSide.LEFT));
-        messageItems.add(new MessageItem("Mhh okay, ich kann aber morgen erst nachmittags.", ago(16, 39, 0), MessageState.SEEN, MessageSide.RIGHT));
-        messageItems.add(new MessageItem("Jetzt könnte ich", ago(0, 59, 0), MessageState.SEEN, MessageSide.RIGHT));
-        messageItems.add(new MessageItem("Okay komm online, jetzt bin ich am PC", ago(0, 39, 0), MessageState.SEEN, MessageSide.LEFT));
-        messageItems.add(new MessageItem("Sehr gut", ago(0, 35, 0), MessageState.SENT, MessageSide.RIGHT));*/
-
         recyclerView.setAdapter(adapter);
 
         SkynetContext.getCurrent().getNetworkManager().setPacketListener(new PacketHandler());
@@ -87,10 +85,11 @@ public class ChatActivityDirect extends ChatActivityBase {
         EmojiEditText editText = findViewById(R.id.input_message);
         findViewById(R.id.button_send).setOnClickListener(v -> {
             P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, editText.getText().toString(), 0);
-            // TODO: Remove the unencrypted flag (this is just for testing)
             databaseHandler.post(() -> {
                 SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(directChannel, new ChannelMessageConfig(), packet);
+                insertMessage(packet);
             });
+            editText.setText("");
         });
     }
 
@@ -110,6 +109,17 @@ public class ChatActivityDirect extends ChatActivityBase {
         return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
     }
 
+    private void insertMessage(P20ChatMessage msg) {
+        long myAccountId = Storage.getSession().getAccountId();
+        MessageState messageState = MessageState.SENDING;
+        MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
+        messageItems.add(new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide));
+        runOnUiThread(() -> {
+            adapter.notifyItemInserted(messageItems.size() - 1);
+            recyclerView.scrollToPosition(messageItems.size() - 1);
+        });
+    }
+
     /**
      * Updates the current activity with
      * new messages / message changes
@@ -118,16 +128,21 @@ public class ChatActivityDirect extends ChatActivityBase {
 
         @Override
         public void onPacket(Packet packet) {
-            long myAccountId = Storage.getSession().getAccountId();
-
             if (packet instanceof P20ChatMessage) {
-                P20ChatMessage chatMessage = (P20ChatMessage) packet;
-                MessageState messageState = /* TODO */ MessageState.SENDING;
-                MessageSide messageSide = chatMessage.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-                messageItems.add(new MessageItem(chatMessage.text, chatMessage.getParent().dispatchTime, messageState, messageSide));
-                runOnUiThread(() -> adapter.notifyItemInserted(messageItems.size() - 1));
+                insertMessage((P20ChatMessage) packet);
+            } else if (packet instanceof P0CChannelMessageResponse) {
+                P0CChannelMessageResponse r = ((P0CChannelMessageResponse) packet);
+                int idx = 0;
+                for (MessageItem item : messageItems) {
+                    if (item.getMessageId() == r.tempMessageId) {
+                        item.setMessageId(r.messageId);
+                        item.setMessageState(MessageState.SENT);
+                        int currentIdx = idx;
+                        runOnUiThread(() -> adapter.notifyItemChanged(currentIdx));
+                    }
+                    idx++;
+                }
             }
-
         }
 
     }

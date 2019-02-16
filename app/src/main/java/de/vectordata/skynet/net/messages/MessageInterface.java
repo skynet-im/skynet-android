@@ -3,6 +3,8 @@ package de.vectordata.skynet.net.messages;
 import java.util.Random;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
@@ -33,6 +35,7 @@ public class MessageInterface {
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
         container.messageId = newId();
+        container.senderId = Storage.getSession().getAccountId();
         container.packetVersion = PACKET_VERSION;
         container.messageFlags = config.getMessageFlags();
         container.fileId = config.getFileId();
@@ -40,6 +43,7 @@ public class MessageInterface {
         container.contentPacketVersion = PACKET_VERSION;
         container.fileKey = config.getFileKey();
         container.dependencies = config.getDependencies();
+        container.dispatchTime = DateTime.now();
 
         PacketBuffer buffer = new PacketBuffer();
         packet.setParent(container);
@@ -47,7 +51,6 @@ public class MessageInterface {
         container.contentPacket = buffer.toArray();
 
         container.writeToDatabase(PacketDirection.SEND);
-        packet.setParent(container);
         packet.writeToDatabase(PacketDirection.SEND);
 
         return skynetContext.getNetworkManager().sendPacket(container);

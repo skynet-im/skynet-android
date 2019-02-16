@@ -1,13 +1,9 @@
 package de.vectordata.skynet.net.packet;
 
-import android.os.Message;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-
-import javax.crypto.spec.DESedeKeySpec;
 
 import de.vectordata.libjvsl.crypt.AesStatic;
 import de.vectordata.libjvsl.util.PacketBuffer;
@@ -118,11 +114,14 @@ public class P0BChannelMessage implements Packet {
     }
 
     public void writeToDatabase(PacketDirection packetDirection) {
-        Channel channel = Storage.getDatabase().channelDao().getById(channelId);
-        if (messageId > channel.getLatestMessage()) {
-            channel.setLatestMessage(messageId);
-            Storage.getDatabase().channelDao().update(channel);
+        if (packetDirection == PacketDirection.RECEIVE) {
+            Channel channel = Storage.getDatabase().channelDao().getById(channelId);
+            if (messageId > channel.getLatestMessage()) {
+                channel.setLatestMessage(messageId);
+                Storage.getDatabase().channelDao().update(channel);
+            }
         }
+        System.out.println("Channel message writing to db");
         Storage.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
         Storage.getDatabase().dependencyDao().insert(de.vectordata.skynet.data.model.Dependency.arrayFromPacket(this, dependencies));
     }

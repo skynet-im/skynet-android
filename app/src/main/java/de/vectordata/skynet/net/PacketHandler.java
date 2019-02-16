@@ -157,9 +157,22 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
+        Log.d(TAG, "Updating message " + packet.tempMessageId + " to " + packet.messageId);
         ChannelMessage message = Storage.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
         message.setMessageId(packet.messageId);
         Storage.getDatabase().channelMessageDao().update(message);
+
+        ChatMessage chatMessage = Storage.getDatabase().chatMessageDao().query(packet.channelId, packet.tempMessageId);
+        if (chatMessage != null) {
+            chatMessage.setMessageId(packet.messageId);
+            Storage.getDatabase().chatMessageDao().update(chatMessage);
+        }
+
+        Channel channel = Storage.getDatabase().channelDao().getById(packet.channelId);
+        if (packet.messageId > channel.getLatestMessage()) {
+            channel.setLatestMessage(packet.messageId);
+            Storage.getDatabase().channelDao().update(channel);
+        }
     }
 
     public void handlePacket(P0FSyncFinished packet) {

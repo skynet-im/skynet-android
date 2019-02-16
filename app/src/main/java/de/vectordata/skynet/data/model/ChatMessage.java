@@ -3,6 +3,8 @@ package de.vectordata.skynet.data.model;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.TypeConverters;
+import de.vectordata.skynet.data.model.enums.MessageState;
+import de.vectordata.skynet.data.sql.converters.MessageStateConverter;
 import de.vectordata.skynet.data.sql.converters.MessageTypeConverter;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.model.MessageType;
@@ -30,6 +32,9 @@ public class ChatMessage {
 
     private boolean isEdited;
 
+    @TypeConverters(MessageStateConverter.class)
+    private MessageState messageState;
+
     public static ChatMessage fromPacket(P20ChatMessage packet) {
         ChatMessage message = new ChatMessage();
         message.channelId = packet.getParent().channelId;
@@ -37,6 +42,7 @@ public class ChatMessage {
         message.messageType = packet.messageType;
         message.text = packet.text;
         message.quotedMessage = packet.quotedMessage;
+        message.messageState = MessageState.SENT;
         return message;
     }
 
@@ -86,5 +92,13 @@ public class ChatMessage {
 
     public void setEdited(boolean edited) {
         isEdited = edited;
+    }
+
+    public MessageState getMessageState() {
+        return messageState;
+    }
+
+    public void setMessageState(MessageState messageState) {
+        this.messageState = messageState;
     }
 }
