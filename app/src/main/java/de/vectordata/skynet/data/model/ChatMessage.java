@@ -9,12 +9,14 @@ import de.vectordata.skynet.data.sql.converters.MessageTypeConverter;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.model.MessageType;
 
-@Entity(tableName = "chatMessages", foreignKeys = @ForeignKey(
-        entity = ChannelMessage.class,
-        parentColumns = {"channelId", "messageId"},
-        childColumns = {"channelId", "messageId"},
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.CASCADE),
+@Entity(tableName = "chatMessages", foreignKeys = {
+        @ForeignKey(
+                entity = ChannelMessage.class,
+                parentColumns = {"channelId", "messageId"},
+                childColumns = {"channelId", "messageId"},
+                onDelete = ForeignKey.CASCADE,
+                onUpdate = ForeignKey.CASCADE
+        )},
         primaryKeys = {"channelId", "messageId"}
 )
 public class ChatMessage {

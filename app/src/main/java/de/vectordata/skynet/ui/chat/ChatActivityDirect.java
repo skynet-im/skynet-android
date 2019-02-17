@@ -7,11 +7,11 @@ import android.widget.TextView;
 import com.vanniktech.emoji.EmojiEditText;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -22,14 +22,18 @@ import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
+import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.P22MessageReceived;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.MessageSide;
+import de.vectordata.skynet.util.Callback;
 import de.vectordata.skynet.util.Handlers;
 
 public class ChatActivityDirect extends ChatActivityBase {
@@ -59,11 +63,8 @@ public class ChatActivityDirect extends ChatActivityBase {
 
             profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getOther(), ChannelType.PROFILE_DATA);
 
-            List<ChatMessage> messagesx = Storage.getDatabase().chatMessageDao().query(channelId);
-            for (ChatMessage x : messagesx)
-                System.out.println("MESSAGE => " + x.getMessageId() + "; " + x.getText());
-
-            List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryAfter(channelId, directChannel.getLatestMessage() - 50);
+            List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
+            Collections.reverse(messages);
             for (ChatMessage message : messages) {
                 ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
                 MessageState messageState = message.getMessageState();
@@ -95,18 +96,16 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     @Override
     public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
-        if (profileDataChannel == null)
+        if (profileDataChannel == null) {
+            nickname.setText(Long.toHexString(directChannel.getChannelId()));
             return;
+        }
         String nicknameVal = Storage.getDatabase().nicknameDao().last(profileDataChannel.getChannelId()).getNickname();
 
         nickname.setText(nicknameVal);
         onlineState.setText("unknown last seen state");
         DefaultProfileImage.create(nicknameVal.substring(0, 1), profileDataChannel.getOwnerId(), 128, 128)
                 .loadInto(avatar);
-    }
-
-    private DateTime ago(int hr, int min, int sec) {
-        return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
     }
 
     private void insertMessage(P20ChatMessage msg) {
@@ -120,31 +119,43 @@ public class ChatActivityDirect extends ChatActivityBase {
         });
     }
 
+    private void modifyMessageItem(long messageId, Callback<MessageItem> modifier) {
+        int idx = 0;
+        for (MessageItem item : messageItems) {
+            if (item.getMessageId() == messageId) {
+                modifier.onCallback(item);
+                int currentIdx = idx;
+                runOnUiThread(() -> adapter.notifyItemChanged(currentIdx));
+                break;
+            }
+            idx++;
+        }
+    }
+
     /**
      * Updates the current activity with
      * new messages / message changes
      */
     private class PacketHandler implements PacketListener {
-
         @Override
         public void onPacket(Packet packet) {
+            if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != directChannel.getChannelId())
+                return;
+
             if (packet instanceof P20ChatMessage) {
                 insertMessage((P20ChatMessage) packet);
             } else if (packet instanceof P0CChannelMessageResponse) {
-                P0CChannelMessageResponse r = ((P0CChannelMessageResponse) packet);
-                int idx = 0;
-                for (MessageItem item : messageItems) {
-                    if (item.getMessageId() == r.tempMessageId) {
-                        item.setMessageId(r.messageId);
-                        item.setMessageState(MessageState.SENT);
-                        int currentIdx = idx;
-                        runOnUiThread(() -> adapter.notifyItemChanged(currentIdx));
-                    }
-                    idx++;
-                }
+                P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
+                if (response.channelId != directChannel.getChannelId()) return;
+                modifyMessageItem(response.tempMessageId, i -> {
+                    i.setMessageId(response.messageId);
+                    i.setMessageState(MessageState.SENT);
+                });
+            } else if (packet instanceof P22MessageReceived) {
+                P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packet).getParent().singleDependency();
+                modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.DELIVERED));
             }
         }
-
     }
 
 }

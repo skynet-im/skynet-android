@@ -35,7 +35,7 @@ public class P0BChannelMessage implements Packet {
     public byte[] fileKey;
     public List<Dependency> dependencies = new ArrayList<>();
 
-    public boolean hasMessageFlag(byte flag) {
+    boolean hasFlag(byte flag) {
         return (messageFlags & flag) != 0;
     }
 
@@ -46,11 +46,11 @@ public class P0BChannelMessage implements Packet {
         buffer.writeInt64(channelId);
         buffer.writeInt64(messageId);
         buffer.writeByte(messageFlags);
-        if (hasMessageFlag(MessageFlags.FILE_ATTACHED)) buffer.writeInt64(fileId);
+        if (hasFlag(MessageFlags.FILE_ATTACHED)) buffer.writeInt64(fileId);
         buffer.writeByte(contentPacketId);
         buffer.writeByte(contentPacketVersion);
-        Log.d("P0BChannelMessage", String.format("Writing channel Message with content id %s: unencrypted=%s fileAttached=%s", contentPacketId, hasMessageFlag(MessageFlags.UNENCRYPTED), hasMessageFlag(MessageFlags.FILE_ATTACHED)));
-        if (hasMessageFlag(MessageFlags.UNENCRYPTED)) writeContents(buffer);
+        Log.d("P0BChannelMessage", String.format("Writing channel Message with content id %s: unencrypted=%s fileAttached=%s", contentPacketId, hasFlag(MessageFlags.UNENCRYPTED), hasFlag(MessageFlags.FILE_ATTACHED)));
+        if (hasFlag(MessageFlags.UNENCRYPTED)) writeContents(buffer);
         else {
             KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
             PacketBuffer encryptedBuffer = new PacketBuffer();
@@ -66,18 +66,6 @@ public class P0BChannelMessage implements Packet {
         }
     }
 
-    private void writeContents(PacketBuffer buffer) {
-        buffer.writeByteArray(contentPacket, true);
-        if (hasMessageFlag(MessageFlags.FILE_ATTACHED))
-            buffer.writeByteArray(fileKey, true);
-    }
-
-    private void readContents(PacketBuffer packetBuffer) {
-        contentPacket = packetBuffer.readByteArray();
-        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
-            fileKey = packetBuffer.readByteArray();
-    }
-
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         dependencies.clear();
@@ -88,11 +76,11 @@ public class P0BChannelMessage implements Packet {
         skipCount = buffer.readInt64();
         dispatchTime = buffer.readDate();
         messageFlags = buffer.readByte();
-        if (hasMessageFlag(MessageFlags.FILE_ATTACHED)) fileId = buffer.readInt64();
+        if (hasFlag(MessageFlags.FILE_ATTACHED)) fileId = buffer.readInt64();
         contentPacketId = buffer.readByte();
         contentPacketVersion = buffer.readByte();
 
-        if (!hasMessageFlag(MessageFlags.UNENCRYPTED)) {
+        if (!hasFlag(MessageFlags.UNENCRYPTED)) {
             KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
             byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
             readContents(new PacketBuffer(decryptedData));
@@ -101,6 +89,18 @@ public class P0BChannelMessage implements Packet {
         int dependencyCount = buffer.readUInt16();
         for (int i = 0; i < dependencyCount; i++)
             dependencies.add(new Dependency(buffer.readInt64(), buffer.readInt64(), buffer.readInt64()));
+    }
+
+    private void writeContents(PacketBuffer buffer) {
+        buffer.writeByteArray(contentPacket, true);
+        if (hasFlag(MessageFlags.FILE_ATTACHED))
+            buffer.writeByteArray(fileKey, true);
+    }
+
+    private void readContents(PacketBuffer packetBuffer) {
+        contentPacket = packetBuffer.readByteArray();
+        if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
+            fileKey = packetBuffer.readByteArray();
     }
 
     @Override
@@ -121,12 +121,24 @@ public class P0BChannelMessage implements Packet {
                 Storage.getDatabase().channelDao().update(channel);
             }
         }
-        System.out.println("Channel message writing to db");
         Storage.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
         Storage.getDatabase().dependencyDao().insert(de.vectordata.skynet.data.model.Dependency.arrayFromPacket(this, dependencies));
     }
 
-    public class Dependency {
+    public Dependency singleDependency() {
+        if (dependencies.size() != 1)
+            throw new IllegalStateException("Asked for exactly one dependency, but had " + dependencies.size());
+        return dependencies.get(0);
+    }
+
+    public Dependency findDependency(Selector<Dependency> selector) {
+        for (Dependency dep : dependencies)
+            if (selector.test(dep))
+                return dep;
+        return null;
+    }
+
+    public static class Dependency {
         public long accountId;
         public long channelId;
         public long messageId;
@@ -136,12 +148,5 @@ public class P0BChannelMessage implements Packet {
             this.channelId = channelId;
             this.messageId = messageId;
         }
-    }
-
-    public Dependency getDependency(Selector<Dependency> selector) {
-        for (Dependency dep : dependencies)
-            if (selector.test(dep))
-                return dep;
-        return null;
     }
 }

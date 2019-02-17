@@ -41,7 +41,7 @@ public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
 
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
-        if (packetDirection == PacketDirection.SEND && getParent().hasMessageFlag(MessageFlags.NO_SENDER_SYNC))
+        if (packetDirection == PacketDirection.SEND && getParent().hasFlag(MessageFlags.NO_SENDER_SYNC))
             return;
         Storage.getDatabase().groupChannelKeyNotifyDao().insert(GroupChannelKeyNotify.fromPacket(this));
     }

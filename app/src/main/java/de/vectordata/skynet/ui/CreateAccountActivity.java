@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.crypto.hash.HashProvider;
+import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.model.CreateAccountError;
@@ -45,8 +46,14 @@ public class CreateAccountActivity extends SkynetActivity {
                 progressDialog = Dialogs.showProgressDialog(this, R.string.progress_creating_account, false)
         );
         Log.d("CreateAccountActivity", "Creating user with " + accountName + " and " + keyHash.length);
-        getSkynetContext().getNetworkManager()
-                .sendPacket(new P02CreateAccount(accountName, keyHash))
+        NetworkManager networkManager = getSkynetContext().getNetworkManager();
+        networkManager.connect();
+        networkManager.setErrorListener(() -> runOnUiThread(() -> {
+            progressDialog.dismiss();
+            Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_no_connection);
+            networkManager.setErrorListener(null);
+        }));
+        networkManager.sendPacket(new P02CreateAccount(accountName, keyHash))
                 .waitForPacket(P03CreateAccountResponse.class, packet -> runOnUiThread(() -> {
                     progressDialog.dismiss();
                     if (packet.errorCode == CreateAccountError.ACCOUNT_NAME_TAKEN)

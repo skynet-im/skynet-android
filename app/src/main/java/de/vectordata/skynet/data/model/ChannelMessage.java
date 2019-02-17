@@ -2,6 +2,8 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
@@ -12,8 +14,12 @@ import de.vectordata.skynet.net.packet.P0BChannelMessage;
         parentColumns = "channelId",
         childColumns = "channelId",
         onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.CASCADE), primaryKeys = {"channelId", "messageId"})
+        onUpdate = ForeignKey.CASCADE),
+        indices = {@Index(value = {"channelId", "messageId"}, unique = true)})
 public class ChannelMessage {
+
+    @PrimaryKey(autoGenerate = true)
+    private long internalId;
 
     private long channelId;
 
@@ -40,6 +46,14 @@ public class ChannelMessage {
         message.fileId = packet.fileId;
         message.fileKey = packet.fileKey;
         return message;
+    }
+
+    public long getInternalId() {
+        return internalId;
+    }
+
+    public void setInternalId(long internalId) {
+        this.internalId = internalId;
     }
 
     public long getChannelId() {

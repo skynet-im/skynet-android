@@ -61,6 +61,7 @@
     <string name="progress_login_preparing">Preparing login…</string>
     <string name="progress_logging_in">Logging in…</string>
     <string name="progress_creating_account">Creating account…</string>
+    <string name="progress_creating_channel">Adding to your address book…</string>
 
     <string name="pref_header_customize">Customize</string>
     <string name="pref_color_theme">Color theme</string>

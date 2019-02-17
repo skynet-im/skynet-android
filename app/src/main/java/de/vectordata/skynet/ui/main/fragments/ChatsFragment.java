@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui.main.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,7 +9,9 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,29 +35,33 @@ import de.vectordata.skynet.ui.main.recycler.ChatsItem;
  */
 public class ChatsFragment extends Fragment {
 
+    private Activity context;
+
     private ChatsAdapter adapter;
 
     private List<ChatsItem> dataset = new ArrayList<>();
 
+    private boolean isReloading;
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
-
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        context = Objects.requireNonNull(getActivity());
+
         adapter = new ChatsAdapter(dataset);
         adapter.setItemClickListener(idx -> {
             ChatsItem item = dataset.get(idx);
             Intent intent = new Intent(getContext(), ChatActivityDirect.class);
             intent.putExtra(ChatActivityBase.EXTRA_CHANNEL_ID, item.getChannelId());
-            getContext().startActivity(intent);
+            context.startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
 
         reload();
-
         return rootView;
     }
 
@@ -67,12 +74,10 @@ public class ChatsFragment extends Fragment {
         });
     }
 
-    private DateTime ago(int hr, int min, int sec) {
-        return DateTime.fromMillis(System.currentTimeMillis() - sec * 1000 - min * 60000 - hr * 3600000);
-    }
-
     private void reload() {
         new Thread(() -> {
+            if (isReloading) return;
+            isReloading = true;
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatsItem> items = new ArrayList<>();
             for (Channel channel : channels) {
@@ -82,10 +87,10 @@ public class ChatsFragment extends Fragment {
                     ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
                     item = new ChatsItem(Long.toHexString(channel.getOther()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, 0, channel.getChannelId());
                 } else
-                    item = new ChatsItem(Long.toHexString(channel.getOther()), "No content", DateTime.now(), 0, 0, channel.getChannelId());
+                    item = new ChatsItem(Long.toHexString(channel.getOther()), "", DateTime.now(), 0, 0, channel.getChannelId());
                 items.add(item);
             }
-            getActivity().runOnUiThread(() -> {
+            context.runOnUiThread(() -> {
                 dataset.clear();
                 dataset.addAll(items);
                 adapter.notifyDataSetChanged();
