@@ -37,8 +37,9 @@ public class SkynetContext implements KeyProvider {
         Channel channel = Storage.getDatabase().channelDao().getById(channelId);
         if (channel.getChannelType() == ChannelType.LOOPBACK)
             return Storage.getSession().getSessionKeys().getLoopbackChannelKeys();
+        Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
         ChannelKey publicKey = Storage.getDatabase().channelKeyDao().getLast(channelId, KeyType.PUBLIC);
-        ChannelKey privateKey = Storage.getDatabase().channelKeyDao().getLast(channelId, KeyType.PRIVATE);
+        ChannelKey privateKey = Storage.getDatabase().channelKeyDao().getLast(loopbackChannel.getChannelId(), KeyType.PRIVATE);
         byte[] ecKey = EC.deriveKey(privateKey.getDerivationKey(), publicKey.getDerivationKey());
         byte[] sha512 = HashProvider.sha512(ecKey);
         return KeyStore.from64ByteArray(sha512);

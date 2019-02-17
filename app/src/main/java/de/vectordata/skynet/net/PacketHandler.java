@@ -11,6 +11,7 @@ import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.model.ConnectionState;
@@ -91,13 +92,15 @@ public class PacketHandler {
         if (packet == null)
             return;
 
+        if (packet instanceof ChannelMessagePacket)
+            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
+        else if (packet instanceof RealtimeMessagePacket)
+            ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
+
         packet.readPacket(new PacketBuffer(payload), keyProvider);
 
-        if (packet instanceof ChannelMessagePacket) {
-            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
+        if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).writeToDatabase(PacketDirection.RECEIVE);
-        } else if (packet instanceof RealtimeMessagePacket)
-            ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
         Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
 
@@ -155,9 +158,16 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
+        Log.d(TAG, "Setting temporary message id " + packet.tempMessageId + " to " + packet.messageId);
         ChannelMessage message = Storage.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
         message.setMessageId(packet.messageId);
         Storage.getDatabase().channelMessageDao().update(message);
+
+        Channel channel = Storage.getDatabase().channelDao().getById(packet.channelId);
+        if (packet.messageId > channel.getLatestMessage()) {
+            channel.setLatestMessage(packet.messageId);
+            Storage.getDatabase().channelDao().update(channel);
+        }
     }
 
     public void handlePacket(P0FSyncFinished packet) {
@@ -225,7 +235,12 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1BDirectChannelUpdate packet) {
-
+        /*long me = Storage.getSession().getAccountId();
+        P0BChannelMessage parent = packet.getParent();
+        P0BChannelMessage.Dependency keypairReferenceDependency = parent.findDependency(d -> d.accountId == me);
+        List<Dependency> dependencies = Storage.getDatabase().dependencyDao().getDependencies(keypairReferenceDependency.channelId, keypairReferenceDependency.messageId);
+        ChannelKey privateKey;
+        ChannelKey publicKey;*/
     }
 
     public void handlePacket(P1CDirectChannelCustomization packet) {
@@ -241,7 +256,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P20ChatMessage packet) {
-
+        SkynetContext.getCurrent().getMessageInterface()
+                .sendChannelMessage(packet.getParent().channelId,
+                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), packet.getParent().channelId, packet.getParent().messageId),
+                        new P22MessageReceived()
+                );
     }
 
     public void handlePacket(P21MessageOverride packet) {
@@ -267,7 +286,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P22MessageReceived packet) {
-
+        // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received it.
+        P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
+        ChatMessage message = Storage.getDatabase().chatMessageDao().query(dependency.channelId, dependency.messageId);
+        message.setMessageState(MessageState.DELIVERED);
+        Storage.getDatabase().chatMessageDao().update(message);
     }
 
     public void handlePacket(P23MessageRead packet) {

@@ -28,6 +28,10 @@ public class ChannelMessageConfig {
         return this;
     }
 
+    public ChannelMessageConfig addDependency(long accountId, long channelId, long messageId) {
+        return addDependency(new P0BChannelMessage.Dependency(accountId, channelId, messageId));
+    }
+
     public ChannelMessageConfig addDependency(P0BChannelMessage.Dependency dependency) {
         dependencies.add(dependency);
         return this;

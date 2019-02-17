@@ -10,9 +10,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.messages.MessageInterface;
+import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P2DSearchAccount;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
+import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
+import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.dialogs.ProgressDialog;
@@ -36,6 +42,13 @@ public class AddContactActivity extends ThemedActivity {
         ChatsAdapter adapter = new ChatsAdapter(dataset);
         recyclerView.setAdapter(adapter);
 
+        adapter.setItemClickListener(item -> {
+            long accountId = dataset.get(item).getChannelId(); // TODO: Naming is bad. But we have to change the UI here anyways.
+            Packet packet = new P0ACreateChannel(MessageInterface.newId(), ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
+            ProgressDialog dialog = Dialogs.showProgressDialog(this, R.string.progress_creating_channel, false);
+            SkynetContext.getCurrent().getNetworkManager().sendPacket(packet).waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(dialog::dismiss));
+        });
+
         EditText searchInput = findViewById(R.id.input_search_user);
         findViewById(R.id.action_search).setOnClickListener(v -> {
             ProgressDialog progressDialog = Dialogs.showProgressDialog(this, R.string.progress_searching, true);
@@ -47,7 +60,7 @@ public class AddContactActivity extends ThemedActivity {
                         List<P2ESearchAccountResponse.Result> results = p.results;
                         dataset.clear();
                         for (P2ESearchAccountResponse.Result result : results) {
-                            ChatsItem item = new ChatsItem(result.accountName, Long.toHexString(result.accountId), DateTime.now(), 0, 0, 0);
+                            ChatsItem item = new ChatsItem(result.accountName, Long.toHexString(result.accountId), DateTime.now(), 0, 0, result.accountId);
                             dataset.add(item);
                         }
                         adapter.notifyDataSetChanged();

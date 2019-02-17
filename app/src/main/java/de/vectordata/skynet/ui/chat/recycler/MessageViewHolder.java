@@ -23,7 +23,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
 
     void configure(MessageItem messageItem) {
         message.setText(messageItem.getContent());
-        if (time != null)
+        if (time != null && messageItem.getSentDate() != null)
             time.setText(messageItem.getSentDate().toTimeString(time.getContext()));
         if (state != null)
             messageItem.getMessageState().apply(state);

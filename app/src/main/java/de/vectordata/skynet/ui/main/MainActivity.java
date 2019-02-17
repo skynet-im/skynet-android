@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -60,6 +61,14 @@ public class MainActivity extends ThemedActivity {
                 .attach(tabLayout);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Storage.getSession() == null) {
+            Log.d(TAG, "The user has not logged in, exiting...");
+            finish();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

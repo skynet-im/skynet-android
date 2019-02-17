@@ -1,5 +1,7 @@
 package de.vectordata.skynet.data.sql.dao;
 
+import java.util.List;
+
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -17,5 +19,8 @@ public interface ChannelMessageDao {
 
     @Query("SELECT * FROM channelMessages WHERE channelId=:channelId AND messageId=:messageId")
     ChannelMessage getById(long channelId, long messageId);
+
+    @Query("SELECT * FROM channelMessages WHERE channelId=:channelId")
+    List<ChannelMessage> query(long channelId);
 
 }

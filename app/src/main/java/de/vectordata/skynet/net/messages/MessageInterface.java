@@ -3,6 +3,8 @@ package de.vectordata.skynet.net.messages;
 import java.util.Random;
 
 import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
@@ -30,23 +32,25 @@ public class MessageInterface {
     }
 
     public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        PacketBuffer buffer = new PacketBuffer();
-        packet.writePacket(buffer, skynetContext);
-
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
         container.messageId = newId();
+        container.senderId = Storage.getSession().getAccountId();
         container.packetVersion = PACKET_VERSION;
         container.messageFlags = config.getMessageFlags();
         container.fileId = config.getFileId();
         container.contentPacketId = packet.getId();
         container.contentPacketVersion = PACKET_VERSION;
-        container.contentPacket = buffer.toArray();
         container.fileKey = config.getFileKey();
         container.dependencies = config.getDependencies();
+        container.dispatchTime = DateTime.now();
+
+        PacketBuffer buffer = new PacketBuffer();
+        packet.setParent(container);
+        packet.writePacket(buffer, skynetContext);
+        container.contentPacket = buffer.toArray();
 
         container.writeToDatabase(PacketDirection.SEND);
-        packet.setParent(container);
         packet.writeToDatabase(PacketDirection.SEND);
 
         return skynetContext.getNetworkManager().sendPacket(container);
@@ -67,7 +71,7 @@ public class MessageInterface {
         return skynetContext.getNetworkManager().sendPacket(container);
     }
 
-    private long newId() {
+    public static long newId() {
         long id;
         do id = idRandom.nextLong(); while (id == 0);
         if (id > 0) id = -id;

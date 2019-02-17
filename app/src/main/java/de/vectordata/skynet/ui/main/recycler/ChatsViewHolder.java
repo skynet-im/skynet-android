@@ -42,12 +42,13 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
     void configure(ChatsItem item) {
         header.setText(item.getHeader());
         DateTime lastActive = item.getLastActiveDate();
-        if (lastActive.isToday())
-            date.setText(lastActive.toTimeString(context));
-        else if (lastActive.isYesterday())
-            date.setText(context.getString(R.string.yesterday));
-        else
-            date.setText(lastActive.toDateString(context));
+        if (lastActive != null)
+            if (lastActive.isToday())
+                date.setText(lastActive.toTimeString(context));
+            else if (lastActive.isYesterday())
+                date.setText(context.getString(R.string.yesterday));
+            else
+                date.setText(lastActive.toDateString(context));
         if (item.getUnreadMessages() == 0)
             bubble.setVisibility(View.GONE);
         else
