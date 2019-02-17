@@ -61,7 +61,6 @@ public class ChatsFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
-        reload();
         return rootView;
     }
 
@@ -72,6 +71,7 @@ public class ChatsFragment extends Fragment {
             if (p instanceof P0FSyncFinished)
                 reload();
         });
+        reload();
     }
 
     private void reload() {
@@ -94,6 +94,7 @@ public class ChatsFragment extends Fragment {
                 dataset.clear();
                 dataset.addAll(items);
                 adapter.notifyDataSetChanged();
+                isReloading = false;
             });
         }).start();
     }

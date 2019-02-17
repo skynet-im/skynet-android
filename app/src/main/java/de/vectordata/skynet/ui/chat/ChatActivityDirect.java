@@ -97,7 +97,11 @@ public class ChatActivityDirect extends ChatActivityBase {
     @Override
     public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
         if (profileDataChannel == null) {
-            nickname.setText(Long.toHexString(directChannel.getChannelId()));
+            // TODO: Remove this once the profile data channels are implemented
+            nickname.setText(Long.toHexString(directChannel.getOther()));
+            onlineState.setText("unknown last seen state");
+            DefaultProfileImage.create(nickname.getText().toString().substring(0, 1), directChannel.getOwnerId(), 128, 128)
+                    .loadInto(avatar);
             return;
         }
         String nicknameVal = Storage.getDatabase().nicknameDao().last(profileDataChannel.getChannelId()).getNickname();
