@@ -5,12 +5,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Random;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 
 /**
@@ -43,20 +42,14 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
         header.setText(item.getHeader());
         DateTime lastActive = item.getLastActiveDate();
         if (lastActive != null)
-            if (lastActive.isToday())
-                date.setText(lastActive.toTimeString(context));
-            else if (lastActive.isYesterday())
-                date.setText(context.getString(R.string.yesterday));
-            else
-                date.setText(lastActive.toDateString(context));
+            date.setText(DateUtil.toString(context, lastActive));
         if (item.getUnreadMessages() == 0)
             bubble.setVisibility(View.GONE);
         else
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
         message.setText(item.getContent());
-        //long other = Storage.getDatabase().channelDao().getById(item.getChannelId()).getOther();
-        DefaultProfileImage.create(item.getHeader().substring(0, 1), (new Random().nextInt()), 128, 128)
+        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getOtherId(), 128, 128)
                 .loadInto(avatar);
         item.getMessageState().apply(messageState);
         item.getMessageSide().apply(messageState);

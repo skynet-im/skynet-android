@@ -28,6 +28,7 @@ import de.vectordata.skynet.ui.chat.ChatActivityBase;
 import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
+import de.vectordata.skynet.ui.util.MessageSide;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -81,13 +82,17 @@ public class ChatsFragment extends Fragment {
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatsItem> items = new ArrayList<>();
             for (Channel channel : channels) {
+                /*Channel profileDataChannel =  Storage.getDatabase().channelDao().getByType(channel.getOther(), ChannelType.PROFILE_DATA);
+                String nickname = Storage.getDatabase().nicknameDao().last(profileDataChannel.getChannelId()).getNickname();*/
+
                 ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId());
                 ChatsItem item;
                 if (latestMessage != null) {
                     ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
-                    item = new ChatsItem(Long.toHexString(channel.getOther()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, 0, channel.getChannelId());
+                    MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
+                    item = new ChatsItem(Long.toHexString(channel.getOther()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), 0, channel.getChannelId(), channel.getOther());
                 } else
-                    item = new ChatsItem(Long.toHexString(channel.getOther()), "", DateTime.now(), 0, 0, channel.getChannelId());
+                    item = new ChatsItem(Long.toHexString(channel.getOther()), context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId());
                 items.add(item);
             }
             context.runOnUiThread(() -> {

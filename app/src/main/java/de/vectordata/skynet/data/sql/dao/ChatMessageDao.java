@@ -27,10 +27,10 @@ public interface ChatMessageDao {
     @Query("SELECT * FROM chatMessages WHERE channelId=:channelId")
     List<ChatMessage> query(long channelId);
 
-    @Query("SELECT * FROM chatMessages WHERE channelId=:channelId ORDER BY messageId DESC LIMIT :limit")
+    @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND chatMessages.channelId=:channelId ORDER BY dispatchTime DESC LIMIT :limit")
     List<ChatMessage> queryLast(long channelId, int limit);
 
-    @Query("SELECT * FROM chatMessages WHERE channelId=:channelId ORDER BY messageId DESC LIMIT 1")
+    @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND chatMessages.channelId=:channelId ORDER BY dispatchTime DESC LIMIT 1")
     ChatMessage queryLast(long channelId);
 
 }

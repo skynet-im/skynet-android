@@ -12,5 +12,6 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/bg_message_center"
         android:padding="8dp"
-        tools:text="TODAY" />
+        android:textAllCaps="true"
+        tools:text="Today" />
 </LinearLayout>

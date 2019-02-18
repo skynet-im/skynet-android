@@ -82,5 +82,9 @@
     <string name="pref_licenses">Licenses</string>
     <string name="pref_licenses_summary">View open-source licenses</string>
 
+    <string name="tip_start_chatting">Tap here to send your first message</string>
+    <string name="tip_create_chats">Looks like you don\'t have any contacts yet. Add friends to Skynet via the contacts tab.</string>
+
+    <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
 </resources>

@@ -40,7 +40,7 @@ public class MessageItem {
         return content;
     }
 
-    DateTime getSentDate() {
+    public DateTime getSentDate() {
         return sentDate;
     }
 

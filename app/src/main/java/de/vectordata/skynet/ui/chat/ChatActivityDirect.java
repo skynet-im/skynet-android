@@ -12,6 +12,7 @@ import java.util.List;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -31,6 +32,7 @@ import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
+import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.util.Callback;
@@ -65,11 +67,17 @@ public class ChatActivityDirect extends ChatActivityBase {
 
             List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
             Collections.reverse(messages);
+
+            ChannelMessage previous = null;
             for (ChatMessage message : messages) {
                 ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
                 MessageState messageState = message.getMessageState();
                 MessageSide messageSide = parent.getSenderId() == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-                messageItems.add(new MessageItem(message.getMessageId(), message.getText(), parent.getDispatchTime(), messageState, messageSide));
+                DateTime dispatchTime = parent.getDispatchTime();
+                if (previous == null || !previous.getDispatchTime().isSameDay(dispatchTime))
+                    messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, dispatchTime)));
+                messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, messageState, messageSide));
+                previous = parent;
             }
 
             runOnUiThread(() -> {
@@ -100,7 +108,7 @@ public class ChatActivityDirect extends ChatActivityBase {
             // TODO: Remove this once the profile data channels are implemented
             nickname.setText(Long.toHexString(directChannel.getOther()));
             onlineState.setText("unknown last seen state");
-            DefaultProfileImage.create(nickname.getText().toString().substring(0, 1), directChannel.getOwnerId(), 128, 128)
+            DefaultProfileImage.create(nickname.getText().toString().substring(0, 1), directChannel.getOther(), 128, 128)
                     .loadInto(avatar);
             return;
         }
@@ -113,11 +121,18 @@ public class ChatActivityDirect extends ChatActivityBase {
     }
 
     private void insertMessage(P20ChatMessage msg) {
+        MessageItem oldLatest = messageItems.size() > 0 ? messageItems.get(messageItems.size() - 1) : null;
+
         long myAccountId = Storage.getSession().getAccountId();
         MessageState messageState = MessageState.SENDING;
         MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-        messageItems.add(new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide));
+        MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide);
         runOnUiThread(() -> {
+            if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
+                messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));
+                adapter.notifyItemInserted(messageItems.size() - 1);
+            }
+            messageItems.add(newLatest);
             adapter.notifyItemInserted(messageItems.size() - 1);
             recyclerView.scrollToPosition(messageItems.size() - 1);
         });

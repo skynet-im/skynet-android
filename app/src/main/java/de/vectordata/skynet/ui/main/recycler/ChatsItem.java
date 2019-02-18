@@ -26,6 +26,8 @@ public class ChatsItem {
 
     private long channelId;
 
+    private long otherId;
+
     public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, long channelId) {
         this.header = header;
         this.content = content;
@@ -37,7 +39,7 @@ public class ChatsItem {
         this.channelId = channelId;
     }
 
-    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, MessageSide messageSide, MessageState messageState, int unreadMessages, long channelId) {
+    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, MessageSide messageSide, MessageState messageState, int unreadMessages, long channelId, long otherId) {
         this.header = header;
         this.content = content;
         this.lastActiveDate = lastActiveDate;
@@ -46,6 +48,7 @@ public class ChatsItem {
         this.messageState = messageState;
         this.messageSide = messageSide;
         this.channelId = channelId;
+        this.otherId = otherId;
     }
 
     String getHeader() {
@@ -78,5 +81,9 @@ public class ChatsItem {
 
     public long getChannelId() {
         return channelId;
+    }
+
+    long getOtherId() {
+        return otherId;
     }
 }
