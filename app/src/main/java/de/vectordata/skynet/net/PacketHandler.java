@@ -74,6 +74,8 @@ public class PacketHandler {
 
     private PacketListener packetListener;
 
+    private boolean inSync;
+
     public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager, ResponseAwaiter responseAwaiter) {
         this.keyProvider = keyProvider;
         this.networkManager = networkManager;
@@ -194,6 +196,9 @@ public class PacketHandler {
                     )
             );
         }
+        inSync = true;
+        for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed())
+            sendReceiveConfirmation(msg.getChannelId(), msg.getMessageId());
     }
 
     public void handlePacket(P10RealTimeMessage packet) {
@@ -256,11 +261,10 @@ public class PacketHandler {
     }
 
     public void handlePacket(P20ChatMessage packet) {
-        SkynetContext.getCurrent().getMessageInterface()
-                .sendChannelMessage(packet.getParent().channelId,
-                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), packet.getParent().channelId, packet.getParent().messageId),
-                        new P22MessageReceived()
-                );
+        if (!inSync) return; // Only send receive confirmations live if in sync
+        if (packet.getParent().senderId == Storage.getSession().getAccountId())
+            return; // Don't send receive confirmations for my own messages
+        sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
     }
 
     public void handlePacket(P21MessageOverride packet) {
@@ -285,16 +289,30 @@ public class PacketHandler {
         }
     }
 
+    // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received/read it.
     public void handlePacket(P22MessageReceived packet) {
-        // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received it.
         P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
-        ChatMessage message = Storage.getDatabase().chatMessageDao().query(dependency.channelId, dependency.messageId);
-        message.setMessageState(MessageState.DELIVERED);
-        Storage.getDatabase().chatMessageDao().update(message);
+        setMessageState(dependency.channelId, dependency.messageId, MessageState.DELIVERED);
     }
 
     public void handlePacket(P23MessageRead packet) {
+        P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
+        setMessageState(dependency.channelId, dependency.messageId, MessageState.SEEN);
+    }
 
+    private void sendReceiveConfirmation(long channelId, long messageId) {
+        SkynetContext.getCurrent().getMessageInterface()
+                .sendChannelMessage(channelId,
+                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), channelId, messageId),
+                        new P22MessageReceived()
+                );
+        setMessageState(channelId, messageId, MessageState.DELIVERED);
+    }
+
+    private void setMessageState(long channelId, long messageId, MessageState messageState) {
+        ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
+        message.setMessageState(messageState);
+        Storage.getDatabase().chatMessageDao().update(message);
     }
 
     public void handlePacket(P24DaystreamMessage packet) {

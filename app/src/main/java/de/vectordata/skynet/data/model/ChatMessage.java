@@ -37,14 +37,14 @@ public class ChatMessage {
     @TypeConverters(MessageStateConverter.class)
     private MessageState messageState;
 
-    public static ChatMessage fromPacket(P20ChatMessage packet) {
+    public static ChatMessage fromPacket(P20ChatMessage packet, MessageState messageState) {
         ChatMessage message = new ChatMessage();
         message.channelId = packet.getParent().channelId;
         message.messageId = packet.getParent().messageId;
         message.messageType = packet.messageType;
         message.text = packet.text;
         message.quotedMessage = packet.quotedMessage;
-        message.messageState = MessageState.SENT;
+        message.messageState = messageState;
         return message;
     }
 

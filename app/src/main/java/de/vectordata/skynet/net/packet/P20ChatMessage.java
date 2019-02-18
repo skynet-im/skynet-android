@@ -6,6 +6,7 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -57,6 +58,6 @@ public class P20ChatMessage extends ChannelMessagePacket {
 
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
-        Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this));
+        Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, packetDirection == PacketDirection.RECEIVE ? MessageState.SENT : MessageState.SENDING));
     }
 }
