@@ -22,11 +22,11 @@ public class FabState {
         return state;
     }
 
-    public boolean isVisible() {
+    boolean isVisible() {
         return visible;
     }
 
-    public int getIcon() {
+    int getIcon() {
         return icon;
     }
 

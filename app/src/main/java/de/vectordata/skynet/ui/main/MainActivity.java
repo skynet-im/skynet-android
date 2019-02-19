@@ -27,13 +27,18 @@ public class MainActivity extends ThemedActivity {
 
     private static final String TAG = "MainActivity";
 
+    private boolean leftForLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Session session = Storage.getSession();
-        if (session == null) startActivity(LoginActivity.class);
+        if (session == null) {
+            startActivity(LoginActivity.class);
+            leftForLogin = true;
+        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -64,11 +69,13 @@ public class MainActivity extends ThemedActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (leftForLogin) {
+            leftForLogin = false;
+            return;
+        }
         if (Storage.getSession() == null) {
             Log.d(TAG, "The user has not logged in, exiting...");
-            //finish();
-        } else {
-            Log.d(TAG, "The user has logged in");
+            finish();
         }
     }
 
