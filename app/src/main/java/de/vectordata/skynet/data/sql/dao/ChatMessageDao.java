@@ -33,7 +33,10 @@ public interface ChatMessageDao {
     @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND chatMessages.channelId=:channelId ORDER BY dispatchTime DESC LIMIT 1")
     ChatMessage queryLast(long channelId);
 
-    @Query("SELECT * FROM chatMessages WHERE messageState!=2")
+    @Query("SELECT * FROM chatMessages WHERE messageState=1")
     List<ChatMessage> queryUnconfirmed();
+
+    @Query("SELECT * FROM chatMessages WHERE isUnread=1")
+    List<ChatMessage> queryUnread();
 
 }

@@ -2,12 +2,18 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e85a6cce17fc6ae505e016e4fe89b189",
+    "identityHash": "cafca38fe6cefa4b9d1272bde029ca90",
     "entities": [
       {
         "tableName": "channels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `channelType` INTEGER, `ownerId` INTEGER NOT NULL, `counterpartId` INTEGER NOT NULL, `latestMessage` INTEGER NOT NULL, PRIMARY KEY(`channelId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`internalId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `channelId` INTEGER NOT NULL, `channelType` INTEGER, `ownerId` INTEGER NOT NULL, `counterpartId` INTEGER NOT NULL, `latestMessage` INTEGER NOT NULL)",
         "fields": [
+          {
+            "fieldPath": "internalId",
+            "columnName": "internalId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "channelId",
             "columnName": "channelId",
@@ -41,11 +47,20 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "channelId"
+            "internalId"
           ],
-          "autoGenerate": false
+          "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_channels_channelId",
+            "unique": true,
+            "columnNames": [
+              "channelId"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_channels_channelId` ON `${TABLE_NAME}` (`channelId`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -193,7 +208,7 @@
       },
       {
         "tableName": "chatMessages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `messageType` INTEGER, `text` TEXT, `quotedMessage` INTEGER NOT NULL, `isEdited` INTEGER NOT NULL, `messageState` INTEGER, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `messageType` INTEGER, `text` TEXT, `quotedMessage` INTEGER NOT NULL, `isEdited` INTEGER NOT NULL, `messageState` INTEGER, `isUnread` INTEGER NOT NULL, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "channelId",
@@ -236,6 +251,12 @@
             "columnName": "messageState",
             "affinity": "INTEGER",
             "notNull": false
+          },
+          {
+            "fieldPath": "isUnread",
+            "columnName": "isUnread",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -822,7 +843,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e85a6cce17fc6ae505e016e4fe89b189\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"cafca38fe6cefa4b9d1272bde029ca90\")"
     ]
   }
 }

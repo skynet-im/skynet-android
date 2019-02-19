@@ -37,6 +37,8 @@ public class ChatMessage {
     @TypeConverters(MessageStateConverter.class)
     private MessageState messageState;
 
+    private boolean isUnread;
+
     public static ChatMessage fromPacket(P20ChatMessage packet, MessageState messageState) {
         ChatMessage message = new ChatMessage();
         message.channelId = packet.getParent().channelId;
@@ -102,5 +104,13 @@ public class ChatMessage {
 
     public void setMessageState(MessageState messageState) {
         this.messageState = messageState;
+    }
+
+    public boolean isUnread() {
+        return isUnread;
+    }
+
+    public void setUnread(boolean unread) {
+        isUnread = unread;
     }
 }

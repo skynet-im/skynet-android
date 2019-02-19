@@ -1,6 +1,7 @@
 package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 import de.vectordata.skynet.auth.Session;
@@ -9,10 +10,12 @@ import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 
-@Entity(tableName = "channels")
+@Entity(tableName = "channels", indices = {@Index(value = {"channelId"}, unique = true)})
 public class Channel {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    private long internalId;
+
     private long channelId;
 
     @TypeConverters(ChannelTypeConverter.class)
@@ -31,6 +34,14 @@ public class Channel {
         channel.ownerId = packet.ownerId;
         channel.counterpartId = packet.counterpartId;
         return channel;
+    }
+
+    public long getInternalId() {
+        return internalId;
+    }
+
+    public void setInternalId(long internalId) {
+        this.internalId = internalId;
     }
 
     public long getChannelId() {

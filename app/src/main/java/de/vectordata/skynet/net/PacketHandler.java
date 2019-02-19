@@ -163,10 +163,15 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
-        Log.d(TAG, "Setting temporary message id " + packet.tempMessageId + " to " + packet.messageId);
         ChannelMessage message = Storage.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
         message.setMessageId(packet.messageId);
         Storage.getDatabase().channelMessageDao().update(message);
+
+        ChatMessage chatMessage = Storage.getDatabase().chatMessageDao().query(message.getChannelId(), message.getMessageId());
+        if (chatMessage != null) {
+            chatMessage.setMessageState(MessageState.SENT);
+            Storage.getDatabase().chatMessageDao().update(chatMessage);
+        }
 
         Channel channel = Storage.getDatabase().channelDao().getById(packet.channelId);
         if (packet.messageId > channel.getLatestMessage()) {

@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -26,8 +27,11 @@ import de.vectordata.skynet.ui.dialogs.ProgressDialog;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
 import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.Handlers;
 
 public class AddContactActivity extends ThemedActivity {
+
+    private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +50,22 @@ public class AddContactActivity extends ThemedActivity {
         adapter.setItemClickListener(item -> {
             long accountId = dataset.get(item).getChannelId(); // TODO: Naming is bad. But we have to change the UI here anyways.
             long tempChannelId = MessageInterface.newId();
-            Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
-            Channel channel = new Channel();
-            channel.setOwnerId(Storage.getSession().getAccountId());
-            channel.setLatestMessage(0);
-            channel.setCounterpartId(accountId);
-            channel.setChannelType(ChannelType.DIRECT);
-            channel.setChannelId(tempChannelId);
-            Storage.getDatabase().channelDao().insert(channel);
             ProgressDialog dialog = Dialogs.showProgressDialog(this, R.string.progress_creating_channel, false);
-            SkynetContext.getCurrent().getNetworkManager().sendPacket(packet)
-                    .waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(dialog::dismiss));
+            backgroundHandler.post(() -> {
+                Channel channel = new Channel();
+                channel.setOwnerId(Storage.getSession().getAccountId());
+                channel.setLatestMessage(0);
+                channel.setCounterpartId(accountId);
+                channel.setChannelType(ChannelType.DIRECT);
+                channel.setChannelId(tempChannelId);
+                Storage.getDatabase().channelDao().insert(channel);
+                Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
+                SkynetContext.getCurrent().getNetworkManager().sendPacket(packet)
+                        .waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(() -> {
+                            dialog.dismiss();
+                            finish();
+                        }));
+            });
         });
 
         EditText searchInput = findViewById(R.id.input_search_user);
