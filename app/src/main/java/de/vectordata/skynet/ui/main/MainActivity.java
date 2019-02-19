@@ -66,7 +66,9 @@ public class MainActivity extends ThemedActivity {
         super.onResume();
         if (Storage.getSession() == null) {
             Log.d(TAG, "The user has not logged in, exiting...");
-            finish();
+            //finish();
+        } else {
+            Log.d(TAG, "The user has logged in");
         }
     }
 

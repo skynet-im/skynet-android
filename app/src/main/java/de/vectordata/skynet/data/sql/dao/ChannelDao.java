@@ -24,6 +24,9 @@ public interface ChannelDao {
     @Update
     void update(Channel... channels);
 
+    @Query("DELETE FROM channels WHERE channelId=:channelId")
+    void deleteById(long channelId);
+
     @Query("SELECT * FROM channels WHERE channelId=:channelId")
     Channel getById(long channelId);
 

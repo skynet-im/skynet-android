@@ -57,6 +57,7 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
 import de.vectordata.skynet.net.packet.model.AsymmetricKey;
+import de.vectordata.skynet.net.packet.model.CreateChannelError;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.model.KeyFormat;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
@@ -149,9 +150,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P2FCreateChannelResponse packet) {
-        Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
-        channel.setChannelId(packet.channelId);
-        Storage.getDatabase().channelDao().update(channel);
+        if (packet.errorCode == CreateChannelError.SUCCESS) {
+            Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
+            channel.setChannelId(packet.channelId);
+            Storage.getDatabase().channelDao().update(channel);
+        } else Storage.getDatabase().channelDao().deleteById(packet.tempChannelId);
     }
 
     public void handlePacket(P0BChannelMessage packet) {

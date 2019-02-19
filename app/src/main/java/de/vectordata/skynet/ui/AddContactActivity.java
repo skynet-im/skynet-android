@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.MessageInterface;
@@ -44,9 +45,18 @@ public class AddContactActivity extends ThemedActivity {
 
         adapter.setItemClickListener(item -> {
             long accountId = dataset.get(item).getChannelId(); // TODO: Naming is bad. But we have to change the UI here anyways.
-            Packet packet = new P0ACreateChannel(MessageInterface.newId(), ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
+            long tempChannelId = MessageInterface.newId();
+            Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
+            Channel channel = new Channel();
+            channel.setOwnerId(Storage.getSession().getAccountId());
+            channel.setLatestMessage(0);
+            channel.setCounterpartId(accountId);
+            channel.setChannelType(ChannelType.DIRECT);
+            channel.setChannelId(tempChannelId);
+            Storage.getDatabase().channelDao().insert(channel);
             ProgressDialog dialog = Dialogs.showProgressDialog(this, R.string.progress_creating_channel, false);
-            SkynetContext.getCurrent().getNetworkManager().sendPacket(packet).waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(dialog::dismiss));
+            SkynetContext.getCurrent().getNetworkManager().sendPacket(packet)
+                    .waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(dialog::dismiss));
         });
 
         EditText searchInput = findViewById(R.id.input_search_user);
