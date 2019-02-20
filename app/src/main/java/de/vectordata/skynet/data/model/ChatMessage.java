@@ -47,6 +47,7 @@ public class ChatMessage {
         message.text = packet.text;
         message.quotedMessage = packet.quotedMessage;
         message.messageState = messageState;
+        message.isUnread = true;
         return message;
     }
 

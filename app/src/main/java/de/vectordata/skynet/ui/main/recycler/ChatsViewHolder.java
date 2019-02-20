@@ -49,7 +49,7 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
         message.setText(item.getContent());
-        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getOtherId(), 128, 128)
+        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getCounterpartId(), 128, 128)
                 .loadInto(avatar);
         item.getMessageState().apply(messageState);
         item.getMessageSide().apply(messageState);

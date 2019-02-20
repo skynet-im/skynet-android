@@ -64,7 +64,7 @@ public class ChatActivityDirect extends ChatActivityBase {
             directChannel = Storage.getDatabase().channelDao().getById(channelId);
             if (directChannel == null) return; // This should not happen in production
 
-            profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getOther(), ChannelType.PROFILE_DATA);
+            profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
 
             List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
             Collections.reverse(messages);
@@ -104,15 +104,21 @@ public class ChatActivityDirect extends ChatActivityBase {
             });
             editText.setText("");
         });
+
+        backgroundHandler.post(() -> {
+            List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(directChannel.getChannelId());
+            for (ChatMessage message : unread)
+                readMessage(message.getMessageId());
+        });
     }
 
     @Override
     public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
         if (profileDataChannel == null) {
             // TODO: Remove this once the profile data channels are implemented
-            nickname.setText(Long.toHexString(directChannel.getOther()));
+            nickname.setText(Long.toHexString(directChannel.getCounterpartId()));
             onlineState.setText("unknown last seen state");
-            DefaultProfileImage.create(nickname.getText().toString().substring(0, 1), directChannel.getOther(), 128, 128)
+            DefaultProfileImage.create(nickname.getText().toString().substring(0, 1), directChannel.getCounterpartId(), 128, 128)
                     .loadInto(avatar);
             return;
         }
@@ -158,6 +164,19 @@ public class ChatActivityDirect extends ChatActivityBase {
         recyclerView.scrollToPosition(messageItems.size() - 1);
     }
 
+    private void readMessage(long messageId) {
+        SkynetContext.getCurrent().getMessageInterface()
+                .sendChannelMessage(directChannel.getChannelId(),
+                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), directChannel.getChannelId(), messageId),
+                        new P23MessageRead()
+                );
+        backgroundHandler.post(() -> {
+            ChatMessage message = Storage.getDatabase().chatMessageDao().query(directChannel.getChannelId(), messageId);
+            message.setUnread(false);
+            Storage.getDatabase().chatMessageDao().update(message);
+        });
+    }
+
     /**
      * Updates the current activity with
      * new messages / message changes
@@ -169,7 +188,9 @@ public class ChatActivityDirect extends ChatActivityBase {
                 return;
 
             if (packet instanceof P20ChatMessage) {
-                insertMessage((P20ChatMessage) packet);
+                P20ChatMessage chatMessage = (P20ChatMessage) packet;
+                insertMessage(chatMessage);
+                readMessage(chatMessage.getParent().messageId);
             } else if (packet instanceof P0CChannelMessageResponse) {
                 P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
                 if (response.channelId != directChannel.getChannelId()) return;

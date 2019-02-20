@@ -39,4 +39,6 @@ public interface ChatMessageDao {
     @Query("SELECT * FROM chatMessages WHERE isUnread=1")
     List<ChatMessage> queryUnread();
 
+    @Query("SELECT * FROM chatMessages WHERE channelId=:channelId AND isUnread=1")
+    List<ChatMessage> queryUnread(long channelId);
 }

@@ -4,8 +4,6 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
-import de.vectordata.skynet.auth.Session;
-import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
@@ -84,10 +82,4 @@ public class Channel {
         this.latestMessage = latestMessage;
     }
 
-    public long getOther() {
-        if (channelType != ChannelType.DIRECT)
-            throw new IllegalStateException("getOther() can only be called on a direct channel");
-        Session session = Storage.getSession();
-        return session.getAccountId() == ownerId ? counterpartId : ownerId;
-    }
 }
