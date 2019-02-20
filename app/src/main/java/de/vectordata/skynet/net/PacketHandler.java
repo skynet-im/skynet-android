@@ -165,6 +165,7 @@ public class PacketHandler {
     public void handlePacket(P0CChannelMessageResponse packet) {
         ChannelMessage message = Storage.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
         message.setMessageId(packet.messageId);
+        message.setDispatchTime(packet.dispatchTime);
         Storage.getDatabase().channelMessageDao().update(message);
 
         ChatMessage chatMessage = Storage.getDatabase().chatMessageDao().query(message.getChannelId(), message.getMessageId());
@@ -319,7 +320,11 @@ public class PacketHandler {
 
     private void setMessageState(long channelId, long messageId, MessageState messageState) {
         ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
+        if (message.getMessageState() == MessageState.SEEN) // Do not un-see the message
+            return;
         message.setMessageState(messageState);
+        if (messageState == MessageState.SEEN)
+            message.setUnread(false);
         Storage.getDatabase().chatMessageDao().update(message);
     }
 

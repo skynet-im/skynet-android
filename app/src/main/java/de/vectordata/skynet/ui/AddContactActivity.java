@@ -48,7 +48,7 @@ public class AddContactActivity extends ThemedActivity {
         recyclerView.setAdapter(adapter);
 
         adapter.setItemClickListener(item -> {
-            long accountId = dataset.get(item).getChannelId(); // TODO: Naming is bad. But we have to change the UI here anyways.
+            long accountId = dataset.get(item).getCounterpartId(); // TODO: Naming is bad. But we have to change the UI here anyways.
             long tempChannelId = MessageInterface.newId();
             ProgressDialog dialog = Dialogs.showProgressDialog(this, R.string.progress_creating_channel, false);
             backgroundHandler.post(() -> {
@@ -79,7 +79,7 @@ public class AddContactActivity extends ThemedActivity {
                         List<P2ESearchAccountResponse.Result> results = p.results;
                         dataset.clear();
                         for (P2ESearchAccountResponse.Result result : results) {
-                            ChatsItem item = new ChatsItem(result.accountName, Long.toHexString(result.accountId), DateTime.now(), 0, 0, result.accountId);
+                            ChatsItem item = new ChatsItem(result.accountName, Long.toHexString(result.accountId), DateTime.now(), 0, 0, 0, result.accountId);
                             dataset.add(item);
                         }
                         adapter.notifyDataSetChanged();

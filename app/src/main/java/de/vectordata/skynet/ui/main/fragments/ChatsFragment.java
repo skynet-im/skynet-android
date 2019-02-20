@@ -101,10 +101,10 @@ public class ChatsFragment extends Fragment {
                     MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
                     item = new ChatsItem(Long.toHexString(channel.getCounterpartId()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId());
                 } else
-                    item = new ChatsItem(Long.toHexString(channel.getCounterpartId()), context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId());
+                    item = new ChatsItem(Long.toHexString(channel.getCounterpartId()), context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
                 items.add(item);
             }
-            Collections.sort(items, (a, b) -> (int) (a.getLastActiveDate().getTicks() - b.getLastActiveDate().getTicks()));
+            Collections.sort(items, (a, b) -> -(int) (a.getLastActiveDate().toBinary() - b.getLastActiveDate().toBinary()));
             context.runOnUiThread(() -> {
                 dataset.clear();
                 dataset.addAll(items);

@@ -28,7 +28,7 @@ public class ChatsItem {
 
     private long counterpartId;
 
-    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, long channelId) {
+    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, long channelId, long counterpartId) {
         this.header = header;
         this.content = content;
         this.lastActiveDate = lastActiveDate;
@@ -37,6 +37,7 @@ public class ChatsItem {
         this.messageState = MessageState.NONE;
         this.messageSide = MessageSide.LEFT;
         this.channelId = channelId;
+        this.counterpartId = counterpartId;
     }
 
     public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, MessageSide messageSide, MessageState messageState, int unreadMessages, long channelId, long counterpartId) {
@@ -83,7 +84,7 @@ public class ChatsItem {
         return channelId;
     }
 
-    long getCounterpartId() {
+    public long getCounterpartId() {
         return counterpartId;
     }
 }

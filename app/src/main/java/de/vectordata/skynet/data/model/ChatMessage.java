@@ -39,7 +39,7 @@ public class ChatMessage {
 
     private boolean isUnread;
 
-    public static ChatMessage fromPacket(P20ChatMessage packet, MessageState messageState) {
+    public static ChatMessage fromPacket(P20ChatMessage packet, MessageState messageState, boolean isUnread) {
         ChatMessage message = new ChatMessage();
         message.channelId = packet.getParent().channelId;
         message.messageId = packet.getParent().messageId;
@@ -47,7 +47,7 @@ public class ChatMessage {
         message.text = packet.text;
         message.quotedMessage = packet.quotedMessage;
         message.messageState = messageState;
-        message.isUnread = true;
+        message.isUnread = isUnread;
         return message;
     }
 

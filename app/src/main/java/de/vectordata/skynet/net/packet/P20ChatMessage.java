@@ -58,6 +58,7 @@ public class P20ChatMessage extends ChannelMessagePacket {
 
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
-        Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, packetDirection == PacketDirection.RECEIVE ? MessageState.SENT : MessageState.SENDING));
+        boolean isUnread = getParent().senderId != Storage.getSession().getAccountId() && packetDirection == PacketDirection.RECEIVE;
+        Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, packetDirection == PacketDirection.RECEIVE ? MessageState.SENT : MessageState.SENDING, isUnread));
     }
 }
