@@ -18,6 +18,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.MailAddress;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.SkynetContext;
@@ -43,6 +44,7 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     private Channel directChannel;
     private Channel profileDataChannel;
+    private Channel accountDataChannel;
 
     private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
 
@@ -65,6 +67,7 @@ public class ChatActivityDirect extends ChatActivityBase {
             if (directChannel == null) return; // This should not happen in production
 
             profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
+            accountDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
 
             List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
             Collections.reverse(messages);
@@ -114,6 +117,17 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     @Override
     public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
+        if (accountDataChannel == null) {
+            nickname.setText("no account data channel");
+            return;
+        }
+        MailAddress mailAddressObj = Storage.getDatabase().mailAddressDao().last(accountDataChannel.getChannelId());
+        if (mailAddressObj == null) {
+            nickname.setText("mail address is null");
+            return;
+        }
+        String mailAddress = mailAddressObj.getMailAddress();
+        nickname.setText(mailAddress);
         if (profileDataChannel == null) {
             // TODO: Remove this once the profile data channels are implemented
             nickname.setText(Long.toHexString(directChannel.getCounterpartId()));
