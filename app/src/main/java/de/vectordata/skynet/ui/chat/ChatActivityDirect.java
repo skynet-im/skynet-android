@@ -120,7 +120,7 @@ public class ChatActivityDirect extends ChatActivityBase {
             P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, 0);
             backgroundHandler.post(() -> {
                 SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(directChannel, new ChannelMessageConfig(), packet);
-                insertMessage(packet);
+                insertMessage(packet, MessageState.SENDING);
             });
             editText.setText("");
         });
@@ -133,11 +133,10 @@ public class ChatActivityDirect extends ChatActivityBase {
         this.lastSeenView = onlineState;
     }
 
-    private void insertMessage(P20ChatMessage msg) {
+    private void insertMessage(P20ChatMessage msg, MessageState messageState) {
         MessageItem oldLatest = messageItems.size() > 0 ? messageItems.get(messageItems.size() - 1) : null;
 
         long myAccountId = Storage.getSession().getAccountId();
-        MessageState messageState = MessageState.SENDING;
         MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
         MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide);
         runOnUiThread(() -> {
@@ -192,8 +191,9 @@ public class ChatActivityDirect extends ChatActivityBase {
 
             if (packet instanceof P20ChatMessage) {
                 P20ChatMessage chatMessage = (P20ChatMessage) packet;
-                insertMessage(chatMessage);
-                readMessage(chatMessage.getParent().messageId);
+                insertMessage(chatMessage, MessageState.SENT);
+                if (chatMessage.getParent().senderId != Storage.getSession().getAccountId())
+                    readMessage(chatMessage.getParent().messageId);
             } else if (packet instanceof P0CChannelMessageResponse) {
                 P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
                 if (response.channelId != directChannel.getChannelId()) return;
