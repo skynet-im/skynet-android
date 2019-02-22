@@ -82,6 +82,7 @@ public class MainActivity extends ThemedActivity {
             return;
         }
         registerPacketListener();
+        checkNicknames();
         if (Storage.getSession() == null) {
             Log.d(TAG, "The user has not logged in, exiting...");
             finish();
@@ -128,12 +129,16 @@ public class MainActivity extends ThemedActivity {
                 if (fragment instanceof PacketListener)
                     ((PacketListener) fragment).onPacket(packet);
 
-            if (packet instanceof P0FSyncFinished) new Thread(() -> {
-                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
-                Nickname nickname = Storage.getDatabase().nicknameDao().last(accountDataChannel.getChannelId());
-                if (nickname == null) runOnUiThread(() -> startActivity(WelcomeActivity.class));
-            }).start();
+            if (packet instanceof P0FSyncFinished) checkNicknames();
         });
+    }
+
+    private void checkNicknames() {
+        new Thread(() -> {
+            Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
+            Nickname nickname = Storage.getDatabase().nicknameDao().last(accountDataChannel.getChannelId());
+            if (nickname == null) runOnUiThread(() -> startActivity(WelcomeActivity.class));
+        }).start();
     }
 
 }

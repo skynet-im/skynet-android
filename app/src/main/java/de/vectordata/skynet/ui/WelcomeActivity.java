@@ -29,7 +29,7 @@ public class WelcomeActivity extends AppCompatActivity {
         Button continueButton = findViewById(R.id.button_continue);
 
         continueButton.setOnClickListener(v -> {
-            String nn = nicknameInput.getText().toString();
+            String nn = nicknameInput.getText().toString().trim();
             new Thread(() -> {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 P25Nickname packet = new P25Nickname(nn);
