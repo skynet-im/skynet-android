@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.os.Handler;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,6 +37,7 @@ import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.MessageSide;
+import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Callback;
 import de.vectordata.skynet.util.Handlers;
 
@@ -43,6 +45,7 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     private Channel directChannel;
     private Channel profileDataChannel;
+    private Channel accountDataChannel;
 
     private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
 
@@ -50,6 +53,10 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     private RecyclerView recyclerView;
     private MessageAdapter adapter;
+
+    private ImageView avatarView;
+    private TextView nicknameView;
+    private TextView lastSeenView;
 
     @Override
     public void initialize() {
@@ -60,11 +67,20 @@ public class ChatActivityDirect extends ChatActivityBase {
 
         long channelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
         long myAccountId = Storage.getSession().getAccountId();
+
         backgroundHandler.post(() -> {
             directChannel = Storage.getDatabase().channelDao().getById(channelId);
             if (directChannel == null) return; // This should not happen in production
 
             profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
+            accountDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
+
+            String friendlyName = NameUtil.getFriendlyName(directChannel.getCounterpartId(), accountDataChannel);
+            runOnUiThread(() -> {
+                nicknameView.setText(friendlyName);
+                lastSeenView.setVisibility(View.GONE);
+                DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128).loadInto(avatarView);
+            });
 
             List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
             Collections.reverse(messages);
@@ -84,6 +100,10 @@ public class ChatActivityDirect extends ChatActivityBase {
                 adapter.notifyDataSetChanged();
                 scrollToBottom();
             });
+
+            List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(directChannel.getChannelId());
+            for (ChatMessage message : unread)
+                readMessage(message.getMessageId());
         });
 
         adapter = new MessageAdapter(messageItems);
@@ -104,30 +124,13 @@ public class ChatActivityDirect extends ChatActivityBase {
             });
             editText.setText("");
         });
-
-        backgroundHandler.post(() -> {
-            List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(directChannel.getChannelId());
-            for (ChatMessage message : unread)
-                readMessage(message.getMessageId());
-        });
     }
 
     @Override
     public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
-        if (profileDataChannel == null) {
-            // TODO: Remove this once the profile data channels are implemented
-            nickname.setText(Long.toHexString(directChannel.getCounterpartId()));
-            onlineState.setText("unknown last seen state");
-            DefaultProfileImage.create(nickname.getText().toString().substring(0, 1), directChannel.getCounterpartId(), 128, 128)
-                    .loadInto(avatar);
-            return;
-        }
-        String nicknameVal = Storage.getDatabase().nicknameDao().last(profileDataChannel.getChannelId()).getNickname();
-
-        nickname.setText(nicknameVal);
-        onlineState.setText("unknown last seen state");
-        DefaultProfileImage.create(nicknameVal.substring(0, 1), profileDataChannel.getOwnerId(), 128, 128)
-                .loadInto(avatar);
+        this.avatarView = avatar;
+        this.nicknameView = nickname;
+        this.lastSeenView = onlineState;
     }
 
     private void insertMessage(P20ChatMessage msg) {

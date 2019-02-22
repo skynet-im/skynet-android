@@ -22,4 +22,6 @@ public interface MailAddressDao {
     @Query("SELECT * FROM mailAddresses WHERE channelId=:channelId AND messageId=:messageId")
     MailAddress get(long channelId, long messageId);
 
+    @Query("SELECT * FROM mailAddresses WHERE channelId=:channelId ORDER BY messageId DESC LIMIT 1")
+    MailAddress last(long channelId);
 }
