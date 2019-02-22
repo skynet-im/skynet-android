@@ -27,6 +27,8 @@ import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.P22MessageReceived;
+import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.ui.chat.ChatActivityBase;
 import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
@@ -73,7 +75,7 @@ public class ChatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         SkynetContext.getCurrent().getNetworkManager().setPacketListener(p -> {
-            if (p instanceof P0FSyncFinished || p instanceof P20ChatMessage || p instanceof P0ACreateChannel)
+            if (p instanceof P0FSyncFinished || p instanceof P20ChatMessage || p instanceof P0ACreateChannel || p instanceof P22MessageReceived || p instanceof P23MessageRead)
                 reload();
         });
         reload();
