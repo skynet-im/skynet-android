@@ -136,6 +136,7 @@ public class MainActivity extends ThemedActivity {
     private void checkNicknames() {
         new Thread(() -> {
             Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
+            if (accountDataChannel == null) return;
             Nickname nickname = Storage.getDatabase().nicknameDao().last(accountDataChannel.getChannelId());
             if (nickname == null) runOnUiThread(() -> startActivity(WelcomeActivity.class));
         }).start();
