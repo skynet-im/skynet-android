@@ -32,6 +32,7 @@ import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
 import de.vectordata.skynet.ui.util.MessageSide;
+import de.vectordata.skynet.ui.util.NameUtil;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -86,8 +87,8 @@ public class ChatsFragment extends Fragment {
             List<ChatsItem> items = new ArrayList<>();
             List<ChatMessage> unreadMessages = Storage.getDatabase().chatMessageDao().queryUnread();
             for (Channel channel : channels) {
-                /*Channel profileDataChannel =  Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.PROFILE_DATA);
-                String nickname = Storage.getDatabase().nicknameDao().last(profileDataChannel.getChannelId()).getNickname();*/
+                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
+                String friendlyName = NameUtil.getFriendlyName(channel.getCounterpartId(), accountDataChannel);
 
                 ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId());
                 ChatsItem item;
@@ -99,9 +100,9 @@ public class ChatsFragment extends Fragment {
 
                     ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
                     MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
-                    item = new ChatsItem(Long.toHexString(channel.getCounterpartId()), latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId());
+                    item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId());
                 } else
-                    item = new ChatsItem(Long.toHexString(channel.getCounterpartId()), context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
+                    item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
                 items.add(item);
             }
             Collections.sort(items, (a, b) -> -(int) (a.getLastActiveDate().toBinary() - b.getLastActiveDate().toBinary()));
