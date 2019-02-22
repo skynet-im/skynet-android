@@ -23,12 +23,16 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
-import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
+import de.vectordata.skynet.net.packet.P14MailAddress;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.P21MessageOverride;
 import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
+import de.vectordata.skynet.net.packet.P25Nickname;
+import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.ui.chat.ChatActivityBase;
 import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
@@ -40,7 +44,7 @@ import de.vectordata.skynet.ui.util.NameUtil;
  * Created by Twometer on 14.12.2018.
  * (c) 2018 Twometer
  */
-public class ChatsFragment extends Fragment {
+public class ChatsFragment extends Fragment implements PacketListener {
 
     private Activity context;
 
@@ -74,11 +78,15 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        SkynetContext.getCurrent().getNetworkManager().setPacketListener(p -> {
-            if (p instanceof P0FSyncFinished || p instanceof P20ChatMessage || p instanceof P0ACreateChannel || p instanceof P22MessageReceived || p instanceof P23MessageRead)
-                reload();
-        });
         reload();
+    }
+
+    @Override
+    public void onPacket(Packet p) {
+        if (p instanceof P0FSyncFinished || p instanceof P20ChatMessage || p instanceof P0ACreateChannel
+                || p instanceof P22MessageReceived || p instanceof P23MessageRead || p instanceof P21MessageOverride
+                || p instanceof P14MailAddress || p instanceof P25Nickname)
+            reload();
     }
 
     private void reload() {

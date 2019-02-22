@@ -24,6 +24,7 @@
     <string name="action_new_group">New group</string>
     <string name="action_profile">Profile</string>
     <string name="action_settings">Settings</string>
+    <string name="action_continue">Continue</string>
 
     <string name="link_create_account">New to Skynet? Create an account now</string>
 
@@ -87,4 +88,7 @@
 
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
+
+    <string name="header_welcome">Welcome to Skynet!</string>
+    <string name="header_nickname">Complete your registration by entering a nickname below.</string>
 </resources>

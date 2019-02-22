@@ -369,4 +369,8 @@ public class PacketHandler {
     public void handlePacket(P31FileUploadResponse packet) {
 
     }
+
+    boolean isInSync() {
+        return inSync;
+    }
 }

@@ -45,6 +45,10 @@ public class SkynetContext implements KeyProvider {
         return KeyStore.from64ByteArray(sha512);
     }
 
+    public boolean isInSync() {
+        return getNetworkManager().isInSync();
+    }
+
     public static SkynetContext getCurrent() {
         if (currentContext == null)
             currentContext = new SkynetContext();

@@ -182,4 +182,8 @@ public class NetworkManager implements VSLClientListener {
         packetCache.clear();
     }
 
+    boolean isInSync() {
+        return packetHandler.isInSync();
+    }
+
 }

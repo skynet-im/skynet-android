@@ -11,14 +11,22 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.Objects;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.Nickname;
+import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.listener.PacketListener;
+import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.ui.AddContactActivity;
 import de.vectordata.skynet.ui.LoginActivity;
 import de.vectordata.skynet.ui.NewGroupActivity;
 import de.vectordata.skynet.ui.PreferencesActivity;
+import de.vectordata.skynet.ui.WelcomeActivity;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.main.fab.FabController;
 import de.vectordata.skynet.ui.main.fab.FabState;
@@ -73,6 +81,7 @@ public class MainActivity extends ThemedActivity {
             leftForLogin = false;
             return;
         }
+        registerPacketListener();
         if (Storage.getSession() == null) {
             Log.d(TAG, "The user has not logged in, exiting...");
             finish();
@@ -110,6 +119,21 @@ public class MainActivity extends ThemedActivity {
     @Override
     protected boolean hasCustomToolbar() {
         return true;
+    }
+
+
+    private void registerPacketListener() {
+        SkynetContext.getCurrent().getNetworkManager().setPacketListener(packet -> {
+            for (Fragment fragment : getSupportFragmentManager().getFragments())
+                if (fragment instanceof PacketListener)
+                    ((PacketListener) fragment).onPacket(packet);
+
+            if (packet instanceof P0FSyncFinished) new Thread(() -> {
+                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
+                Nickname nickname = Storage.getDatabase().nicknameDao().last(accountDataChannel.getChannelId());
+                if (nickname == null) runOnUiThread(() -> startActivity(WelcomeActivity.class));
+            }).start();
+        });
     }
 
 }

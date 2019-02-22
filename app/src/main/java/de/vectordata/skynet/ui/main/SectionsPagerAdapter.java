@@ -27,11 +27,12 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             return new ChatsFragment();
         if (position == 2)
             return new DaystreamFragment();
-        return null;
+        throw new ArrayIndexOutOfBoundsException(position);
     }
 
     @Override
     public int getCount() {
         return 3;
     }
+
 }

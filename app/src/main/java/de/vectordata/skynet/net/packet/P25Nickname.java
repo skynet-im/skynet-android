@@ -18,6 +18,13 @@ public class P25Nickname extends ChannelMessagePacket {
 
     public String nickname;
 
+    public P25Nickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public P25Nickname() {
+    }
+
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(nickname);
