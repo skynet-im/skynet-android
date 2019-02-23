@@ -134,6 +134,7 @@ public class MainActivity extends ThemedActivity {
     }
 
     private void checkNicknames() {
+        if (!SkynetContext.getCurrent().isInSync()) return;
         new Thread(() -> {
             Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
             if (accountDataChannel == null) return;
