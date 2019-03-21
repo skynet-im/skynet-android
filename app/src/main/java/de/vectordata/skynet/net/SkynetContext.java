@@ -10,6 +10,8 @@ import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.net.messages.MessageInterface;
+import de.vectordata.skynet.ui.notification.INotificationManager;
+import de.vectordata.skynet.ui.notification.NotificationManagerFactory;
 
 public class SkynetContext implements KeyProvider {
 
@@ -17,8 +19,10 @@ public class SkynetContext implements KeyProvider {
 
     private MessageInterface messageInterface;
     private NetworkManager networkManager;
+    private INotificationManager notificationManager;
 
     private SkynetContext() {
+        notificationManager = (new NotificationManagerFactory()).createManager();
         messageInterface = new MessageInterface(this);
         networkManager = new NetworkManager(this);
         networkManager.connect();
@@ -30,6 +34,10 @@ public class SkynetContext implements KeyProvider {
 
     public MessageInterface getMessageInterface() {
         return messageInterface;
+    }
+
+    public INotificationManager getNotificationManager() {
+        return notificationManager;
     }
 
     @Override

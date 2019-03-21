@@ -22,6 +22,7 @@ public class SkynetApplication extends Application {
         FirebaseApp.initializeApp(this);
         SkynetContext.getCurrent().getNetworkManager().connect();
         EmojiManager.install(new IosEmojiProvider());
+        SkynetContext.getCurrent().getNotificationManager().onInitialize(this);
         Log.i(TAG, "Application init completed");
     }
 

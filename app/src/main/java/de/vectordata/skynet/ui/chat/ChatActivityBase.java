@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 
 /**
@@ -77,5 +78,17 @@ public abstract class ChatActivityBase extends ThemedActivity {
     public abstract void initialize();
 
     public abstract void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState);
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SkynetContext.getCurrent().getNotificationManager().onForeground();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SkynetContext.getCurrent().getNotificationManager().onBackground();
+    }
 
 }
