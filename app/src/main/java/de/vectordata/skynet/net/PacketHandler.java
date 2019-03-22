@@ -274,6 +274,7 @@ public class PacketHandler {
         if (packet.getParent().senderId == Storage.getSession().getAccountId())
             return; // Don't send receive confirmations for my own messages
         sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
+        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet);
     }
 
     public void handlePacket(P21MessageOverride packet) {

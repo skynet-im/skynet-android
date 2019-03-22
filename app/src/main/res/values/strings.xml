@@ -91,4 +91,7 @@
 
     <string name="header_welcome">Welcome to Skynet!</string>
     <string name="header_nickname">Complete your registration by entering a nickname below.</string>
+
+    <string name="notification_channel_name">New message notifications</string>
+    <string name="notification_channel_desc">Notifications for new chat messages are posted to this notification channel</string>
 </resources>

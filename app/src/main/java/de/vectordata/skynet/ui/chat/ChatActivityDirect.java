@@ -72,6 +72,8 @@ public class ChatActivityDirect extends ChatActivityBase {
             directChannel = Storage.getDatabase().channelDao().getById(channelId);
             if (directChannel == null) return; // This should not happen in production
 
+            SkynetContext.getCurrent().getNotificationManager().onMessagesDeleted(directChannel.getChannelId());
+
             profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
             accountDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
 
