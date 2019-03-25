@@ -94,4 +94,5 @@
 
     <string name="notification_channel_name">New message notifications</string>
     <string name="notification_channel_desc">Notifications for new chat messages are posted to this notification channel</string>
+    <string name="notification_subtitle">%1$d messages from %2$d chats</string>
 </resources>

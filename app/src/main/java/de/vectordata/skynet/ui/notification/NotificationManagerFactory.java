@@ -1,10 +1,14 @@
 package de.vectordata.skynet.ui.notification;
 
+import android.os.Build;
+
 public class NotificationManagerFactory {
 
     public INotificationManager createManager() {
-        // TODO: Return correct manager based on the system version
-        return new NotificationManagerNew();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            return new NotificationManagerNew();
+        else
+            return new NotificationManagerOld();
     }
 
 }

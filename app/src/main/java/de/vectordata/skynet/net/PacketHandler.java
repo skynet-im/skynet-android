@@ -290,8 +290,10 @@ public class PacketHandler {
             }
         } else {
             ChatMessage message = Storage.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.messageId);
-            if (packet.action == OverrideAction.DELETE) message.setText("\0");
-            else {
+            if (packet.action == OverrideAction.DELETE) {
+                message.setText("\0");
+                SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(packet.getParent().channelId, packet.messageId);
+            } else {
                 message.setText(packet.newText);
                 message.setEdited(true);
             }
