@@ -28,7 +28,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.WelcomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysVisible" />
         <activity android:name=".ui.chat.ChatActivityDirect" />
         <activity
             android:name=".ui.AddContactActivity"

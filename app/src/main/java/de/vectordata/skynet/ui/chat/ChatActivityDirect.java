@@ -208,7 +208,10 @@ public class ChatActivityDirect extends ChatActivityBase {
                 });
             } else if (packet instanceof P22MessageReceived) {
                 P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packet).getParent().singleDependency();
-                modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.DELIVERED));
+                modifyMessageItem(dependency.messageId, i -> {
+                    if (i.getMessageState() != MessageState.SEEN)
+                        i.setMessageState(MessageState.DELIVERED);
+                });
             } else if (packet instanceof P23MessageRead) {
                 P0BChannelMessage.Dependency dependency = ((P23MessageRead) packet).getParent().singleDependency();
                 modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));

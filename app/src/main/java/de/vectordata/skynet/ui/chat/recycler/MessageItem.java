@@ -44,7 +44,7 @@ public class MessageItem {
         return sentDate;
     }
 
-    MessageState getMessageState() {
+    public MessageState getMessageState() {
         return messageState;
     }
 

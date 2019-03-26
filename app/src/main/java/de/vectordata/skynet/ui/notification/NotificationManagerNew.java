@@ -85,6 +85,8 @@ public class NotificationManagerNew implements INotificationManager {
             notificationManager.cancel(notificationIdMap.get(channelId));
             notificationIdMap.remove(channelId);
         }
+        if (messages.size() == 0)
+            notificationManager.cancel(SUMMARY_ID);
     }
 
     @Override

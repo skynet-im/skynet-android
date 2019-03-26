@@ -3,6 +3,7 @@ package de.vectordata.skynet.ui.main.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
+import de.vectordata.skynet.util.Handlers;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -48,11 +50,11 @@ public class ChatsFragment extends Fragment implements PacketListener {
 
     private Activity context;
 
+    private Handler handler;
+
     private ChatsAdapter adapter;
 
     private List<ChatsItem> dataset = new ArrayList<>();
-
-    private boolean isReloading;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +64,8 @@ public class ChatsFragment extends Fragment implements PacketListener {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         context = Objects.requireNonNull(getActivity());
+        if (handler == null)
+            handler = Handlers.createOnThread("DatabaseThread");
 
         adapter = new ChatsAdapter(dataset);
         adapter.setItemClickListener(idx -> {
@@ -90,9 +94,7 @@ public class ChatsFragment extends Fragment implements PacketListener {
     }
 
     private void reload() {
-        new Thread(() -> {
-            if (isReloading) return;
-            isReloading = true;
+        handler.post(() -> {
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatsItem> items = new ArrayList<>();
             List<ChatMessage> unreadMessages = Storage.getDatabase().chatMessageDao().queryUnread();
@@ -115,14 +117,13 @@ public class ChatsFragment extends Fragment implements PacketListener {
                     item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
                 items.add(item);
             }
-            Collections.sort(items, (a, b) -> -(int) (a.getLastActiveDate().toBinary() - b.getLastActiveDate().toBinary()));
+            Collections.sort(items, (a, b) -> -Long.compare(a.getLastActiveDate().toBinary(), b.getLastActiveDate().toBinary()));
             context.runOnUiThread(() -> {
                 dataset.clear();
                 dataset.addAll(items);
                 adapter.notifyDataSetChanged();
-                isReloading = false;
             });
-        }).start();
+        });
     }
 
 }

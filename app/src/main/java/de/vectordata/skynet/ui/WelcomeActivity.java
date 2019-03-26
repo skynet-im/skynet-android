@@ -37,6 +37,8 @@ public class WelcomeActivity extends AppCompatActivity {
                         .waitForPacket(P0CChannelMessageResponse.class, p -> runOnUiThread(this::finish));
             }).start();
         });
+
+        findViewById(R.id.input_nickname).requestFocus();
     }
 
 }
