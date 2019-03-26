@@ -94,6 +94,7 @@ public class ChatsFragment extends Fragment implements PacketListener {
     }
 
     private void reload() {
+        if (handler == null) return;
         handler.post(() -> {
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatsItem> items = new ArrayList<>();
