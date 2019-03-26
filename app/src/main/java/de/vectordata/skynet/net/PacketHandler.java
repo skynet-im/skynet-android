@@ -270,11 +270,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P20ChatMessage packet) {
+        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet);
         if (!inSync) return; // Only send receive confirmations live if in sync
         if (packet.getParent().senderId == Storage.getSession().getAccountId())
             return; // Don't send receive confirmations for my own messages
         sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
-        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet);
     }
 
     public void handlePacket(P21MessageOverride packet) {
