@@ -70,6 +70,8 @@ public class LoginActivity extends SkynetActivity {
         networkManager.connect();
 
         networkManager.setErrorListener(() -> runOnUiThread(() -> {
+            if (!getWindow().getDecorView().isShown())
+                return;
             progressDialog.dismiss();
             Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_no_connection);
             networkManager.setErrorListener(null);
@@ -84,7 +86,7 @@ public class LoginActivity extends SkynetActivity {
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);
                     else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
-                    else if(p.errorCode == CreateSessionError.UNCONFIRMED_ACCOUNT)
+                    else if (p.errorCode == CreateSessionError.UNCONFIRMED_ACCOUNT)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_unconfirmed_account);
                     else if (p.errorCode == CreateSessionError.SUCCESS) {
                         session.setSessionId(p.sessionId);
