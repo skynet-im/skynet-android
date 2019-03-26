@@ -36,6 +36,7 @@ import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
+import de.vectordata.skynet.ui.util.KeyboardUtil;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Callback;
@@ -62,6 +63,8 @@ public class ChatActivityDirect extends ChatActivityBase {
     public void initialize() {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        KeyboardUtil.registerOnKeyboardOpen(recyclerView, this::scrollToBottom);
 
         messageItems = new ArrayList<>();
 
