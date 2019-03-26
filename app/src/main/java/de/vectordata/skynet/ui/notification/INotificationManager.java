@@ -12,9 +12,7 @@ public interface INotificationManager {
 
     void onMessageDeleted(long channelId, long messageId);
 
-    void onMessagesDeleted(long channelId);
-
-    void onForeground();
+    void onForeground(long channelId);
 
     void onBackground();
 

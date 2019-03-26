@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -28,12 +29,17 @@ import de.vectordata.skynet.ui.NewGroupActivity;
 import de.vectordata.skynet.ui.PreferencesActivity;
 import de.vectordata.skynet.ui.WelcomeActivity;
 import de.vectordata.skynet.ui.base.ThemedActivity;
+import de.vectordata.skynet.ui.chat.ChatActivityBase;
+import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.fab.FabController;
 import de.vectordata.skynet.ui.main.fab.FabState;
 
 public class MainActivity extends ThemedActivity {
 
     private static final String TAG = "MainActivity";
+
+    public static final String ACTION_OPEN_CHAT = "de.vectordata.skynet.open_chat";
+    public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.open_chat.channel";
 
     private boolean leftForLogin;
 
@@ -75,6 +81,12 @@ public class MainActivity extends ThemedActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(getIntent());
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (leftForLogin) {
@@ -86,6 +98,18 @@ public class MainActivity extends ThemedActivity {
         if (Storage.getSession() == null) {
             Log.d(TAG, "The user has not logged in, exiting...");
             finish();
+        }
+        handleIntent(getIntent());
+        setIntent(null);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+        long channelId = intent.getLongExtra(EXTRA_CHANNEL_ID, 0);
+        if (channelId != 0) {
+            Intent chatIntent = new Intent(this, ChatActivityDirect.class);
+            chatIntent.putExtra(ChatActivityBase.EXTRA_CHANNEL_ID, channelId);
+            startActivity(chatIntent);
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 
 public class NotificationManagerOld implements INotificationManager {
+
     @Override
     public void onInitialize(Context context) {
 
@@ -21,12 +22,7 @@ public class NotificationManagerOld implements INotificationManager {
     }
 
     @Override
-    public void onMessagesDeleted(long channelId) {
-
-    }
-
-    @Override
-    public void onForeground() {
+    public void onForeground(long channelId) {
 
     }
 

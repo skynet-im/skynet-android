@@ -82,7 +82,6 @@ public abstract class ChatActivityBase extends ThemedActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        SkynetContext.getCurrent().getNotificationManager().onForeground();
     }
 
     @Override
