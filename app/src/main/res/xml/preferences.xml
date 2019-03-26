@@ -68,4 +68,8 @@
             app:summary="%version%"
             app:title="@string/pref_version" />
     </PreferenceCategory>
+    <Preference
+        app:key="logoff"
+        app:summary="@string/pref_logoff_summary"
+        app:title="@string/pref_logoff" />
 </androidx.preference.PreferenceScreen>

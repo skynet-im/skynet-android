@@ -49,6 +49,9 @@
     <string name="success_header_create_acc">Account created</string>
     <string name="success_create_acc">Your account has been created successfully. Please confirm it by clicking the code we sent to you by email.</string>
 
+    <string name="question_header_logoff">Log off?</string>
+    <string name="question_logoff">Do you really want to log off from this device?</string>
+
     <string name="tab_header_contacts">Contacts</string>
     <string name="tab_header_chats">Chats</string>
     <string name="tab_header_daystream">Daystream</string>
@@ -82,6 +85,8 @@
     <string name="pref_version">Version</string>
     <string name="pref_licenses">Licenses</string>
     <string name="pref_licenses_summary">View open-source licenses</string>
+    <string name="pref_logoff">Log off</string>
+    <string name="pref_logoff_summary">Log off your account from this device.</string>
 
     <string name="tip_start_chatting">Tap here to send your first message</string>
     <string name="tip_create_chats">Looks like you don\'t have any contacts yet. Add friends to Skynet via the contacts tab.</string>

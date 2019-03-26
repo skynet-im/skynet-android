@@ -7,7 +7,6 @@ import org.nustaq.serialization.FSTConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -38,6 +37,11 @@ public class ObjectCache<T> {
     public T get() {
         if (cache == null) load();
         return cache;
+    }
+
+    public void clear() {
+        cache = null;
+        file.delete();
     }
 
     private void load() {

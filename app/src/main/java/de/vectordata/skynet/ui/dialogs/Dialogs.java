@@ -30,6 +30,15 @@ public class Dialogs {
                 .show();
     }
 
+    public static void showYesNoBox(Context context, int titleRes, int contentRes, DialogInterface.OnClickListener yesListener, DialogInterface.OnClickListener noListener) {
+        new AlertDialog.Builder(context)
+                .setTitle(titleRes)
+                .setMessage(contentRes)
+                .setPositiveButton(R.string.yes, yesListener)
+                .setPositiveButton(R.string.no, noListener)
+                .show();
+    }
+
     public static void showMessageBox(Context context, int titleRes, String content) {
         new AlertDialog.Builder(context)
                 .setTitle(titleRes)

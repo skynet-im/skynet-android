@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import com.takisoft.preferencex.PreferenceFragmentCompat;
@@ -13,7 +14,9 @@ import androidx.preference.Preference;
 import de.psdev.licensesdialog.LicensesDialog;
 import de.vectordata.skynet.BuildConfig;
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.ui.base.ThemedActivity;
+import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.util.Activities;
 
 /**
@@ -37,15 +40,18 @@ public class PreferencesActivity extends ThemedActivity {
         @Override
         public void onCreatePreferencesFix(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences, rootKey);
+
+            Activity activity = Objects.requireNonNull(getActivity());
+
             Preference colorTheme = findPreference("color_theme");
             colorTheme.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
             colorTheme.setOnPreferenceChangeListener((preference, newValue) -> {
-                Objects.requireNonNull(getActivity()).recreate();
+                activity.recreate();
                 return true;
             });
 
             findPreference("licenses").setOnPreferenceClickListener(preference -> {
-                new LicensesDialog.Builder(Objects.requireNonNull(getContext()))
+                new LicensesDialog.Builder(activity)
                         .setTitle(R.string.pref_licenses)
                         .setNotices(R.raw.licenses)
                         .setIncludeOwnLicense(true)
@@ -55,6 +61,14 @@ public class PreferencesActivity extends ThemedActivity {
             });
 
             findPreference("version").setSummary(String.format(Locale.getDefault(), "%s (build %d)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
+
+            findPreference("logoff").setOnPreferenceClickListener(preference -> {
+                Dialogs.showYesNoBox(activity, R.string.question_header_logoff, R.string.question_logoff, (dialog, which) -> {
+                    Storage.clear();
+                    activity.finish();
+                }, null);
+                return true;
+            });
         }
     }
 

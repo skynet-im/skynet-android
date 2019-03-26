@@ -40,4 +40,9 @@ public class Storage {
         return true;
     }
 
+    public static void clear() {
+        skynetDatabase.clearAllTables();
+        sessionCache.clear();
+    }
+
 }
