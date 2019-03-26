@@ -35,7 +35,7 @@ public class Dialogs {
                 .setTitle(titleRes)
                 .setMessage(contentRes)
                 .setPositiveButton(R.string.yes, yesListener)
-                .setPositiveButton(R.string.no, noListener)
+                .setNegativeButton(R.string.no, noListener)
                 .show();
     }
 

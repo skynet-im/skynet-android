@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.takisoft.preferencex.PreferenceFragmentCompat;
@@ -63,10 +64,11 @@ public class PreferencesActivity extends ThemedActivity {
             findPreference("version").setSummary(String.format(Locale.getDefault(), "%s (build %d)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
 
             findPreference("logoff").setOnPreferenceClickListener(preference -> {
-                Dialogs.showYesNoBox(activity, R.string.question_header_logoff, R.string.question_logoff, (dialog, which) -> {
+                Dialogs.showYesNoBox(activity, R.string.question_header_logoff, R.string.question_logoff, (dialog, which) -> new Thread(() -> {
                     Storage.clear();
+                    startActivity(new Intent(activity, LoginActivity.class));
                     activity.finish();
-                }, null);
+                }).start(), null);
                 return true;
             });
         }
