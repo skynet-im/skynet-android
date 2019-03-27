@@ -20,7 +20,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.ui.main.MainActivity;
 import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Handlers;
@@ -55,9 +54,9 @@ public class NotificationManagerNew implements INotificationManager {
     }
 
     @Override
-    public void onMessageReceived(P20ChatMessage chatMessage) {
-        if (chatMessage.getParent().channelId == foregroundChannelId) return;
-        messages.add(new MessageInfo(chatMessage.getParent().channelId, chatMessage.getParent().messageId, chatMessage.text));
+    public void onMessageReceived(long channelId, long messageId, String text) {
+        if (channelId == foregroundChannelId) return;
+        messages.add(new MessageInfo(channelId, messageId, text));
         resendNotification();
     }
 

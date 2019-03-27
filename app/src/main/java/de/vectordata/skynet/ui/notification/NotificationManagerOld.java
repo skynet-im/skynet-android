@@ -2,8 +2,6 @@ package de.vectordata.skynet.ui.notification;
 
 import android.content.Context;
 
-import de.vectordata.skynet.net.packet.P20ChatMessage;
-
 public class NotificationManagerOld implements INotificationManager {
 
     @Override
@@ -12,7 +10,7 @@ public class NotificationManagerOld implements INotificationManager {
     }
 
     @Override
-    public void onMessageReceived(P20ChatMessage chatMessage) {
+    public void onMessageReceived(long channelId, long messageId, String content) {
 
     }
 

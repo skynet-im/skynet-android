@@ -206,8 +206,10 @@ public class PacketHandler {
             );
         }
         inSync = true;
-        for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed())
+        for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed()) {
             sendReceiveConfirmation(msg.getChannelId(), msg.getMessageId());
+            SkynetContext.getCurrent().getNotificationManager().onMessageReceived(msg.getChannelId(), msg.getMessageId(), msg.getText());
+        }
     }
 
     public void handlePacket(P10RealTimeMessage packet) {
@@ -270,11 +272,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P20ChatMessage packet) {
-        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet);
         if (!inSync) return; // Only send receive confirmations live if in sync
         if (packet.getParent().senderId == Storage.getSession().getAccountId())
             return; // Don't send receive confirmations for my own messages
         sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
+        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet.getParent().channelId, packet.getParent().messageId, packet.text);
     }
 
     public void handlePacket(P21MessageOverride packet) {
