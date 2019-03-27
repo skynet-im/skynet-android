@@ -208,6 +208,11 @@ public class PacketHandler {
         inSync = true;
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed()) {
             sendReceiveConfirmation(msg.getChannelId(), msg.getMessageId());
+        }
+        for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnread()) {
+            ChannelMessage channelMsg = Storage.getDatabase().channelMessageDao().getById(msg.getChannelId(), msg.getMessageId());
+            if (channelMsg.getSenderId() == Storage.getSession().getAccountId())
+                continue;
             SkynetContext.getCurrent().getNotificationManager().onMessageReceived(msg.getChannelId(), msg.getMessageId(), msg.getText());
         }
     }

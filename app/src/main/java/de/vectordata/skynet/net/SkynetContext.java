@@ -28,6 +28,11 @@ public class SkynetContext implements KeyProvider {
         networkManager.connect();
     }
 
+    public void recreateNetworkManager() {
+        this.networkManager = new NetworkManager(this);
+        this.networkManager.connect();
+    }
+
     public NetworkManager getNetworkManager() {
         return networkManager;
     }

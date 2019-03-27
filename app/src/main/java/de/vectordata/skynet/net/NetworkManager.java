@@ -70,6 +70,10 @@ public class NetworkManager implements VSLClientListener {
         }).start();
     }
 
+    public void disconnect() {
+        vslClient.disconnect();
+    }
+
     public ResponseAwaiter sendPacket(Packet packet) {
         if (shouldCache(packet)) packetCache.add(packet);
         else {
