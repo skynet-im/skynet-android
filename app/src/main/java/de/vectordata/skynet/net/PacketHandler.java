@@ -312,6 +312,7 @@ public class PacketHandler {
     public void handlePacket(P23MessageRead packet) {
         P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
         setMessageState(dependency.channelId, dependency.messageId, MessageState.SEEN);
+        SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(dependency.channelId, dependency.messageId);
     }
 
     private void sendReceiveConfirmation(long channelId, long messageId) {

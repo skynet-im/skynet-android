@@ -70,11 +70,28 @@ public class NotificationManagerNew implements INotificationManager {
             messages.remove(toBeDeleted);
             resendNotification();
         }
+        for (MessageInfo info : messages)
+            if (info.getChannelId() == channelId)
+                return;
+        clearNotifications(channelId);
     }
 
     @Override
     public void onForeground(long channelId) {
         foregroundChannelId = channelId;
+        clearNotifications(channelId);
+    }
+
+    @Override
+    public void onBackground() {
+        foregroundChannelId = 0;
+    }
+
+    private void resendNotification() {
+        handler.post(this::resendNotificationImpl);
+    }
+
+    private void clearNotifications(long channelId) {
         List<MessageInfo> toBeDeleted = new ArrayList<>();
         for (MessageInfo info : messages)
             if (info.getChannelId() == channelId)
@@ -88,16 +105,15 @@ public class NotificationManagerNew implements INotificationManager {
             notificationManager.cancel(SUMMARY_ID);
     }
 
-    @Override
-    public void onBackground() {
-        foregroundChannelId = 0;
-    }
-
-    private void resendNotification() {
-        handler.post(this::resendNotificationImpl);
-    }
-
     private void resendNotificationImpl() {
+        if (messages.size() == 0) {
+            for (int i = 0; i < notificationIdMap.size(); i++)
+                notificationManager.cancel(notificationIdMap.valueAt(i));
+            notificationManager.cancel(SUMMARY_ID);
+            notificationIdMap.clear();
+            return;
+        }
+
         int color = ContextCompat.getColor(context, R.color.colorPrimary);
 
         Set<Long> channelSet = new HashSet<>();
