@@ -80,11 +80,6 @@ public abstract class ChatActivityBase extends ThemedActivity {
     public abstract void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState);
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         SkynetContext.getCurrent().getNotificationManager().onBackground();

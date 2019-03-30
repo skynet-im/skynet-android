@@ -185,7 +185,7 @@ public class ChatActivityDirect extends ChatActivityBase {
     }
 
     @Subscribe
-    private void onPacket(PacketEvent event){
+    public void onPacketEvent(PacketEvent event) {
         Packet packet = event.getPacket();
         if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != directChannel.getChannelId())
             return;
