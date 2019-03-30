@@ -4,9 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.MenuItem;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.net.NetworkManager;
+import de.vectordata.skynet.event.AuthenticationFailedEvent;
+import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
@@ -18,12 +23,6 @@ import de.vectordata.skynet.ui.dialogs.Dialogs;
  */
 public abstract class SkynetActivity extends AppCompatActivity {
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerDialogs();
-    }
-
     protected SkynetContext getSkynetContext() {
         return SkynetContext.getCurrent();
     }
@@ -32,22 +31,20 @@ public abstract class SkynetActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), clazz));
     }
 
-    private void registerDialogs() {
-        NetworkManager manager = SkynetContext.getCurrent().getNetworkManager();
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHandshakeFailed(HandshakeFailedEvent event){
+        if (event.getState() == HandshakeState.CAN_UPGRADE)
+            Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.warn_can_upgrade), event.getNewVersion()));
+        else if (event.getState() == HandshakeState.MUST_UPGRADE)
+            Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.error_must_upgrade), event.getNewVersion()));
+    }
 
-        manager.setHandshakeListener((state, ver) -> runOnUiThread(() -> {
-            if (state == HandshakeState.CAN_UPGRADE)
-                Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.warn_can_upgrade), ver));
-            else if (state == HandshakeState.MUST_UPGRADE)
-                Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.error_must_upgrade), ver));
-        }));
-
-        manager.setAuthenticationListener((state) -> runOnUiThread(() -> {
-            if (state == RestoreSessionError.INVALID_CREDENTIALS)
-                Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
-            else if (state == RestoreSessionError.INVALID_SESSION)
-                Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
-        }));
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAuthenticationFailed(AuthenticationFailedEvent event){
+        if (event.getError() == RestoreSessionError.INVALID_CREDENTIALS)
+            Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
+        else if (event.getError() == RestoreSessionError.INVALID_SESSION)
+            Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
     }
 
     @Override
@@ -57,6 +54,18 @@ public abstract class SkynetActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
 }

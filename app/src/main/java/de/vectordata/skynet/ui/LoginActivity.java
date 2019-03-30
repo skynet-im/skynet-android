@@ -7,11 +7,15 @@ import android.widget.EditText;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.crypto.hash.KeyCollection;
 import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
@@ -69,14 +73,6 @@ public class LoginActivity extends SkynetActivity {
         NetworkManager networkManager = getSkynetContext().getNetworkManager();
         networkManager.connect();
 
-        networkManager.setErrorListener(() -> runOnUiThread(() -> {
-            if (!getWindow().getDecorView().isShown())
-                return;
-            progressDialog.dismiss();
-            Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_no_connection);
-            networkManager.setErrorListener(null);
-        }));
-
         Session session = new Session(keys);
 
         networkManager.sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
@@ -95,6 +91,12 @@ public class LoginActivity extends SkynetActivity {
                         finish();
                     }
                 }));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnectionFailed(ConnectionFailedEvent event) {
+        progressDialog.dismiss();
+        Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_no_connection);
     }
 
     @Override

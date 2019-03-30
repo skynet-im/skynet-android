@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import com.vanniktech.emoji.EmojiEditText;
 
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,8 +23,8 @@ import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
+import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.listener.PacketListener;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
@@ -114,8 +116,6 @@ public class ChatActivityDirect extends ChatActivityBase {
         adapter = new MessageAdapter(messageItems);
         recyclerView.setAdapter(adapter);
 
-        SkynetContext.getCurrent().getNetworkManager().setPacketListener(new PacketHandler());
-
         EmojiEditText editText = findViewById(R.id.input_message);
         findViewById(R.id.button_send).setOnClickListener(v -> {
             String text;
@@ -184,38 +184,34 @@ public class ChatActivityDirect extends ChatActivityBase {
         });
     }
 
-    /**
-     * Updates the current activity with
-     * new messages / message changes
-     */
-    private class PacketHandler implements PacketListener {
-        @Override
-        public void onPacket(Packet packet) {
-            if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != directChannel.getChannelId())
-                return;
+    @Subscribe
+    private void onPacket(PacketEvent event){
+        Packet packet = event.getPacket();
+        if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != directChannel.getChannelId())
+            return;
 
-            if (packet instanceof P20ChatMessage) {
-                P20ChatMessage chatMessage = (P20ChatMessage) packet;
-                insertMessage(chatMessage, MessageState.SENT);
-                if (chatMessage.getParent().senderId != Storage.getSession().getAccountId())
-                    readMessage(chatMessage.getParent().messageId);
-            } else if (packet instanceof P0CChannelMessageResponse) {
-                P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
-                if (response.channelId != directChannel.getChannelId()) return;
-                modifyMessageItem(response.tempMessageId, i -> {
-                    i.setMessageId(response.messageId);
-                    i.setMessageState(MessageState.SENT);
-                });
-            } else if (packet instanceof P22MessageReceived) {
-                P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packet).getParent().singleDependency();
-                modifyMessageItem(dependency.messageId, i -> {
-                    if (i.getMessageState() != MessageState.SEEN)
-                        i.setMessageState(MessageState.DELIVERED);
-                });
-            } else if (packet instanceof P23MessageRead) {
-                P0BChannelMessage.Dependency dependency = ((P23MessageRead) packet).getParent().singleDependency();
-                modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));
-            }
+        if (packet instanceof P20ChatMessage) {
+            P20ChatMessage chatMessage = (P20ChatMessage) packet;
+            insertMessage(chatMessage, MessageState.SENT);
+            if (chatMessage.getParent().senderId != Storage.getSession().getAccountId())
+                readMessage(chatMessage.getParent().messageId);
+        } else if (packet instanceof P0CChannelMessageResponse) {
+            P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
+            if (response.channelId != directChannel.getChannelId()) return;
+            modifyMessageItem(response.tempMessageId, i -> {
+                i.setMessageId(response.messageId);
+                i.setMessageState(MessageState.SENT);
+            });
+        } else if (packet instanceof P22MessageReceived) {
+            P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packet).getParent().singleDependency();
+            modifyMessageItem(dependency.messageId, i -> {
+                if (i.getMessageState() != MessageState.SEEN)
+                    i.setMessageState(MessageState.DELIVERED);
+            });
+        } else if (packet instanceof P23MessageRead) {
+            P0BChannelMessage.Dependency dependency = ((P23MessageRead) packet).getParent().singleDependency();
+            modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));
         }
     }
+
 }

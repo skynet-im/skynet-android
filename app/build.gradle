@@ -47,10 +47,11 @@ dependencies {
     implementation 'vectordata:libargon2:1.0.1@aar'
     implementation 'de.ruedigermoeller:fst:2.56'
     implementation 'de.psdev.licensesdialog:licensesdialog:2.0.0'
-    implementation 'com.google.android.material:material:1.1.0-alpha04'
+    implementation 'com.google.android.material:material:1.1.0-alpha05'
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-messaging:17.5.0'
     implementation 'com.vanniktech:emoji-ios:0.6.0'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 
     annotationProcessor 'androidx.room:room-compiler:2.1.0-alpha06'
     testImplementation 'androidx.room:room-testing:2.1.0-alpha06'

@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +27,7 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
-import de.vectordata.skynet.net.listener.PacketListener;
+import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P14MailAddress;
@@ -46,7 +49,7 @@ import de.vectordata.skynet.util.Handlers;
  * Created by Twometer on 14.12.2018.
  * (c) 2018 Twometer
  */
-public class ChatsFragment extends Fragment implements PacketListener {
+public class ChatsFragment extends Fragment {
 
     private Activity context;
 
@@ -85,11 +88,12 @@ public class ChatsFragment extends Fragment implements PacketListener {
         reload();
     }
 
-    @Override
-    public void onPacket(Packet p) {
-        if (p instanceof P0FSyncFinished || p instanceof P20ChatMessage || p instanceof P0ACreateChannel
-                || p instanceof P22MessageReceived || p instanceof P23MessageRead || p instanceof P21MessageOverride
-                || p instanceof P14MailAddress || p instanceof P25Nickname)
+    @Subscribe
+    public void onPacket(PacketEvent event) {
+        Packet packet = event.getPacket();
+        if (packet instanceof P0FSyncFinished || packet instanceof P20ChatMessage || packet instanceof P0ACreateChannel
+                || packet instanceof P22MessageReceived || packet instanceof P23MessageRead || packet instanceof P21MessageOverride
+                || packet instanceof P14MailAddress || packet instanceof P25Nickname)
             reload();
     }
 
@@ -127,4 +131,15 @@ public class ChatsFragment extends Fragment implements PacketListener {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
 }

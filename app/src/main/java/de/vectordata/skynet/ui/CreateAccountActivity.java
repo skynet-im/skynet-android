@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.Objects;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.crypto.hash.HashProvider;
+import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
@@ -48,11 +52,7 @@ public class CreateAccountActivity extends SkynetActivity {
         Log.d("CreateAccountActivity", "Creating user with " + accountName + " and " + keyHash.length);
         NetworkManager networkManager = getSkynetContext().getNetworkManager();
         networkManager.connect();
-        networkManager.setErrorListener(() -> runOnUiThread(() -> {
-            progressDialog.dismiss();
-            Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_no_connection);
-            networkManager.setErrorListener(null);
-        }));
+
         networkManager.sendPacket(new P02CreateAccount(accountName, keyHash))
                 .waitForPacket(P03CreateAccountResponse.class, packet -> runOnUiThread(() -> {
                     progressDialog.dismiss();
@@ -63,6 +63,12 @@ public class CreateAccountActivity extends SkynetActivity {
                     else if (packet.errorCode == CreateAccountError.SUCCESS)
                         Dialogs.showMessageBox(this, R.string.success_header_create_acc, R.string.success_create_acc, (x, y) -> finish());
                 }));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnectionFailed(ConnectionFailedEvent event) {
+        progressDialog.dismiss();
+        Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_no_connection);
     }
 
     @Override

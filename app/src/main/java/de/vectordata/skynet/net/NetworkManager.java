@@ -3,6 +3,8 @@ package de.vectordata.skynet.net;
 import android.os.Handler;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +14,10 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.auth.Authenticator;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.Storage;
-import de.vectordata.skynet.net.listener.AuthenticationListener;
-import de.vectordata.skynet.net.listener.ErrorListener;
-import de.vectordata.skynet.net.listener.HandshakeListener;
-import de.vectordata.skynet.net.listener.PacketListener;
+import de.vectordata.skynet.event.AuthenticationFailedEvent;
+import de.vectordata.skynet.event.AuthenticationSucessfulEvent;
+import de.vectordata.skynet.event.ConnectionFailedEvent;
+import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -37,10 +39,6 @@ public class NetworkManager implements VSLClientListener {
     private PacketHandler packetHandler;
     private ResponseAwaiter responseAwaiter = new ResponseAwaiter();
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
-
-    private AuthenticationListener authenticationListener;
-    private HandshakeListener handshakeListener;
-    private ErrorListener errorListener;
 
     private List<Packet> packetCache = new ArrayList<>();
 
@@ -129,8 +127,7 @@ public class NetworkManager implements VSLClientListener {
         connectionState = ConnectionState.DISCONNECTED;
         Log.d(TAG, "Scheduling reconnect in 1 min");
         handler.postDelayed(this::connect, 60000);
-        if (errorListener != null)
-            errorListener.onConnectionFailed();
+        EventBus.getDefault().post(new ConnectionFailedEvent());
     }
 
     private void authenticate() {
@@ -140,30 +137,15 @@ public class NetworkManager implements VSLClientListener {
             return;
         }
         Authenticator.authenticate(session, err -> {
-            if (err != RestoreSessionError.SUCCESS && authenticationListener != null)
-                authenticationListener.onAuthFailed(err);
+            if (err != RestoreSessionError.SUCCESS)
+                EventBus.getDefault().post(new AuthenticationFailedEvent(err));
+            else
+                EventBus.getDefault().post(new AuthenticationSucessfulEvent());
         });
     }
 
     private void raiseHandshakeEvent(HandshakeState state, String newVersion) {
-        if (handshakeListener != null)
-            handshakeListener.onInvalidState(state, newVersion);
-    }
-
-    public void setHandshakeListener(HandshakeListener handshakeListener) {
-        this.handshakeListener = handshakeListener;
-    }
-
-    public void setAuthenticationListener(AuthenticationListener authenticationListener) {
-        this.authenticationListener = authenticationListener;
-    }
-
-    public void setErrorListener(ErrorListener errorListener) {
-        this.errorListener = errorListener;
-    }
-
-    public void setPacketListener(PacketListener packetListener) {
-        this.packetHandler.setPacketListener(packetListener);
+        EventBus.getDefault().post(new HandshakeFailedEvent(state, newVersion));
     }
 
     public ConnectionState getConnectionState() {
