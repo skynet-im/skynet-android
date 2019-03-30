@@ -79,12 +79,14 @@ public class MainActivity extends ThemedActivity {
                 }))
                 .setInitialState(1)
                 .attach(tabLayout);
+
+        if (savedInstanceState == null) handleIntent(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        handleIntent(getIntent());
+        handleIntent(intent);
     }
 
     @Override
@@ -99,8 +101,6 @@ public class MainActivity extends ThemedActivity {
             Log.d(TAG, "The user has not logged in, exiting...");
             finish();
         }
-        handleIntent(getIntent());
-        setIntent(null);
     }
 
     private void handleIntent(Intent intent) {

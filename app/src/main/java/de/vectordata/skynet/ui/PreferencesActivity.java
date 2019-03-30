@@ -3,6 +3,7 @@ package de.vectordata.skynet.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
@@ -16,6 +17,7 @@ import de.psdev.licensesdialog.LicensesDialog;
 import de.vectordata.skynet.BuildConfig;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.util.Activities;
@@ -66,6 +68,8 @@ public class PreferencesActivity extends ThemedActivity {
             findPreference("logoff").setOnPreferenceClickListener(preference -> {
                 Dialogs.showYesNoBox(activity, R.string.question_header_logoff, R.string.question_logoff, (dialog, which) -> new Thread(() -> {
                     Storage.clear();
+                    SkynetContext.getCurrent().getNetworkManager().disconnect();
+                    new Handler(activity.getApplicationContext().getMainLooper()).post(() -> SkynetContext.getCurrent().recreateNetworkManager());
                     startActivity(new Intent(activity, LoginActivity.class));
                     activity.finish();
                 }).start(), null);

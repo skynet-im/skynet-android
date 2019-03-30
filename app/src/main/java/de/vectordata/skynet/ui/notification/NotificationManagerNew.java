@@ -20,7 +20,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.ui.main.MainActivity;
 import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Handlers;
@@ -55,9 +54,9 @@ public class NotificationManagerNew implements INotificationManager {
     }
 
     @Override
-    public void onMessageReceived(P20ChatMessage chatMessage) {
-        if (chatMessage.getParent().channelId == foregroundChannelId) return;
-        messages.add(new MessageInfo(chatMessage.getParent().channelId, chatMessage.getParent().messageId, chatMessage.text));
+    public void onMessageReceived(long channelId, long messageId, String text) {
+        if (channelId == foregroundChannelId) return;
+        messages.add(new MessageInfo(channelId, messageId, text));
         resendNotification();
     }
 
@@ -71,11 +70,28 @@ public class NotificationManagerNew implements INotificationManager {
             messages.remove(toBeDeleted);
             resendNotification();
         }
+        for (MessageInfo info : messages)
+            if (info.getChannelId() == channelId)
+                return;
+        clearNotifications(channelId);
     }
 
     @Override
     public void onForeground(long channelId) {
         foregroundChannelId = channelId;
+        clearNotifications(channelId);
+    }
+
+    @Override
+    public void onBackground() {
+        foregroundChannelId = 0;
+    }
+
+    private void resendNotification() {
+        handler.post(this::resendNotificationImpl);
+    }
+
+    private void clearNotifications(long channelId) {
         List<MessageInfo> toBeDeleted = new ArrayList<>();
         for (MessageInfo info : messages)
             if (info.getChannelId() == channelId)
@@ -89,16 +105,15 @@ public class NotificationManagerNew implements INotificationManager {
             notificationManager.cancel(SUMMARY_ID);
     }
 
-    @Override
-    public void onBackground() {
-        foregroundChannelId = 0;
-    }
-
-    private void resendNotification() {
-        handler.post(this::resendNotificationImpl);
-    }
-
     private void resendNotificationImpl() {
+        if (messages.size() == 0) {
+            for (int i = 0; i < notificationIdMap.size(); i++)
+                notificationManager.cancel(notificationIdMap.valueAt(i));
+            notificationManager.cancel(SUMMARY_ID);
+            notificationIdMap.clear();
+            return;
+        }
+
         int color = ContextCompat.getColor(context, R.color.colorPrimary);
 
         Set<Long> channelSet = new HashSet<>();
