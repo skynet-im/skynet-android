@@ -1,10 +1,13 @@
-package de.vectordata.skynet.jobs.api;
+package de.vectordata.skynet.jobengine.api;
 
 
 import java.util.Random;
 
-import de.vectordata.skynet.jobs.JobEngine;
-import de.vectordata.skynet.jobs.annotations.Retry;
+import de.vectordata.skynet.jobengine.JobEngine;
+import de.vectordata.skynet.jobengine.annotations.Retry;
+import de.vectordata.skynet.jobengine.await.JobAwaiter;
+import de.vectordata.skynet.jobengine.await.ResultAwaiter;
+import de.vectordata.skynet.jobengine.await.UpdateAwaiter;
 import de.vectordata.skynet.util.Callback;
 
 public abstract class Job<R> {
@@ -23,6 +26,8 @@ public abstract class Job<R> {
 
     private JobEngine engine;
 
+    private JobAwaiter<Job<R>> awaiter;
+
     public Job() {
         id = idRandom.nextLong();
         Retry annotation = getClass().getAnnotation(Retry.class);
@@ -38,10 +43,16 @@ public abstract class Job<R> {
 
     public abstract void onExecute();
 
+    protected final void setResult(R result) {
+        this.result = result;
+    }
+
     protected final void reportState(JobState state) {
         if (state != this.state) {
             this.state = state;
             this.engine.onJobUpdated(this);
+            if (awaiter != null)
+                awaiter.onJobUpdated(this);
         }
     }
 
@@ -72,12 +83,16 @@ public abstract class Job<R> {
         return progress;
     }
 
-    public void awaitResult(Callback<R> result) {
+    protected JobEngine getEngine() {
+        return engine;
+    }
 
+    public void awaitResult(Callback<Job<R>> resultCallback) {
+        awaiter = new ResultAwaiter<>(resultCallback);
     }
 
     public void awaitUpdate(Callback<Job<R>> jobCallback) {
-
+        awaiter = new UpdateAwaiter<>(jobCallback);
     }
 
 }

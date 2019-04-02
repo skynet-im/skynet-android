@@ -1,4 +1,4 @@
-package de.vectordata.skynet.jobs.annotations;
+package de.vectordata.skynet.jobengine.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

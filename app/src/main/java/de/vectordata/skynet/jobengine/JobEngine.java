@@ -1,4 +1,4 @@
-package de.vectordata.skynet.jobs;
+package de.vectordata.skynet.jobengine;
 
 
 import org.greenrobot.eventbus.EventBus;
@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.vectordata.skynet.event.AuthenticationSucessfulEvent;
-import de.vectordata.skynet.jobs.annotations.Retry;
-import de.vectordata.skynet.jobs.api.Job;
-import de.vectordata.skynet.jobs.api.JobState;
+import de.vectordata.skynet.jobengine.annotations.Retry;
+import de.vectordata.skynet.jobengine.api.Job;
+import de.vectordata.skynet.jobengine.api.JobState;
 
 public class JobEngine {
 

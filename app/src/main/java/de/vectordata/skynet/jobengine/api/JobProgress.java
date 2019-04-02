@@ -1,4 +1,4 @@
-package de.vectordata.skynet.jobs.api;
+package de.vectordata.skynet.jobengine.api;
 
 import java.util.Objects;
 
