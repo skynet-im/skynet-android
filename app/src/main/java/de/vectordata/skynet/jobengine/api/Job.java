@@ -1,6 +1,7 @@
 package de.vectordata.skynet.jobengine.api;
 
 
+import java.util.List;
 import java.util.Random;
 
 import de.vectordata.skynet.jobengine.JobEngine;
@@ -26,6 +27,8 @@ public abstract class Job<R> {
 
     private JobEngine engine;
 
+    private List<Job> childJobs;
+
     private JobAwaiter<Job<R>> awaiter;
 
     public Job() {
@@ -43,8 +46,18 @@ public abstract class Job<R> {
 
     public abstract void onExecute();
 
+    public abstract void onCancel();
+
     protected final void setResult(R result) {
         this.result = result;
+    }
+
+    public final void cancel() {
+        onCancel();
+        for (Job job : childJobs)
+            if (job.getState() == JobState.RUNNING || job.getState() == JobState.SCHEDULED || job.getState() == JobState.SLEEPING)
+                job.cancel();
+        reportState(JobState.FAILED);
     }
 
     protected final void reportState(JobState state) {
@@ -61,6 +74,11 @@ public abstract class Job<R> {
             this.progress = progress;
             this.engine.onJobUpdated(this);
         }
+    }
+
+    protected final <T> Job<T> startChildJob(Job<T> job) {
+        childJobs.add(job);
+        return getEngine().schedule(job);
     }
 
     public long getId() {
