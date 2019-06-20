@@ -9,6 +9,7 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.KeyType;
+import de.vectordata.skynet.jobengine.JobEngine;
 import de.vectordata.skynet.net.messages.MessageInterface;
 import de.vectordata.skynet.ui.notification.INotificationManager;
 import de.vectordata.skynet.ui.notification.NotificationManagerFactory;
@@ -17,11 +18,13 @@ public class SkynetContext implements KeyProvider {
 
     private static SkynetContext currentContext;
 
+    private JobEngine jobEngine;
     private MessageInterface messageInterface;
     private NetworkManager networkManager;
     private INotificationManager notificationManager;
 
     private SkynetContext() {
+        jobEngine = new JobEngine();
         notificationManager = (new NotificationManagerFactory()).createManager();
         messageInterface = new MessageInterface(this);
         networkManager = new NetworkManager(this);
