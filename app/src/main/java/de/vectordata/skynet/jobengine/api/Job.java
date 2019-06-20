@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.vectordata.skynet.jobengine.JobEngine;
+import de.vectordata.skynet.jobengine.annotations.RegisterEvents;
 import de.vectordata.skynet.jobengine.annotations.Retry;
 import de.vectordata.skynet.jobengine.await.JobAwaiter;
 import de.vectordata.skynet.jobengine.await.ResultAwaiter;
@@ -31,11 +32,14 @@ public abstract class Job<R> {
 
     private JobAwaiter<Job<R>> awaiter;
 
+    private boolean hasEvents = false;
+
     public Job() {
         id = idRandom.nextLong();
         Retry annotation = getClass().getAnnotation(Retry.class);
         if (annotation != null)
             retryMode = annotation.value();
+        hasEvents = getClass().getAnnotation(RegisterEvents.class) != null;
     }
 
     public void initialize(JobEngine jobEngine) {
@@ -58,6 +62,10 @@ public abstract class Job<R> {
             if (job.getState() == JobState.RUNNING || job.getState() == JobState.SCHEDULED || job.getState() == JobState.SLEEPING)
                 job.cancel();
         reportState(JobState.FAILED);
+    }
+
+    public boolean hasEvents() {
+        return hasEvents;
     }
 
     protected final void reportState(JobState state) {

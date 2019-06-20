@@ -5,6 +5,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.vanniktech.emoji.EmojiEditText;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -13,8 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
@@ -24,6 +25,7 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.PacketEvent;
+import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
@@ -122,9 +124,11 @@ public class ChatActivityDirect extends ChatActivityBase {
             if (editText.getText() == null || (text = editText.getText().toString()).trim().isEmpty())
                 return;
 
-            P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, 0);
             backgroundHandler.post(() -> {
-                SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(directChannel, new ChannelMessageConfig(), packet);
+                P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, 0);
+                ChannelMessageConfig config = new ChannelMessageConfig();
+                P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(directChannel.getChannelId(), config, packet);
+                getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
                 insertMessage(packet, MessageState.SENDING);
             });
             editText.setText("");

@@ -129,8 +129,8 @@ public class NetworkManager implements VSLClientListener {
 
     private void onConnectionFailed() {
         connectionState = ConnectionState.DISCONNECTED;
-        Log.d(TAG, "Scheduling reconnect in 1 min");
-        handler.postDelayed(this::connect, 60000);
+        Log.d(TAG, "Scheduling reconnect in 10 sec");
+        handler.postDelayed(this::connect, 10000);
         EventBus.getDefault().post(new ConnectionFailedEvent());
     }
 

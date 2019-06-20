@@ -32,6 +32,11 @@ public class MessageInterface {
     }
 
     public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+        P0BChannelMessage container = prepare(channelId, config, packet);
+        return skynetContext.getNetworkManager().sendPacket(container);
+    }
+
+    public P0BChannelMessage prepare(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
         container.messageId = newId();
@@ -52,8 +57,7 @@ public class MessageInterface {
 
         container.writeToDatabase(PacketDirection.SEND);
         packet.writeToDatabase(PacketDirection.SEND);
-
-        return skynetContext.getNetworkManager().sendPacket(container);
+        return container;
     }
 
     public ResponseAwaiter sendRealTimeMessage(long channelId, RealtimeMessagePacket packet) {

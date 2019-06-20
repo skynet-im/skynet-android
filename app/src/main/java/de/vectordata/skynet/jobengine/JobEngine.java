@@ -32,10 +32,12 @@ public class JobEngine {
 
     public void onJobUpdated(Job job) {
         if (job.getState() == JobState.SUCCESSFUL) {
-            EventBus.getDefault().unregister(job);
+            if (job.hasEvents())
+                EventBus.getDefault().unregister(job);
             runningJobs.remove(job);
         } else if (job.getState() == JobState.FAILED) {
-            EventBus.getDefault().unregister(job);
+            if (job.hasEvents())
+                EventBus.getDefault().unregister(job);
             if (job.getRetryMode() == Retry.Mode.INSTANTLY) execute(job);
             else if (job.getRetryMode() == Retry.Mode.NEVER) runningJobs.remove(job);
         }
@@ -61,7 +63,8 @@ public class JobEngine {
     }
 
     private void execute(Job job) {
-        EventBus.getDefault().register(job);
+        if (job.hasEvents())
+            EventBus.getDefault().register(job);
         job.initialize(this);
         job.onExecute();
         if (!runningJobs.contains(job))

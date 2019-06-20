@@ -48,6 +48,10 @@ public class SkynetContext implements KeyProvider {
         return notificationManager;
     }
 
+    public JobEngine getJobEngine() {
+        return jobEngine;
+    }
+
     @Override
     public KeyStore getChannelKeys(long channelId) {
         Channel channel = Storage.getDatabase().channelDao().getById(channelId);

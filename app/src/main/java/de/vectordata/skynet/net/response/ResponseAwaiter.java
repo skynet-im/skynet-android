@@ -33,7 +33,17 @@ public class ResponseAwaiter {
     }
 
     public <T extends Packet> void waitForPacket(Class<T> packetClass, ResponseHandler<T> handler) {
-        awaiterItems.add(new AwaiterItem(packetClass, handler));
+        waitForPacket(packetClass, handler, null);
+    }
+
+    public <T extends Packet> void waitForPacket(Class<T> packetClass, ResponseHandler<T> handler, Runnable timeout) {
+        if (timeout != null)
+            this.handler.postDelayed(timeout, 5000);
+        awaiterItems.add(new AwaiterItem(packetClass, packet -> {
+            if (timeout != null)
+                this.handler.removeCallbacks(timeout);
+            handler.handle((T) packet);
+        }));
     }
 
 }
