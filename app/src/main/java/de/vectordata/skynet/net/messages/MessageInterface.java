@@ -32,14 +32,18 @@ public class MessageInterface {
     }
 
     public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        P0BChannelMessage container = prepare(channelId, config, packet);
+        P0BChannelMessage container = prepare(channelId, config, packet, true);
         return skynetContext.getNetworkManager().sendPacket(container);
     }
 
-    public P0BChannelMessage prepare(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+    public P0BChannelMessage prepare(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet, boolean save) {
+        return prepare(channelId, newId(), config, packet, save);
+    }
+
+    public P0BChannelMessage prepare(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet, boolean save) {
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
-        container.messageId = newId();
+        container.messageId = messageId;
         container.senderId = Storage.getSession().getAccountId();
         container.packetVersion = PACKET_VERSION;
         container.messageFlags = config.getMessageFlags();
@@ -55,8 +59,11 @@ public class MessageInterface {
         packet.writePacket(buffer, skynetContext);
         container.contentPacket = buffer.toArray();
 
-        container.writeToDatabase(PacketDirection.SEND);
-        packet.writeToDatabase(PacketDirection.SEND);
+        if (save) {
+            container.writeToDatabase(PacketDirection.SEND);
+            packet.writeToDatabase(PacketDirection.SEND);
+        }
+
         return container;
     }
 

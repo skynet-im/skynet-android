@@ -1,6 +1,8 @@
 package de.vectordata.skynet.jobengine;
 
 
+import android.util.Log;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -9,19 +11,24 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.vectordata.skynet.event.AuthenticationSucessfulEvent;
+import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.jobengine.annotations.Retry;
 import de.vectordata.skynet.jobengine.api.Job;
 import de.vectordata.skynet.jobengine.api.JobState;
 
 public class JobEngine {
 
+    private static final String TAG = "JobEngine";
+
     private Queue<Job> pendingJobs = new ConcurrentLinkedQueue<>();
 
     private List<Job> runningJobs = new CopyOnWriteArrayList<>();
 
+    private RetryController retryController = new RetryController();
+
     public JobEngine() {
         EventBus.getDefault().register(this);
+        EventBus.getDefault().register(retryController);
     }
 
     public <T> Job<T> schedule(Job<T> job) {
@@ -36,6 +43,7 @@ public class JobEngine {
                 EventBus.getDefault().unregister(job);
             runningJobs.remove(job);
         } else if (job.getState() == JobState.FAILED) {
+            Log.i(TAG, "Job FAILED: " + job.toString());
             if (job.hasEvents())
                 EventBus.getDefault().unregister(job);
             if (job.getRetryMode() == Retry.Mode.INSTANTLY) execute(job);
@@ -45,13 +53,19 @@ public class JobEngine {
     }
 
     @Subscribe
-    public void onReconnect(AuthenticationSucessfulEvent event) {
+    public void onReconnect(SyncFinishedEvent event) {
         // Only one non-sleeping job can be in the running list at the same time.
         // Here, we check if there is a failed one and if it needs retry
         // on reconnect. If so, we execute it.
         for (Job job : runningJobs)
-            if (job.getState() == JobState.FAILED && job.getRetryMode() == Retry.Mode.RECONNECT)
+            if (job.getState() == JobState.FAILED && job.getRetryMode() == Retry.Mode.RECONNECT) {
+                Log.i(TAG, "Retrying job " + job.toString());
                 execute(job);
+            }
+    }
+
+    boolean isEmpty() {
+        return runningJobs.isEmpty() && pendingJobs.isEmpty();
     }
 
     private void tryExecuteNext() {

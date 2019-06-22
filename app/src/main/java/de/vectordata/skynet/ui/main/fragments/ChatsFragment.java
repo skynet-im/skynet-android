@@ -8,6 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -16,10 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
@@ -27,6 +28,7 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.event.ChatMessageSentEvent;
 import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
@@ -95,6 +97,11 @@ public class ChatsFragment extends Fragment {
                 || packet instanceof P22MessageReceived || packet instanceof P23MessageRead || packet instanceof P21MessageOverride
                 || packet instanceof P14MailAddress || packet instanceof P25Nickname)
             reload();
+    }
+
+    @Subscribe
+    public void onMessageSent(ChatMessageSentEvent event) {
+        reload();
     }
 
     private void reload() {

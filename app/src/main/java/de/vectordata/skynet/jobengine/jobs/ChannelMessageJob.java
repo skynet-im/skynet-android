@@ -1,5 +1,8 @@
 package de.vectordata.skynet.jobengine.jobs;
 
+import org.greenrobot.eventbus.Subscribe;
+
+import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.jobengine.annotations.Retry;
 import de.vectordata.skynet.jobengine.api.Job;
 import de.vectordata.skynet.jobengine.api.JobState;
@@ -21,12 +24,12 @@ public class ChannelMessageJob extends Job<Void> {
     public void onExecute() {
         SkynetContext context = SkynetContext.getCurrent();
 
-        context.getNetworkManager().sendPacket(message).waitForPacket(P0CChannelMessageResponse.class, response -> {
-            reportState(response.errorCode == MessageSendError.SUCCESS ? JobState.SUCCESSFUL : JobState.FAILED);
-        }, () -> {
-            // No response from the server after 5 seconds, assume timeout
-            reportState(JobState.FAILED);
-        });
+        context.getNetworkManager().sendPacket(message).waitForPacket(P0CChannelMessageResponse.class, response ->
+                        reportState(response.errorCode == MessageSendError.SUCCESS ? JobState.SUCCESSFUL : JobState.FAILED),
+                () -> {
+                    // No response from the server after 5 seconds, assume timeout
+                    reportState(JobState.FAILED);
+                });
     }
 
     @Override
@@ -34,4 +37,13 @@ public class ChannelMessageJob extends Job<Void> {
         throw new UnsupportedOperationException("Single message jobs cannot be cancelled");
     }
 
+    @Subscribe
+    public void onConnectionLost(ConnectionFailedEvent event) {
+        reportState(JobState.FAILED);
+    }
+
+    @Override
+    public boolean hasEvents() {
+        return true;
+    }
 }

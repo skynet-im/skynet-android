@@ -127,7 +127,7 @@ public class ChatActivityDirect extends ChatActivityBase {
             backgroundHandler.post(() -> {
                 P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, 0);
                 ChannelMessageConfig config = new ChannelMessageConfig();
-                P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(directChannel.getChannelId(), config, packet);
+                P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(directChannel.getChannelId(), config, packet, true);
                 getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
                 insertMessage(packet, MessageState.SENDING);
             });

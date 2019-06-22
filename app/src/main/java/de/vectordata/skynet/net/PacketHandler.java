@@ -14,7 +14,9 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
+import de.vectordata.skynet.event.ChatMessageSentEvent;
 import de.vectordata.skynet.event.PacketEvent;
+import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.model.PacketDirection;
@@ -167,6 +169,7 @@ public class PacketHandler {
         if (chatMessage != null) {
             chatMessage.setMessageState(MessageState.SENT);
             Storage.getDatabase().chatMessageDao().update(chatMessage);
+            EventBus.getDefault().post(new ChatMessageSentEvent());
         }
 
         Channel channel = Storage.getDatabase().channelDao().getById(packet.channelId);
@@ -201,6 +204,7 @@ public class PacketHandler {
             );
         }
         inSync = true;
+        EventBus.getDefault().post(new SyncFinishedEvent());
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed()) {
             sendReceiveConfirmation(msg.getChannelId(), msg.getMessageId());
         }

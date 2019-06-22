@@ -132,6 +132,7 @@ public class NetworkManager implements VSLClientListener {
         Log.d(TAG, "Scheduling reconnect in 10 sec");
         handler.postDelayed(this::connect, 10000);
         EventBus.getDefault().post(new ConnectionFailedEvent());
+        packetCache.clear();
     }
 
     private void authenticate() {
@@ -163,6 +164,7 @@ public class NetworkManager implements VSLClientListener {
     void releaseCache() {
         if (this.connectionState != ConnectionState.AUTHENTICATED)
             return;
+        Log.i(TAG, "Releasing packet cache with contents: " + packetCache.size());
         for (Packet packet : packetCache)
             sendPacket(packet);
         packetCache.clear();

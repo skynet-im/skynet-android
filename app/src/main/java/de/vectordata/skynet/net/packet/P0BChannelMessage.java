@@ -19,6 +19,7 @@ import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.Selector;
 
+
 public class P0BChannelMessage implements Packet {
 
     public byte packetVersion;
