@@ -1,18 +1,21 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vanniktech.emoji.EmojiEditText;
-import com.vanniktech.emoji.EmojiPopup;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiPopup;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.ui.base.ThemedActivity;
@@ -32,6 +35,19 @@ public abstract class ChatActivityBase extends ThemedActivity {
 
         EmojiEditText messageInput = findViewById(R.id.input_message);
         ImageButton emojiToggleButton = findViewById(R.id.button_emoji);
+        ImageButton sendButton = findViewById(R.id.button_send);
+
+        boolean enterToSend = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enter_to_send", false);
+
+        messageInput.setSingleLine(enterToSend);
+        messageInput.setImeOptions(enterToSend ? EditorInfo.IME_ACTION_SEND : EditorInfo.IME_ACTION_NONE);
+        messageInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                sendButton.performClick();
+                return true;
+            }
+            return false;
+        });
 
         EmojiPopup popup = EmojiPopup.Builder.fromRootView(findViewById(R.id.root_view))
                 .setOnEmojiPopupShownListener(() -> emojiToggleButton.setImageResource(R.drawable.ic_keyboard))
