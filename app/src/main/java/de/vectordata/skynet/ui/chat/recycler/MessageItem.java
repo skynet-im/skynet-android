@@ -52,7 +52,7 @@ public class MessageItem {
         this.messageState = messageState;
     }
 
-    MessageSide getMessageSide() {
+    public MessageSide getMessageSide() {
         return messageSide;
     }
 }

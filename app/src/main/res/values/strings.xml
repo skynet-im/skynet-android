@@ -25,6 +25,9 @@
     <string name="action_profile">Profile</string>
     <string name="action_settings">Settings</string>
     <string name="action_continue">Continue</string>
+    <string name="action_quote">Quote</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
 
     <string name="link_create_account">New to Skynet? Create an account now</string>
 
@@ -96,8 +99,10 @@
 
     <string name="header_welcome">Welcome to Skynet!</string>
     <string name="header_nickname">Complete your registration by entering a nickname below.</string>
+    <string name="header_selected">%d selected</string>
 
     <string name="notification_channel_name">New message notifications</string>
     <string name="notification_channel_desc">Notifications for new chat messages are posted to this notification channel</string>
     <string name="notification_subtitle">%1$d messages from %2$d chats</string>
+
 </resources>

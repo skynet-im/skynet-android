@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -13,8 +16,6 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Objects;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.ViewPager;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.Storage;
@@ -74,7 +75,7 @@ public class MainActivity extends ThemedActivity {
         FabController.with(fab)
                 .addState(new FabState(R.drawable.ic_person_add, v -> startActivity(AddContactActivity.class)))
                 .addState(FabState.invisible())
-                .addState(new FabState(R.drawable.ic_add_a_photo_black_24dp, v -> {
+                .addState(new FabState(R.drawable.ic_add_a_photo, v -> {
 
                 }))
                 .setInitialState(1)

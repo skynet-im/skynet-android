@@ -1,12 +1,15 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.vanniktech.emoji.EmojiEditText;
 
@@ -36,8 +39,10 @@ import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
+import de.vectordata.skynet.ui.chat.recycler.CheckableRecyclerView;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
+import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
 import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
@@ -46,7 +51,7 @@ import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Callback;
 import de.vectordata.skynet.util.Handlers;
 
-public class ChatActivityDirect extends ChatActivityBase {
+public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceListener {
 
     private Channel directChannel;
     private Channel profileDataChannel;
@@ -56,7 +61,7 @@ public class ChatActivityDirect extends ChatActivityBase {
 
     private List<MessageItem> messageItems;
 
-    private RecyclerView recyclerView;
+    private CheckableRecyclerView recyclerView;
     private MessageAdapter adapter;
 
     private ImageView avatarView;
@@ -67,6 +72,7 @@ public class ChatActivityDirect extends ChatActivityBase {
     public void initialize() {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setActionModeCallback(this);
 
         KeyboardUtil.registerOnKeyboardOpen(recyclerView, this::scrollToBottom);
 
@@ -115,7 +121,7 @@ public class ChatActivityDirect extends ChatActivityBase {
                 readMessage(message.getMessageId());
         });
 
-        adapter = new MessageAdapter(messageItems);
+        adapter = new MessageAdapter(recyclerView, messageItems);
         recyclerView.setAdapter(adapter);
 
         EmojiEditText editText = findViewById(R.id.input_message);
@@ -218,4 +224,45 @@ public class ChatActivityDirect extends ChatActivityBase {
         }
     }
 
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, boolean checked) {
+        if (position < adapter.getItemCount() - 1 && adapter.getItem(position).getMessageSide() == MessageSide.CENTER && checked) {
+            recyclerView.setItemChecked(position, false, false);
+            recyclerView.toggleItem(position + 1);
+        }
+        if (mode != null)
+            mode.setTitle(getString(R.string.header_selected, recyclerView.getCheckedItemCount()));
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.context_menu_chat, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        int id = item.getItemId();
+        // TODO implement actions
+        switch (id) {
+            case R.id.action_quote:
+                break;
+            case R.id.action_edit:
+                break;
+            case R.id.action_delete:
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+
+    }
 }

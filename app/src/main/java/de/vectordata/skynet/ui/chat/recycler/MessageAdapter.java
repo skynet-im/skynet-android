@@ -1,20 +1,25 @@
 package de.vectordata.skynet.ui.chat.recycler;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.util.MessageSide;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
 
+    private final CheckableRecyclerView recyclerView;
+
     private final List<MessageItem> dataset;
 
-    public MessageAdapter(List<MessageItem> dataset) {
+    public MessageAdapter(CheckableRecyclerView recyclerView, List<MessageItem> dataset) {
+        this.recyclerView = recyclerView;
         this.dataset = dataset;
     }
 
@@ -27,7 +32,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         if (messageSide == MessageSide.LEFT) layout = R.layout.item_msg_left;
         else if (messageSide == MessageSide.CENTER) layout = R.layout.item_msg_center;
         else if (messageSide == MessageSide.RIGHT) layout = R.layout.item_msg_right;
-        return new MessageViewHolder(inflater.inflate(layout, parent, false));
+
+        View inflated = inflater.inflate(layout, parent, false);
+        inflated.setOnClickListener(recyclerView);
+        inflated.setOnLongClickListener(recyclerView);
+        return new MessageViewHolder(inflated);
     }
 
     @Override
@@ -41,6 +50,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     public int getItemViewType(int position) {
         MessageItem item = dataset.get(position);
         return item.getMessageSide().ordinal();
+    }
+
+    public MessageItem getItem(int position) {
+        return dataset.get(position);
     }
 
     @Override
