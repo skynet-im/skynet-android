@@ -47,7 +47,6 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@null"
-        android:ems="10"
         android:fadeScrollbars="true"
         android:hint="@string/input_message"
         android:inputType="textMultiLine|textLongMessage"
@@ -110,7 +109,7 @@
         android:layout_marginBottom="16dp"
         android:padding="8dp"
         android:tint="?attr/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/button_emoji"
+        app:layout_constraintBottom_toTopOf="@+id/input_message"
         app:layout_constraintStart_toStartOf="@+id/background"
         app:srcCompat="@drawable/ic_quote" />
 
