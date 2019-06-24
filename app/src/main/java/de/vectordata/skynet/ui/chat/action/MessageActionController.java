@@ -16,6 +16,8 @@ public class MessageActionController {
     private TextView headerTextView;
     private TextView contentTextView;
 
+    private long affectedMessage;
+
     private MessageAction currentAction = MessageAction.NONE;
 
     public MessageActionController(Activity parent) {
@@ -25,7 +27,37 @@ public class MessageActionController {
         imageView = parent.findViewById(R.id.image_message_action);
     }
 
-    public void setAction(MessageAction action) {
+    public void begin(MessageAction action, long affectedMessage) {
+        setAction(action);
+        this.affectedMessage = affectedMessage;
+    }
+
+    public void exit() {
+        setAction(MessageAction.NONE);
+        this.affectedMessage = 0;
+    }
+
+    public void setHeader(String header) {
+        headerTextView.setText(header);
+    }
+
+    public void setContent(String content) {
+        contentTextView.setText(content);
+    }
+
+    public long getAffectedMessage() {
+        return affectedMessage;
+    }
+
+    public MessageAction getAction() {
+        return currentAction;
+    }
+
+    public boolean isOpen() {
+        return currentAction != MessageAction.NONE;
+    }
+
+    private void setAction(MessageAction action) {
         this.currentAction = action;
 
         messageActionGroup.setVisibility(currentAction == MessageAction.NONE ? View.GONE : View.VISIBLE);
@@ -41,19 +73,4 @@ public class MessageActionController {
         }
     }
 
-    public void exit() {
-        setAction(MessageAction.NONE);
-    }
-
-    public void setHeader(String header) {
-        headerTextView.setText(header);
-    }
-
-    public void setContent(String content) {
-        contentTextView.setText(content);
-    }
-
-    public boolean isOpen() {
-        return currentAction != MessageAction.NONE;
-    }
 }

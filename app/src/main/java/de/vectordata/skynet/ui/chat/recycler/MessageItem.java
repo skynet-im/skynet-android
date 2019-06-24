@@ -36,7 +36,7 @@ public class MessageItem {
         this.messageId = messageId;
     }
 
-    String getContent() {
+    public String getContent() {
         return content;
     }
 

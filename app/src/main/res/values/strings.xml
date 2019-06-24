@@ -6,6 +6,7 @@
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="you">You</string>
 
     <string name="input_email">Email</string>
     <string name="input_nickname">Nickname</string>

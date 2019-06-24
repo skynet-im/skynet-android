@@ -138,12 +138,15 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 return;
 
             backgroundHandler.post(() -> {
-                P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, 0);
-                ChannelMessageConfig config = new ChannelMessageConfig();
-                P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(directChannel.getChannelId(), config, packet, true);
-                getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
-                insertMessage(packet, MessageState.SENDING);
+                if (!messageActionController.isOpen() || messageActionController.getAction() == MessageAction.QUOTE) {
+                    P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
+                    ChannelMessageConfig config = new ChannelMessageConfig();
+                    P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(directChannel.getChannelId(), config, packet, true);
+                    getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
+                    insertMessage(packet, MessageState.SENDING);
+                }
             });
+            messageActionController.exit();
             editText.setText("");
         });
     }
@@ -268,13 +271,18 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         int id = item.getItemId();
         // TODO implement actions
+        MessageItem selectedMessage = getSelectedMessage();
         switch (id) {
             case R.id.action_quote:
-                messageActionController.setAction(MessageAction.QUOTE);
+                messageActionController.begin(MessageAction.QUOTE, selectedMessage.getMessageId());
+                messageActionController.setHeader(getFriendlySenderName(selectedMessage));
+                messageActionController.setContent(selectedMessage.getContent());
                 mode.finish();
                 break;
             case R.id.action_edit:
-                messageActionController.setAction(MessageAction.EDIT);
+                messageActionController.begin(MessageAction.EDIT, getSelectedMessage().getMessageId());
+                messageActionController.setHeader(getFriendlySenderName(selectedMessage));
+                messageActionController.setContent(selectedMessage.getContent());
                 mode.finish();
                 break;
             case R.id.action_delete:
@@ -298,4 +306,19 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             messageActionController.exit();
         else super.onBackPressed();
     }
+
+    private String getFriendlySenderName(MessageItem item) {
+        return item.getMessageSide() == MessageSide.LEFT ? nicknameView.getText().toString() : getString(R.string.you);
+    }
+
+    private MessageItem getSelectedMessage() {
+        MessageItem message = null;
+        for (int i = 0; i < adapter.getItemCount(); i++)
+            if (recyclerView.isItemChecked(i)) {
+                message = adapter.getItem(i);
+                break;
+            }
+        return message;
+    }
+
 }
