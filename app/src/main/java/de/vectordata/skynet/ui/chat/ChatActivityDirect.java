@@ -39,6 +39,8 @@ import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
+import de.vectordata.skynet.ui.chat.action.MessageAction;
+import de.vectordata.skynet.ui.chat.action.MessageActionController;
 import de.vectordata.skynet.ui.chat.recycler.CheckableRecyclerView;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
@@ -68,8 +70,13 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private TextView nicknameView;
     private TextView lastSeenView;
 
+    private MessageActionController messageActionController;
+
     @Override
     public void initialize() {
+        messageActionController = new MessageActionController(this);
+        findViewById(R.id.button_exit_message_action).setOnClickListener(v -> messageActionController.exit());
+
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
@@ -230,8 +237,19 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             recyclerView.setItemChecked(position, false, false);
             recyclerView.toggleItem(position + 1);
         }
-        if (mode != null)
-            mode.setTitle(String.valueOf(recyclerView.getCheckedItemCount()));
+        if (mode != null) {
+            int checkedItems = recyclerView.getCheckedItemCount();
+            mode.setTitle(String.valueOf(checkedItems));
+            if (checkedItems > 1) {
+                mode.getMenu().findItem(R.id.action_quote).setVisible(false);
+                mode.getMenu().findItem(R.id.action_edit).setVisible(false);
+                mode.getMenu().findItem(R.id.action_info).setVisible(false);
+            } else {
+                mode.getMenu().findItem(R.id.action_quote).setVisible(true);
+                mode.getMenu().findItem(R.id.action_edit).setVisible(true);
+                mode.getMenu().findItem(R.id.action_info).setVisible(true);
+            }
+        }
     }
 
     @Override
@@ -252,8 +270,12 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         // TODO implement actions
         switch (id) {
             case R.id.action_quote:
+                messageActionController.setAction(MessageAction.QUOTE);
+                mode.finish();
                 break;
             case R.id.action_edit:
+                messageActionController.setAction(MessageAction.EDIT);
+                mode.finish();
                 break;
             case R.id.action_delete:
                 break;
@@ -268,5 +290,12 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     @Override
     public void onDestroyActionMode(ActionMode mode) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (messageActionController.isOpen())
+            messageActionController.exit();
+        else super.onBackPressed();
     }
 }

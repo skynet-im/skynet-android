@@ -5,9 +5,11 @@
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     tools:context=".ui.chat.ChatActivityDirect">
 
     <ImageView
+        android:id="@+id/image_wallpaper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
@@ -30,10 +32,12 @@
         android:layout_marginBottom="8dp"
         android:clipToPadding="false"
         android:paddingTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/input_message"
+        app:layout_constraintBottom_toTopOf="@+id/image_message_action"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <com.vanniktech.emoji.EmojiEditText
         android:id="@+id/input_message"
@@ -78,5 +82,72 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_send" />
+
+    <!-- Message actions such as quoting or editing -->
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_message_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="image_message_action,label_message_action_content,separator,label_message_action_header,button_exit_message_action" />
+
+    <com.vanniktech.emoji.EmojiTextView
+        android:id="@+id/label_message_action_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="?attr/colorPrimary"
+        app:layout_constraintStart_toEndOf="@+id/image_message_action"
+        app:layout_constraintTop_toTopOf="@+id/image_message_action"
+        tools:text="Account Name" />
+
+    <ImageView
+        android:id="@+id/image_message_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp"
+        android:padding="8dp"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/button_emoji"
+        app:layout_constraintStart_toStartOf="@+id/background"
+        app:srcCompat="@drawable/ic_quote" />
+
+    <com.vanniktech.emoji.EmojiTextView
+        android:id="@+id/label_message_action_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintBottom_toBottomOf="@+id/image_message_action"
+        app:layout_constraintEnd_toStartOf="@+id/button_exit_message_action"
+        app:layout_constraintStart_toEndOf="@+id/image_message_action"
+        tools:text="I am quoting this message sent by account name and this is a long message so it should ellipsize it at the end" />
+
+    <ImageButton
+        android:id="@+id/button_exit_message_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        app:layout_constraintBottom_toTopOf="@+id/separator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view"
+        app:srcCompat="@drawable/ic_close" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/lightGray"
+        app:layout_constraintEnd_toEndOf="@+id/background"
+        app:layout_constraintStart_toStartOf="@+id/background"
+        app:layout_constraintTop_toBottomOf="@+id/label_message_action_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
