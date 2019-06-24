@@ -28,6 +28,8 @@
     <string name="action_quote">Quote</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
+    <string name="action_info">Info</string>
+    <string name="action_forward">Forward</string>
 
     <string name="link_create_account">New to Skynet? Create an account now</string>
 

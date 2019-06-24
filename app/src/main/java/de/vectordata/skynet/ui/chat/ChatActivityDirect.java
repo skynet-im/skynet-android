@@ -231,7 +231,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             recyclerView.toggleItem(position + 1);
         }
         if (mode != null)
-            mode.setTitle(getString(R.string.header_selected, recyclerView.getCheckedItemCount()));
+            mode.setTitle(String.valueOf(recyclerView.getCheckedItemCount()));
     }
 
     @Override
@@ -256,6 +256,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             case R.id.action_edit:
                 break;
             case R.id.action_delete:
+                break;
+            case R.id.action_info:
+                break;
+            case R.id.action_forward:
                 break;
         }
         return false;
