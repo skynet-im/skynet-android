@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
@@ -17,8 +18,14 @@ import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.messages.ChannelMessageConfig;
+import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.ui.base.ThemedActivity;
+import de.vectordata.skynet.util.Handlers;
 
 /**
  * Created by Twometer on 21.01.2019.
@@ -27,6 +34,18 @@ import de.vectordata.skynet.ui.base.ThemedActivity;
 public abstract class ChatActivityBase extends ThemedActivity {
 
     public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.chat.channelId";
+
+    /**
+     * This is the channel over which the actual messages are transmitted, such as
+     * a group channel or direct channel.
+     */
+    Channel messageChannel;
+
+    /**
+     * Shared handler for executing things like loading from the database on a separate
+     * thread.
+     */
+    Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,6 +118,19 @@ public abstract class ChatActivityBase extends ThemedActivity {
     protected void onPause() {
         super.onPause();
         SkynetContext.getCurrent().getNotificationManager().onBackground();
+    }
+
+    void readMessage(long messageId) {
+        SkynetContext.getCurrent().getMessageInterface()
+                .sendChannelMessage(messageChannel.getChannelId(),
+                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId),
+                        new P23MessageRead()
+                );
+        backgroundHandler.post(() -> {
+            ChatMessage message = Storage.getDatabase().chatMessageDao().query(messageChannel.getChannelId(), messageId);
+            message.setUnread(false);
+            Storage.getDatabase().chatMessageDao().update(message);
+        });
     }
 
 }

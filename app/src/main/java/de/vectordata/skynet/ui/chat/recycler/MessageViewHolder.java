@@ -37,7 +37,6 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
             messageItem.getMessageState().apply(state);
 
         if (quoteGroup == null) return;
-        System.out.println("--> " + messageItem.hasQuote());
 
         if (messageItem.hasQuote()) {
             quoteGroup.setVisibility(View.VISIBLE);

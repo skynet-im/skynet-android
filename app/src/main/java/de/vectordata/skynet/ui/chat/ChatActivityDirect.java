@@ -1,6 +1,5 @@
 package de.vectordata.skynet.ui.chat;
 
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,15 +51,11 @@ import de.vectordata.skynet.ui.util.KeyboardUtil;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Callback;
-import de.vectordata.skynet.util.Handlers;
 
 public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceListener {
 
-    private Channel directChannel;
     private Channel profileDataChannel;
     private Channel accountDataChannel;
-
-    private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
 
     private List<MessageItem> messageItems;
 
@@ -70,6 +65,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private ImageView avatarView;
     private TextView nicknameView;
     private TextView lastSeenView;
+    private EmojiEditText messageInput;
 
     private MessageActionController messageActionController;
 
@@ -78,31 +74,65 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         messageActionController = new MessageActionController(this);
         findViewById(R.id.button_exit_message_action).setOnClickListener(v -> messageActionController.exit());
 
+        messageItems = new ArrayList<>();
+        adapter = new MessageAdapter(recyclerView, messageItems);
+
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
+        recyclerView.setAdapter(adapter);
+
+        messageInput = findViewById(R.id.input_message);
+
+        findViewById(R.id.button_send).setOnClickListener(v -> {
+            String text;
+            if (messageInput.getText() == null || (text = messageInput.getText().toString()).trim().isEmpty())
+                return;
+
+            backgroundHandler.post(() -> {
+                if (!messageActionController.isOpen() || messageActionController.getAction() == MessageAction.QUOTE) {
+                    P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
+                    ChannelMessageConfig config = new ChannelMessageConfig();
+                    P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(messageChannel.getChannelId(), config, packet, true);
+                    getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
+                    insertMessage(packet, MessageState.SENDING);
+                }
+            });
+            messageActionController.exit();
+            messageInput.setText("");
+        });
 
         KeyboardUtil.registerOnKeyboardOpen(recyclerView, this::scrollToBottom);
 
-        messageItems = new ArrayList<>();
+        setup();
+    }
 
+    @Override
+    public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
+        this.avatarView = avatar;
+        this.nicknameView = nickname;
+        this.lastSeenView = onlineState;
+    }
+
+    private void setup() {
         long channelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
         long myAccountId = Storage.getSession().getAccountId();
 
         backgroundHandler.post(() -> {
-            directChannel = Storage.getDatabase().channelDao().getById(channelId);
-            if (directChannel == null) return; // This should not happen in production
+            messageChannel = Storage.getDatabase().channelDao().getById(channelId);
+            if (messageChannel == null) return; // This should not happen in production
 
-            SkynetContext.getCurrent().getNotificationManager().onForeground(directChannel.getChannelId());
+            profileDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
+            accountDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
 
-            profileDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
-            accountDataChannel = Storage.getDatabase().channelDao().getByType(directChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
+            SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
 
-            String friendlyName = NameUtil.getFriendlyName(directChannel.getCounterpartId(), accountDataChannel);
+            String friendlyName = NameUtil.getFriendlyName(messageChannel.getCounterpartId(), accountDataChannel);
+            DefaultProfileImage profileImage = DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128);
             runOnUiThread(() -> {
                 nicknameView.setText(friendlyName);
                 lastSeenView.setVisibility(View.GONE);
-                DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128).loadInto(avatarView);
+                profileImage.loadInto(avatarView);
             });
 
             List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
@@ -119,7 +149,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
                 QuotedMessage quotedMessage = null;
                 if (message.getQuotedMessage() != 0)
-                    quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), directChannel, accountDataChannel);
+                    quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
                 messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage));
                 previous = parent;
             }
@@ -129,39 +159,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 scrollToBottom();
             });
 
-            List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(directChannel.getChannelId());
+            List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(messageChannel.getChannelId());
             for (ChatMessage message : unread)
                 readMessage(message.getMessageId());
         });
-
-        adapter = new MessageAdapter(recyclerView, messageItems);
-        recyclerView.setAdapter(adapter);
-
-        EmojiEditText editText = findViewById(R.id.input_message);
-        findViewById(R.id.button_send).setOnClickListener(v -> {
-            String text;
-            if (editText.getText() == null || (text = editText.getText().toString()).trim().isEmpty())
-                return;
-
-            backgroundHandler.post(() -> {
-                if (!messageActionController.isOpen() || messageActionController.getAction() == MessageAction.QUOTE) {
-                    P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
-                    ChannelMessageConfig config = new ChannelMessageConfig();
-                    P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(directChannel.getChannelId(), config, packet, true);
-                    getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
-                    insertMessage(packet, MessageState.SENDING);
-                }
-            });
-            messageActionController.exit();
-            editText.setText("");
-        });
-    }
-
-    @Override
-    public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
-        this.avatarView = avatar;
-        this.nicknameView = nickname;
-        this.lastSeenView = onlineState;
     }
 
     private void insertMessage(P20ChatMessage msg, MessageState messageState) {
@@ -171,7 +172,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
         QuotedMessage quotedMessage = null;
         if (msg.quotedMessage != 0)
-            quotedMessage = QuotedMessage.load(this, msg.quotedMessage, directChannel, accountDataChannel);
+            quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
         MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide, quotedMessage);
         runOnUiThread(() -> {
             if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
@@ -200,23 +201,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         recyclerView.scrollToPosition(messageItems.size() - 1);
     }
 
-    private void readMessage(long messageId) {
-        SkynetContext.getCurrent().getMessageInterface()
-                .sendChannelMessage(directChannel.getChannelId(),
-                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), directChannel.getChannelId(), messageId),
-                        new P23MessageRead()
-                );
-        backgroundHandler.post(() -> {
-            ChatMessage message = Storage.getDatabase().chatMessageDao().query(directChannel.getChannelId(), messageId);
-            message.setUnread(false);
-            Storage.getDatabase().chatMessageDao().update(message);
-        });
-    }
-
     @Subscribe
     public void onPacketEvent(PacketEvent event) {
         Packet packet = event.getPacket();
-        if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != directChannel.getChannelId())
+        if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != messageChannel.getChannelId())
             return;
 
         if (packet instanceof P20ChatMessage) {
@@ -226,7 +214,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 readMessage(chatMessage.getParent().messageId);
         } else if (packet instanceof P0CChannelMessageResponse) {
             P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
-            if (response.channelId != directChannel.getChannelId()) return;
+            if (response.channelId != messageChannel.getChannelId()) return;
             modifyMessageItem(response.tempMessageId, i -> {
                 i.setMessageId(response.messageId);
                 i.setMessageState(MessageState.SENT);
@@ -292,6 +280,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 messageActionController.begin(MessageAction.EDIT, getSelectedMessage().getMessageId());
                 messageActionController.setHeader(getFriendlySenderName(selectedMessage));
                 messageActionController.setContent(selectedMessage.getContent());
+                messageInput.setText(selectedMessage.getContent());
                 mode.finish();
                 break;
             case R.id.action_delete:
