@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+
 import de.vectordata.skynet.ui.main.fragments.ChatsFragment;
 import de.vectordata.skynet.ui.main.fragments.ContactsFragment;
 import de.vectordata.skynet.ui.main.fragments.DaystreamFragment;
@@ -15,7 +16,7 @@ import de.vectordata.skynet.ui.main.fragments.DaystreamFragment;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     SectionsPagerAdapter(@NonNull FragmentManager fm) {
-        super(fm);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
     }
 
     @NonNull
