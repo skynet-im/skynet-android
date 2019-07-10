@@ -40,8 +40,8 @@ public class MainActivity extends ThemedActivity {
 
     private static final String TAG = "MainActivity";
 
-    public static final String ACTION_OPEN_CHAT = "de.vectordata.skynet.open_chat";
-    public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.open_chat.channel";
+    public static final String ACTION_OPEN_CHAT = "skynet.open_chat";
+    public static final String EXTRA_CHANNEL_ID = "skynet.open_chat.channel";
 
     private boolean leftForLogin;
 

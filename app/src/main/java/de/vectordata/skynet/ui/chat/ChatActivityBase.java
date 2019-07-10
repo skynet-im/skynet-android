@@ -33,7 +33,7 @@ import de.vectordata.skynet.util.Handlers;
  */
 public abstract class ChatActivityBase extends ThemedActivity {
 
-    public static final String EXTRA_CHANNEL_ID = "de.vectordata.skynet.chat.channelId";
+    public static final String EXTRA_CHANNEL_ID = "skynet.chat.channelId";
 
     /**
      * This is the channel over which the actual messages are transmitted, such as

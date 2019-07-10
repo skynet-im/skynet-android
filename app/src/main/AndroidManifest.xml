@@ -40,6 +40,9 @@
         <activity
             android:name=".ui.PreferencesActivity"
             android:label="@string/activity_preferences" />
+        <activity
+            android:name=".ui.ForwardActivity"
+            android:label="@string/action_forward" />
 
         <service android:name=".fcm.FcmService">
             <intent-filter>

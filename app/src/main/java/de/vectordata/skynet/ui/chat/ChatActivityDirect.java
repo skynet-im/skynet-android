@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui.chat;
 
+import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
+import de.vectordata.skynet.ui.ForwardActivity;
 import de.vectordata.skynet.ui.chat.action.MessageAction;
 import de.vectordata.skynet.ui.chat.action.MessageActionController;
 import de.vectordata.skynet.ui.chat.recycler.CheckableRecyclerView;
@@ -75,12 +77,13 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         findViewById(R.id.button_exit_message_action).setOnClickListener(v -> messageActionController.exit());
 
         messageItems = new ArrayList<>();
-        adapter = new MessageAdapter(recyclerView, messageItems);
 
         recyclerView = findViewById(R.id.recycler_view);
+        adapter = new MessageAdapter(recyclerView, messageItems);
+
+        recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
-        recyclerView.setAdapter(adapter);
 
         messageInput = findViewById(R.id.input_message);
 
@@ -288,6 +291,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             case R.id.action_info:
                 break;
             case R.id.action_forward:
+                Intent intent = new Intent(this, ForwardActivity.class);
+                intent.putExtra(ForwardActivity.EXTRA_SRC_CHANNEL, messageChannel.getChannelId());
+                intent.putExtra(ForwardActivity.EXTRA_SRC_MESSAGE, selectedMessage.getMessageId());
+                startActivity(intent);
                 break;
         }
         return false;
