@@ -45,6 +45,7 @@ import de.vectordata.skynet.ui.chat.recycler.CheckableRecyclerView;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
+import de.vectordata.skynet.ui.chat.recycler.QuotedMessage;
 import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
@@ -112,9 +113,14 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
                 MessageSide messageSide = parent.getSenderId() == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
                 DateTime dispatchTime = parent.getDispatchTime();
+
                 if (previous == null || !previous.getDispatchTime().isSameDay(dispatchTime))
                     messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, dispatchTime)));
-                messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide));
+
+                QuotedMessage quotedMessage = null;
+                if (message.getQuotedMessage() != 0)
+                    quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), directChannel, accountDataChannel);
+                messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage));
                 previous = parent;
             }
 
@@ -163,7 +169,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
         long myAccountId = Storage.getSession().getAccountId();
         MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-        MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide);
+        QuotedMessage quotedMessage = null;
+        if (msg.quotedMessage != 0)
+            quotedMessage = QuotedMessage.load(this, msg.quotedMessage, directChannel, accountDataChannel);
+        MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide, quotedMessage);
         runOnUiThread(() -> {
             if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
                 messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));

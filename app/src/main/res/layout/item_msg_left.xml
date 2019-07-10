@@ -14,6 +14,45 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_message_left">
 
+        <View
+            android:id="@+id/quote_indicator"
+            android:layout_width="1.5dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/label_quoted_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/label_quoted_name" />
+
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/label_quoted_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@+id/quote_indicator"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Name" />
+
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/label_quoted_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/quote_indicator"
+            app:layout_constraintTop_toBottomOf="@+id/label_quoted_name"
+            tools:text="Message" />
+
         <TextView
             android:id="@+id/label_time"
             android:layout_width="wrap_content"
@@ -36,9 +75,17 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/label_time"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/label_quoted_text"
             tools:text="Hello this is a test" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_quote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="label_quoted_name, label_quoted_text, quote_indicator" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

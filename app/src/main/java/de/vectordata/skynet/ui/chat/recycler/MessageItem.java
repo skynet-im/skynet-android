@@ -16,16 +16,19 @@ public class MessageItem {
 
     private MessageSide messageSide;
 
-    public MessageItem(long messageId, String content, DateTime sentDate, MessageState messageState, MessageSide messageSide) {
+    private QuotedMessage quotedMessage;
+
+    public MessageItem(long messageId, String content, DateTime sentDate, MessageState messageState, MessageSide messageSide, QuotedMessage quotedMessage) {
         this.messageId = messageId;
         this.content = content;
         this.sentDate = sentDate;
         this.messageState = messageState;
         this.messageSide = messageSide;
+        this.quotedMessage = quotedMessage;
     }
 
     public static MessageItem newSystemMessage(String content) {
-        return new MessageItem(0, content, null, MessageState.SYSTEM, MessageSide.CENTER);
+        return new MessageItem(0, content, null, MessageState.SYSTEM, MessageSide.CENTER, null);
     }
 
     public long getMessageId() {
@@ -54,5 +57,13 @@ public class MessageItem {
 
     public MessageSide getMessageSide() {
         return messageSide;
+    }
+
+    boolean hasQuote() {
+        return quotedMessage != null;
+    }
+
+    QuotedMessage getQuotedMessage() {
+        return quotedMessage;
     }
 }

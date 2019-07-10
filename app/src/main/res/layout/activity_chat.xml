@@ -16,7 +16,7 @@
         android:src="@drawable/wallpaper_chat" />
 
     <View
-        android:id="@+id/background"
+        android:id="@+id/quote_indicator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#ffF"
@@ -110,7 +110,7 @@
         android:padding="8dp"
         android:tint="?attr/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/input_message"
-        app:layout_constraintStart_toStartOf="@+id/background"
+        app:layout_constraintStart_toStartOf="@+id/quote_indicator"
         app:srcCompat="@drawable/ic_quote" />
 
     <com.vanniktech.emoji.EmojiTextView
@@ -145,8 +145,8 @@
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
         android:background="@color/lightGray"
-        app:layout_constraintEnd_toEndOf="@+id/background"
-        app:layout_constraintStart_toStartOf="@+id/background"
+        app:layout_constraintEnd_toEndOf="@+id/quote_indicator"
+        app:layout_constraintStart_toStartOf="@+id/quote_indicator"
         app:layout_constraintTop_toBottomOf="@+id/label_message_action_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

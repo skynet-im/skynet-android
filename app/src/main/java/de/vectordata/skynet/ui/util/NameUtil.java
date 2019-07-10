@@ -1,5 +1,8 @@
 package de.vectordata.skynet.ui.util;
 
+import android.content.Context;
+
+import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.MailAddress;
@@ -28,6 +31,12 @@ public class NameUtil {
             return mailAddressObj.getMailAddress();
 
         return Long.toHexString(counterpartId);
+    }
+
+    public static String getFriendlySenderName(Context context, long senderId, Channel accountDataChannel) {
+        if (senderId == Storage.getSession().getAccountId())
+            return context.getString(R.string.you);
+        return getFriendlyName(senderId, accountDataChannel);
     }
 
 }
