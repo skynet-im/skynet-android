@@ -43,6 +43,10 @@ public class MessageItem {
         return content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public DateTime getSentDate() {
         return sentDate;
     }
@@ -66,4 +70,5 @@ public class MessageItem {
     QuotedMessage getQuotedMessage() {
         return quotedMessage;
     }
+
 }

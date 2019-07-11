@@ -6,6 +6,7 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
@@ -32,12 +33,17 @@ public class MessageInterface {
     }
 
     public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        P0BChannelMessage container = prepare(channelId, config, packet, true);
+        P0BChannelMessage container = prepare(channelId, config, packet);
         return skynetContext.getNetworkManager().sendPacket(container);
     }
 
-    public P0BChannelMessage prepare(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet, boolean save) {
-        return prepare(channelId, newId(), config, packet, save);
+    public void schedule(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+        P0BChannelMessage message = prepare(channelId, config, packet);
+        SkynetContext.getCurrent().getJobEngine().schedule(new ChannelMessageJob(message));
+    }
+
+    private P0BChannelMessage prepare(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+        return prepare(channelId, newId(), config, packet, true);
     }
 
     public P0BChannelMessage prepare(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet, boolean save) {
@@ -71,7 +77,7 @@ public class MessageInterface {
         return sendRealTimeMessage(channelId, MessageFlags.NONE, packet);
     }
 
-    public ResponseAwaiter sendRealTimeMessage(long channelId, byte flags, RealtimeMessagePacket packet) {
+    private ResponseAwaiter sendRealTimeMessage(long channelId, byte flags, RealtimeMessagePacket packet) {
         P10RealTimeMessage container = new P10RealTimeMessage();
         container.channelId = channelId;
         container.messageFlags = flags;

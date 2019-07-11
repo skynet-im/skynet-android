@@ -28,17 +28,18 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.PacketEvent;
-import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.P21MessageOverride;
 import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
+import de.vectordata.skynet.net.packet.model.OverrideAction;
 import de.vectordata.skynet.ui.ForwardActivity;
 import de.vectordata.skynet.ui.chat.action.MessageAction;
 import de.vectordata.skynet.ui.chat.action.MessageActionController;
@@ -95,13 +96,17 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             backgroundHandler.post(() -> {
                 if (!messageActionController.isOpen() || messageActionController.getAction() == MessageAction.QUOTE) {
                     P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
-                    ChannelMessageConfig config = new ChannelMessageConfig();
-                    P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(messageChannel.getChannelId(), config, packet, true);
-                    getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
+                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
                     insertMessage(packet, MessageState.SENDING);
+                } else if (messageActionController.getAction() == MessageAction.EDIT) {
+                    P21MessageOverride packet = new P21MessageOverride(messageActionController.getAffectedMessage(), OverrideAction.EDIT, text);
+                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                    modifyMessageItem(messageActionController.getAffectedMessage(), data -> data.setContent(text));
                 }
+
+                runOnUiThread(() -> messageActionController.exit());
             });
-            messageActionController.exit();
+
             messageInput.setText("");
         });
 
@@ -231,6 +236,9 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         } else if (packet instanceof P23MessageRead) {
             P0BChannelMessage.Dependency dependency = ((P23MessageRead) packet).getParent().singleDependency();
             modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));
+        } else if (packet instanceof P21MessageOverride) {
+            P21MessageOverride override = (P21MessageOverride) packet;
+            modifyMessageItem(override.messageId, i -> i.setContent(override.newText));
         }
     }
 
@@ -287,6 +295,13 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 mode.finish();
                 break;
             case R.id.action_delete:
+                // TODO Add confirmation dialog here
+                backgroundHandler.post(() -> {
+                    P21MessageOverride packet = new P21MessageOverride(selectedMessage.getMessageId(), OverrideAction.DELETE);
+                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                });
+                modifyMessageItem(messageActionController.getAffectedMessage(), data -> data.setContent("\0"));
+                mode.finish();
                 break;
             case R.id.action_info:
                 break;

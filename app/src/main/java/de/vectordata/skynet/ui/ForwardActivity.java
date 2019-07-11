@@ -16,9 +16,7 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
-import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.base.ThemedActivity;
@@ -72,11 +70,7 @@ public class ForwardActivity extends ThemedActivity {
                 ChatsItem target = dataset.get(i);
 
                 P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, source.getText(), 0);
-
-                ChannelMessageConfig config = new ChannelMessageConfig();
-                P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(target.getChannelId(), config, packet, true);
-
-                getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
+                getSkynetContext().getMessageInterface().schedule(target.getChannelId(), ChannelMessageConfig.createDefault(), packet);
             }
             Toast.makeText(this, R.string.progress_sending_messages, Toast.LENGTH_SHORT).show();
             finish();

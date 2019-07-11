@@ -16,6 +16,10 @@ public class ChannelMessageConfig {
 
     private List<P0BChannelMessage.Dependency> dependencies = new ArrayList<>();
 
+    public static ChannelMessageConfig createDefault() {
+        return new ChannelMessageConfig();
+    }
+
     public ChannelMessageConfig addFlag(byte messageFlags) {
         this.messageFlags |= messageFlags;
         return this;
@@ -32,7 +36,7 @@ public class ChannelMessageConfig {
         return addDependency(new P0BChannelMessage.Dependency(accountId, channelId, messageId));
     }
 
-    public ChannelMessageConfig addDependency(P0BChannelMessage.Dependency dependency) {
+    private ChannelMessageConfig addDependency(P0BChannelMessage.Dependency dependency) {
         dependencies.add(dependency);
         return this;
     }

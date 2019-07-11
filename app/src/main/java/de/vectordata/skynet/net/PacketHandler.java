@@ -11,7 +11,6 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
-import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
@@ -65,7 +64,6 @@ import de.vectordata.skynet.net.packet.model.CreateChannelError;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.model.KeyFormat;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
-import de.vectordata.skynet.net.packet.model.OverrideAction;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
@@ -284,27 +282,6 @@ public class PacketHandler {
     }
 
     public void handlePacket(P21MessageOverride packet) {
-        Channel channel = Storage.getDatabase().channelDao().getById(packet.getParent().channelId);
-        if (channel.getChannelType() == ChannelType.PROFILE_DATA) {
-            DaystreamMessage message = Storage.getDatabase().daystreamMessageDao().get(channel.getChannelId(), packet.messageId);
-            if (packet.action == OverrideAction.DELETE)
-                Storage.getDatabase().daystreamMessageDao().delete(message);
-            else {
-                message.setText(packet.newText);
-                message.setEdited(true);
-                Storage.getDatabase().daystreamMessageDao().update(message);
-            }
-        } else {
-            ChatMessage message = Storage.getDatabase().chatMessageDao().query(packet.getParent().channelId, packet.messageId);
-            if (packet.action == OverrideAction.DELETE) {
-                message.setText("\0");
-                SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(packet.getParent().channelId, packet.messageId);
-            } else {
-                message.setText(packet.newText);
-                message.setEdited(true);
-            }
-            Storage.getDatabase().chatMessageDao().update(message);
-        }
     }
 
     // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received/read it.
