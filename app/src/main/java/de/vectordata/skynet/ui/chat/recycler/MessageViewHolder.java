@@ -1,5 +1,6 @@
 package de.vectordata.skynet.ui.chat.recycler;
 
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +31,16 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     void configure(MessageItem messageItem) {
-        message.setText(messageItem.getContent());
+        if (messageItem.getContent().equals("\0")) {
+            message.setTypeface(null, Typeface.ITALIC);
+            message.setAlpha(0.75f);
+            message.setText(R.string.message_deleted);
+        } else {
+            message.setTypeface(null, Typeface.NORMAL);
+            message.setAlpha(1.0f);
+            message.setText(messageItem.getContent());
+        }
+
         if (time != null && messageItem.getSentDate() != null)
             time.setText(messageItem.getSentDate().toTimeString(time.getContext()));
         if (state != null)

@@ -109,4 +109,6 @@
     <string name="notification_channel_desc">Notifications for new chat messages are posted to this notification channel</string>
     <string name="notification_subtitle">%1$d messages from %2$d chats</string>
 
+    <string name="message_deleted">This message was deleted</string>
+
 </resources>
