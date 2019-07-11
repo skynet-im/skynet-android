@@ -8,17 +8,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
+import android.service.notification.StatusBarNotification;
 import android.util.LongSparseArray;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.main.MainActivity;
 import de.vectordata.skynet.ui.util.NameUtil;
@@ -26,8 +29,10 @@ import de.vectordata.skynet.util.Handlers;
 
 public class NotificationManagerNew implements INotificationManager {
 
-    private static final String GROUP_KEY = "de.vectordata.skynet.notification_group";
-    private static final String CHANNEL_ID = "de.vectordata.skynet.notification_channel";
+    private static final String GROUP_KEY = "skynet.notification_group";
+    private static final String CHANNEL_ID = "skynet.notification_channel";
+
+    private static final String EXTRA_CHANNEL = "skynet.notification.extra_channel";
 
     private static final int SUMMARY_ID = 42;
 
@@ -51,6 +56,16 @@ public class NotificationManagerNew implements INotificationManager {
             channel.setDescription(context.getString(R.string.notification_channel_desc));
             notificationManager.createNotificationChannel(channel);
         }
+
+        // To make sure that notifications are not sent multiple times, read which
+        // notifications are still in the status bar from the previous session, and
+        // save them to the known notification ids.
+        for (StatusBarNotification activeNotification : notificationManager.getActiveNotifications())
+            if (activeNotification.getId() != SUMMARY_ID) {
+                long channelId = activeNotification.getNotification().extras.getLong(EXTRA_CHANNEL, 0);
+                if (channelId != 0)
+                    notificationIdMap.put(channelId, activeNotification.getId());
+            }
     }
 
     @Override
@@ -151,6 +166,9 @@ public class NotificationManagerNew implements INotificationManager {
 
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+            Bundle extras = new Bundle();
+            extras.putLong(EXTRA_CHANNEL, channelId);
+
             Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.skynet_icon) // TODO Use different notification icon
                     .setCategory(NotificationCompat.CATEGORY_MESSAGE)
@@ -163,6 +181,7 @@ public class NotificationManagerNew implements INotificationManager {
                     .setGroup(GROUP_KEY)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setContentIntent(pendingIntent)
+                    .addExtras(extras)
                     .build();
 
             notificationIdMap.put(channelId, idx);
