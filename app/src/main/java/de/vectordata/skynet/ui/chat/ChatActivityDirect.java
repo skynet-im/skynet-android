@@ -328,6 +328,12 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         else super.onBackPressed();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
+    }
+
     private String getFriendlySenderName(MessageItem item) {
         return item.getMessageSide() == MessageSide.LEFT ? nicknameView.getText().toString() : getString(R.string.you);
     }
