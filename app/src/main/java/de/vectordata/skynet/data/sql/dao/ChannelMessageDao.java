@@ -1,11 +1,12 @@
 package de.vectordata.skynet.data.sql.dao;
 
-import java.util.List;
-
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
+
+import java.util.List;
+
 import de.vectordata.skynet.data.model.ChannelMessage;
 
 @Dao
@@ -22,5 +23,8 @@ public interface ChannelMessageDao {
 
     @Query("SELECT * FROM channelMessages WHERE channelId=:channelId")
     List<ChannelMessage> query(long channelId);
+
+    @Query("SELECT * FROM channelMessages WHERE channelId=:channelId ORDER BY dispatchTime DESC LIMIT 1")
+    ChannelMessage queryLast(long channelId);
 
 }

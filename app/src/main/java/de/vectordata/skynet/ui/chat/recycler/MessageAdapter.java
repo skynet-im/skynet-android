@@ -1,7 +1,6 @@
 package de.vectordata.skynet.ui.chat.recycler;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -14,12 +13,9 @@ import de.vectordata.skynet.ui.util.MessageSide;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
 
-    private final CheckableRecyclerView recyclerView;
-
     private final List<MessageItem> dataset;
 
-    public MessageAdapter(CheckableRecyclerView recyclerView, List<MessageItem> dataset) {
-        this.recyclerView = recyclerView;
+    public MessageAdapter(List<MessageItem> dataset) {
         this.dataset = dataset;
     }
 
@@ -33,10 +29,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         else if (messageSide == MessageSide.CENTER) layout = R.layout.item_msg_center;
         else if (messageSide == MessageSide.RIGHT) layout = R.layout.item_msg_right;
 
-        View inflated = inflater.inflate(layout, parent, false);
-        inflated.setOnClickListener(recyclerView);
-        inflated.setOnLongClickListener(recyclerView);
-        return new MessageViewHolder(inflated);
+        return new MessageViewHolder(inflater.inflate(layout, parent, false));
     }
 
     @Override

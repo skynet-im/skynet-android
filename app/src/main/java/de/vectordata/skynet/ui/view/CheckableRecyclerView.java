@@ -1,4 +1,4 @@
-package de.vectordata.skynet.ui.chat.recycler;
+package de.vectordata.skynet.ui.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
 import de.vectordata.skynet.ui.util.OnItemClickListener;
 
 public class CheckableRecyclerView extends RecyclerView implements View.OnClickListener, View.OnLongClickListener {
@@ -26,18 +27,27 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
     private MultiChoiceListener actionModeCallback;
     private ActionMode actionMode;
 
+    private CheckableBehavior behavior = CheckableBehavior.LONG_CLICK;
+
     private int lastFirstVisibleItem;
 
     public CheckableRecyclerView(@NonNull Context context) {
         super(context);
+        registerListener();
     }
 
     public CheckableRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        registerListener();
     }
 
     public CheckableRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        registerListener();
+    }
+
+    public void setBehavior(CheckableBehavior behavior) {
+        this.behavior = behavior;
     }
 
     public void setActionModeCallback(MultiChoiceListener actionModeCallback) {
@@ -56,12 +66,13 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
         if (checked) checkedItems.add(position);
         else checkedItems.remove(position);
 
-        if (checkedItems.isEmpty() && user) {
-            actionMode.finish();
-            actionMode = null;
+        if (actionMode != null) {
+            if (checkedItems.isEmpty() && user) {
+                actionMode.finish();
+                actionMode = null;
+            }
+            actionModeCallback.onItemCheckedStateChanged(actionMode, position, checked);
         }
-
-        actionModeCallback.onItemCheckedStateChanged(actionMode, position, checked);
         getChildAt(position - getFirstVisiblePosition()).setActivated(checked);
     }
 
@@ -75,14 +86,14 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
     @Override
     public void onClick(View v) {
         int position = getChildAdapterPosition(v);
-        if (actionMode != null) toggleItem(position);
+        if (actionMode != null || behavior == CheckableBehavior.SINGLE_CLICK) toggleItem(position);
         else if (onItemClickListener != null)
             onItemClickListener.onItemClick(position);
     }
 
     @Override
     public boolean onLongClick(View v) {
-        if (actionMode == null) {
+        if (actionMode == null && behavior == CheckableBehavior.LONG_CLICK) {
             actionMode = ((AppCompatActivity) getContext()).startSupportActionMode(new ActionMode.Callback() {
                 @Override
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -143,5 +154,23 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
         }
         checkedItems.clear();
     }
+
+    private void registerListener() {
+        addOnChildAttachStateChangeListener(new OnChildAttachStateChangeListener() {
+            @Override
+            public void onChildViewAttachedToWindow(@NonNull View view) {
+                view.setOnLongClickListener(CheckableRecyclerView.this);
+                view.setOnClickListener(CheckableRecyclerView.this);
+            }
+
+            @Override
+            public void onChildViewDetachedFromWindow(@NonNull View view) {
+                view.setOnClickListener(null);
+                view.setOnLongClickListener(null);
+            }
+        });
+    }
+
+
 
 }

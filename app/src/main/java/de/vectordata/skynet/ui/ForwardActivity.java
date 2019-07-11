@@ -1,33 +1,44 @@
 package de.vectordata.skynet.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
+import de.vectordata.skynet.net.messages.ChannelMessageConfig;
+import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.packet.P20ChatMessage;
+import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
-import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
+import de.vectordata.skynet.ui.view.CheckableBehavior;
+import de.vectordata.skynet.ui.view.CheckableRecyclerView;
 import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.Handlers;
 
 public class ForwardActivity extends ThemedActivity {
 
     public static final String EXTRA_SRC_CHANNEL = "skynet.forward.srcChannel";
 
     public static final String EXTRA_SRC_MESSAGE = "skynet.forward.srcMessage";
+
+    private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
+
+    private ChatMessage source;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,33 +54,50 @@ public class ForwardActivity extends ThemedActivity {
             return;
         }
 
-        (new Thread(() -> {
-            List<ChatsItem> dataset = new ArrayList<>();
+        List<ChatsItem> dataset = new ArrayList<>();
 
-            ChatsAdapter adapter = new ChatsAdapter(dataset);
-            RecyclerView recyclerView = findViewById(R.id.recycler_view);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setAdapter(adapter);
+        CheckableRecyclerView recyclerView = findViewById(R.id.recycler_view);
+
+        ChatsAdapter adapter = new ChatsAdapter(dataset);
+        adapter.setSingleLine(true);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setBehavior(CheckableBehavior.SINGLE_CLICK);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        findViewById(R.id.fab).setOnClickListener(v -> backgroundHandler.post(() -> {
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                if (!recyclerView.isItemChecked(i)) continue;
+                ChatsItem target = dataset.get(i);
+
+                P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, source.getText(), 0);
+
+                ChannelMessageConfig config = new ChannelMessageConfig();
+                P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(target.getChannelId(), config, packet, true);
+
+                getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
+            }
+            Toast.makeText(this, R.string.progress_sending_messages, Toast.LENGTH_SHORT).show();
+            finish();
+        }));
+
+        backgroundHandler.post(() -> {
+            source = Storage.getDatabase().chatMessageDao().query(srcChannel, srcMessage);
 
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             for (Channel channel : channels) {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
                 String friendlyName = NameUtil.getFriendlyName(channel.getCounterpartId(), accountDataChannel);
 
-                ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId());
-                ChatsItem item;
-                if (latestMessage != null) {
-                    ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
-                    MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
-                    item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), 0, channel.getChannelId(), channel.getCounterpartId());
-                } else
-                    item = new ChatsItem(friendlyName, getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
+                ChannelMessage latestMessage = Storage.getDatabase().channelMessageDao().queryLast(channel.getChannelId());
+
+                ChatsItem item = new ChatsItem(friendlyName, latestMessage.getDispatchTime(), channel.getCounterpartId(), channel.getChannelId());
                 dataset.add(item);
             }
             Collections.sort(dataset, (a, b) -> -Long.compare(a.getLastActiveDate().toBinary(), b.getLastActiveDate().toBinary()));
             runOnUiThread(adapter::notifyDataSetChanged);
-        })).start();
+        });
     }
 
 }

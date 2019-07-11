@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.util.DateUtil;
@@ -38,8 +39,21 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
         message = itemView.findViewById(R.id.label_message);
     }
 
-    void configure(ChatsItem item) {
+    void configure(ChatsItem item, boolean singleLine) {
         header.setText(item.getHeader());
+        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getCounterpartId(), 128, 128)
+                .loadInto(avatar);
+
+        if (singleLine) {
+            message.setVisibility(View.GONE);
+            bubble.setVisibility(View.GONE);
+            date.setVisibility(View.GONE);
+            return;
+        } else {
+            message.setVisibility(View.VISIBLE);
+            date.setVisibility(View.VISIBLE);
+        }
+
         DateTime lastActive = item.getLastActiveDate();
         if (lastActive != null)
             date.setText(DateUtil.toString(context, lastActive));
@@ -49,9 +63,9 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
         message.setText(item.getContent());
-        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getCounterpartId(), 128, 128)
-                .loadInto(avatar);
+
         item.getMessageState().apply(messageState);
         item.getMessageSide().apply(messageState);
     }
+
 }

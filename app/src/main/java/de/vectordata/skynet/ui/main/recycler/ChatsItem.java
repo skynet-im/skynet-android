@@ -28,6 +28,13 @@ public class ChatsItem {
 
     private long counterpartId;
 
+    public ChatsItem(String header, DateTime lastActiveDate, long counterpartId, long channelId) {
+        this.header = header;
+        this.lastActiveDate = lastActiveDate;
+        this.counterpartId = counterpartId;
+        this.channelId = channelId;
+    }
+
     public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, long channelId, long counterpartId) {
         this.header = header;
         this.content = content;

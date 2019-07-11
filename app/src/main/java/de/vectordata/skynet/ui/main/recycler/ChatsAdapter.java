@@ -3,10 +3,11 @@ package de.vectordata.skynet.ui.main.recycler;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.util.OnItemClickListener;
 
@@ -19,8 +20,14 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
     private List<ChatsItem> dataset;
     private OnItemClickListener itemClickListener;
 
+    private boolean singleLine;
+
     public ChatsAdapter(List<ChatsItem> dataset) {
         this.dataset = dataset;
+    }
+
+    public void setSingleLine(boolean singleLine) {
+        this.singleLine = singleLine;
     }
 
     @NonNull
@@ -34,7 +41,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
     public void onBindViewHolder(@NonNull ChatsViewHolder holder, int position) {
         ChatsItem item = dataset.get(position);
         if (item != null) {
-            holder.configure(item);
+            holder.configure(item, singleLine);
             holder.itemView.setOnClickListener(v -> {
                 if (itemClickListener != null)
                     itemClickListener.onItemClick(position);

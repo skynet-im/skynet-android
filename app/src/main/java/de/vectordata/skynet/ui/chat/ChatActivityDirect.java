@@ -42,7 +42,6 @@ import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.ui.ForwardActivity;
 import de.vectordata.skynet.ui.chat.action.MessageAction;
 import de.vectordata.skynet.ui.chat.action.MessageActionController;
-import de.vectordata.skynet.ui.chat.recycler.CheckableRecyclerView;
 import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
@@ -52,6 +51,7 @@ import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
+import de.vectordata.skynet.ui.view.CheckableRecyclerView;
 import de.vectordata.skynet.util.Callback;
 
 public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceListener {
@@ -79,7 +79,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         messageItems = new ArrayList<>();
 
         recyclerView = findViewById(R.id.recycler_view);
-        adapter = new MessageAdapter(recyclerView, messageItems);
+        adapter = new MessageAdapter(messageItems);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -295,6 +295,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 intent.putExtra(ForwardActivity.EXTRA_SRC_CHANNEL, messageChannel.getChannelId());
                 intent.putExtra(ForwardActivity.EXTRA_SRC_MESSAGE, selectedMessage.getMessageId());
                 startActivity(intent);
+                mode.finish();
                 break;
         }
         return false;
