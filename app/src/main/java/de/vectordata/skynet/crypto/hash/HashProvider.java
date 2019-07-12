@@ -2,7 +2,6 @@ package de.vectordata.skynet.crypto.hash;
 
 import android.util.Log;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

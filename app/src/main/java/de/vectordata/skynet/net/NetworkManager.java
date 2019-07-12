@@ -15,7 +15,7 @@ import de.vectordata.skynet.auth.Authenticator;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.event.AuthenticationFailedEvent;
-import de.vectordata.skynet.event.AuthenticationSucessfulEvent;
+import de.vectordata.skynet.event.AuthenticationSuccessfulEvent;
 import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.model.ConnectionState;
@@ -145,7 +145,7 @@ public class NetworkManager implements VSLClientListener {
             if (err != RestoreSessionError.SUCCESS)
                 EventBus.getDefault().post(new AuthenticationFailedEvent(err));
             else
-                EventBus.getDefault().post(new AuthenticationSucessfulEvent());
+                EventBus.getDefault().post(new AuthenticationSuccessfulEvent());
         });
     }
 

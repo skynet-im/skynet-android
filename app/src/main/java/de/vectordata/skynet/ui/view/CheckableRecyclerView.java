@@ -14,9 +14,7 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
@@ -25,7 +23,6 @@ import de.vectordata.skynet.ui.util.OnItemClickListener;
 public class CheckableRecyclerView extends RecyclerView implements View.OnClickListener, View.OnLongClickListener {
 
     private Set<Integer> checkedItems = new HashSet<>();
-    private List<ViewHolder> boundViewHolders = new ArrayList<>();
     private OnItemClickListener onItemClickListener;
     private MultiChoiceListener actionModeCallback;
     private ActionMode actionMode;
@@ -159,10 +156,8 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
     }
 
     private void deselectAll() {
-        for (int i = 0; i < getChildCount(); i++) {
+        for (int i = 0; i < getChildCount(); i++)
             getChildAt(i).setActivated(false);
-
-        }
         checkedItems.clear();
     }
 
