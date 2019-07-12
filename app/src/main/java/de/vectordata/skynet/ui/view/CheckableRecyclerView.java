@@ -14,7 +14,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
@@ -23,13 +25,14 @@ import de.vectordata.skynet.ui.util.OnItemClickListener;
 public class CheckableRecyclerView extends RecyclerView implements View.OnClickListener, View.OnLongClickListener {
 
     private Set<Integer> checkedItems = new HashSet<>();
+    private List<ViewHolder> boundViewHolders = new ArrayList<>();
     private OnItemClickListener onItemClickListener;
     private MultiChoiceListener actionModeCallback;
     private ActionMode actionMode;
 
     private CheckableBehavior behavior = CheckableBehavior.LONG_CLICK;
 
-    private int lastFirstVisibleItem;
+    private int lastVisiblePosition;
 
     public CheckableRecyclerView(@NonNull Context context) {
         super(context);
@@ -129,18 +132,25 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
         super.onScrolled(dx, dy);
         int currentVisiblePosition = getFirstVisiblePosition();
 
-        if (lastFirstVisibleItem != currentVisiblePosition)
-            for (int i = 0; i < getChildCount(); i++)
-                getChildAt(i).setActivated(isItemChecked(i + currentVisiblePosition));
+        if (lastVisiblePosition != currentVisiblePosition)
+            for (int i = 0; i < getChildCount(); i++) {
+                View child = getChildAt(i);
+                int adapterIdx = getChildAdapterPosition(child);
+                child.setActivated(isItemChecked(adapterIdx));
+            }
 
-        lastFirstVisibleItem = currentVisiblePosition;
+        lastVisiblePosition = currentVisiblePosition;
     }
 
     public int getFirstVisiblePosition() {
+        if (getLayoutManager() == null)
+            return -1;
         return ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
     }
 
     public int getLastVisiblePosition() {
+        if (getLayoutManager() == null)
+            return -1;
         return ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
     }
 
@@ -151,6 +161,7 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
     private void deselectAll() {
         for (int i = 0; i < getChildCount(); i++) {
             getChildAt(i).setActivated(false);
+
         }
         checkedItems.clear();
     }
