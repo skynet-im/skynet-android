@@ -258,8 +258,11 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 mode.getMenu().findItem(R.id.action_info).setVisible(false);
             } else {
                 mode.getMenu().findItem(R.id.action_quote).setVisible(true);
-                mode.getMenu().findItem(R.id.action_edit).setVisible(true);
                 mode.getMenu().findItem(R.id.action_info).setVisible(true);
+
+                MessageItem selectedMessage = getSelectedMessage();
+                if (selectedMessage != null)
+                    mode.getMenu().findItem(R.id.action_edit).setVisible(selectedMessage.getMessageSide() == MessageSide.RIGHT);
             }
         }
     }
