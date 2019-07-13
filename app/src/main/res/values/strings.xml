@@ -31,6 +31,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_info">Info</string>
     <string name="action_forward">Forward</string>
+    <string name="action_beta_info">Beta info</string>
 
     <string name="link_create_account">New to Skynet? Create an account now</string>
 
