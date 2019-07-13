@@ -33,6 +33,7 @@
             app:title="@string/pref_notifications" />
 
         <RingtonePreference
+            android:defaultValue="content://settings/system/notification_sound"
             android:dependency="notifications"
             android:ringtoneType="notification"
             app:key="ringtone"
