@@ -35,16 +35,19 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
             message.setTypeface(null, Typeface.ITALIC);
             message.setAlpha(0.75f);
             message.setText(R.string.message_deleted);
+            if (state != null)
+                state.setVisibility(View.GONE);
         } else {
             message.setTypeface(null, Typeface.NORMAL);
             message.setAlpha(1.0f);
             message.setText(messageItem.getContent());
+            if (state != null)
+                state.setVisibility(View.VISIBLE);
         }
 
         if (time != null && messageItem.getSentDate() != null)
             time.setText(messageItem.getSentDate().toTimeString(time.getContext()));
-        if (state != null)
-            messageItem.getMessageState().apply(state);
+        messageItem.getMessageState().apply(state);
 
         if (quoteGroup == null) return;
 

@@ -17,6 +17,9 @@ public enum MessageState {
     NONE;
 
     public void apply(ImageView imageView) {
+        if (imageView == null)
+            return;
+
         if (this == SENDING)
             imageView.setImageResource(R.drawable.ic_msg_sending);
         else if (this == SENT)
