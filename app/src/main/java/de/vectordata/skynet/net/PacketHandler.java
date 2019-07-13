@@ -102,6 +102,9 @@ public class PacketHandler {
 
         packet.readPacket(new PacketBuffer(payload), keyProvider);
 
+        if (!packet.validatePacket())
+            return;
+
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).writeToDatabase(PacketDirection.RECEIVE);
 

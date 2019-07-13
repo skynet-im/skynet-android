@@ -12,6 +12,8 @@ public interface Packet {
 
     void handlePacket(PacketHandler handler);
 
+    boolean validatePacket();
+
     byte getId();
 
 }

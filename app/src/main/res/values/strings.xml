@@ -60,7 +60,7 @@
     <string name="question_logoff">Do you really want to log off from this device?</string>
 
     <string name="question_header_delete">Delete message?</string>
-    <string name="question_delete">Do you really want to delete this message?</string>
+    <string name="question_delete">Do you really want to delete this message? It will be deleted for everyone.</string>
 
     <string name="tab_header_contacts">Contacts</string>
     <string name="tab_header_chats">Chats</string>

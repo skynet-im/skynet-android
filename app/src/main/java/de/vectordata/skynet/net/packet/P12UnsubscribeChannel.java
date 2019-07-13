@@ -3,9 +3,9 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
-public class P12UnsubscribeChannel implements Packet {
+public class P12UnsubscribeChannel extends AbstractPacket {
 
     public long channelId;
     public byte packetId;

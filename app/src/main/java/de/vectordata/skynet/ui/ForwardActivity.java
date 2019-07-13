@@ -70,7 +70,7 @@ public class ForwardActivity extends ThemedActivity {
                 ChatsItem target = dataset.get(i);
 
                 P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, source.getText(), 0);
-                getSkynetContext().getMessageInterface().schedule(target.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                getSkynetContext().getMessageInterface().schedule(target.getChannelId(), ChannelMessageConfig.create(), packet);
             }
             Toast.makeText(this, R.string.progress_sending_messages, Toast.LENGTH_SHORT).show();
             finish();

@@ -3,10 +3,10 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.CreateChannelError;
 
-public class P2FCreateChannelResponse implements Packet {
+public class P2FCreateChannelResponse extends AbstractPacket {
 
     public long tempChannelId;
     public CreateChannelError errorCode;

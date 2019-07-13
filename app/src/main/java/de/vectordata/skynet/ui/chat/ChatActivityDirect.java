@@ -95,13 +95,19 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 return;
 
             backgroundHandler.post(() -> {
-                if (!messageActionController.isOpen() || messageActionController.getAction() == MessageAction.QUOTE) {
+                if (!messageActionController.isOpen()) {
                     P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
-                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.create(), packet);
+                    insertMessage(packet, MessageState.SENDING);
+                } else if (messageActionController.getAction() == MessageAction.QUOTE) {
+                    P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
+                    ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
+                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
                     insertMessage(packet, MessageState.SENDING);
                 } else if (messageActionController.getAction() == MessageAction.EDIT) {
                     P21MessageOverride packet = new P21MessageOverride(messageActionController.getAffectedMessage(), OverrideAction.EDIT, text);
-                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                    ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
+                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
                     modifyMessageItem(messageActionController.getAffectedMessage(), data -> data.setContent(text));
                 }
 
@@ -255,14 +261,19 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             if (checkedItems > 1) {
                 mode.getMenu().findItem(R.id.action_quote).setVisible(false);
                 mode.getMenu().findItem(R.id.action_edit).setVisible(false);
+                mode.getMenu().findItem(R.id.action_delete).setVisible(false);
                 mode.getMenu().findItem(R.id.action_info).setVisible(false);
             } else {
                 mode.getMenu().findItem(R.id.action_quote).setVisible(true);
                 mode.getMenu().findItem(R.id.action_info).setVisible(true);
 
                 MessageItem selectedMessage = getSelectedMessage();
-                if (selectedMessage != null)
-                    mode.getMenu().findItem(R.id.action_edit).setVisible(selectedMessage.getMessageSide() == MessageSide.RIGHT);
+                if (selectedMessage != null) {
+                    boolean mayOverwrite = mayOverwite(selectedMessage);
+
+                    mode.getMenu().findItem(R.id.action_delete).setVisible(mayOverwrite);
+                    mode.getMenu().findItem(R.id.action_edit).setVisible(mayOverwrite);
+                }
             }
         }
     }
@@ -302,7 +313,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 Dialogs.showYesNoBox(this, R.string.question_header_delete, R.string.question_delete, (dialog, which) -> {
                     backgroundHandler.post(() -> {
                         P21MessageOverride packet = new P21MessageOverride(selectedMessage.getMessageId(), OverrideAction.DELETE);
-                        getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                        ChannelMessageConfig config = createConfigWithDependencyTo(selectedMessage.getMessageId());
+                        getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
                     });
                     modifyMessageItem(selectedMessage.getMessageId(), data -> data.setContent("\0"));
                     mode.finish();
@@ -351,6 +363,16 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 break;
             }
         return message;
+    }
+
+    private boolean mayOverwite(MessageItem messageItem) {
+        boolean noTimeout = System.currentTimeMillis() - messageItem.getSentDate().toJavaDate().getTime() <= P21MessageOverride.OVERWITE_TIMEOUT;
+        boolean ownMessage = messageItem.getMessageSide() == MessageSide.RIGHT;
+        return noTimeout && ownMessage;
+    }
+
+    private ChannelMessageConfig createConfigWithDependencyTo(long messageId) {
+        return ChannelMessageConfig.create().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId);
     }
 
 }

@@ -3,10 +3,10 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 
-public class P09RestoreSessionResponse implements Packet {
+public class P09RestoreSessionResponse extends AbstractPacket {
 
     public RestoreSessionError errorCode;
 

@@ -5,10 +5,10 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
 @AllowState(ConnectionState.HANDSHAKING)
-public class P00ConnectionHandshake implements Packet {
+public class P00ConnectionHandshake extends AbstractPacket {
 
     public int protocolVersion;
     public String applicationIdentifier;

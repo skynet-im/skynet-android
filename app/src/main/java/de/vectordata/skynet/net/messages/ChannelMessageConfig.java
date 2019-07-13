@@ -16,7 +16,7 @@ public class ChannelMessageConfig {
 
     private List<P0BChannelMessage.Dependency> dependencies = new ArrayList<>();
 
-    public static ChannelMessageConfig createDefault() {
+    public static ChannelMessageConfig create() {
         return new ChannelMessageConfig();
     }
 

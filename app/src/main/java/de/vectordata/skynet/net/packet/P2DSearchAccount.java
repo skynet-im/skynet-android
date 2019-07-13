@@ -3,9 +3,9 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
-public class P2DSearchAccount implements Packet {
+public class P2DSearchAccount extends AbstractPacket {
 
     public String query;
 

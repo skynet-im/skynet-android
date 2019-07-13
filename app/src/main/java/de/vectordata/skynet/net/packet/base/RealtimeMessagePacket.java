@@ -2,7 +2,7 @@ package de.vectordata.skynet.net.packet.base;
 
 import de.vectordata.skynet.net.packet.P10RealTimeMessage;
 
-public abstract class RealtimeMessagePacket implements Packet {
+public abstract class RealtimeMessagePacket extends AbstractPacket {
 
     private P10RealTimeMessage parent;
 

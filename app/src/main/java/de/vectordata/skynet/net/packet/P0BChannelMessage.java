@@ -15,12 +15,12 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.PacketDirection;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.Selector;
 
 
-public class P0BChannelMessage implements Packet {
+public class P0BChannelMessage extends AbstractPacket {
 
     public byte packetVersion;
     public long channelId;

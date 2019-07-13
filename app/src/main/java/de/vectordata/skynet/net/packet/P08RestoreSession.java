@@ -7,10 +7,10 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
-import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
 @AllowState(ConnectionState.AUTHENTICATING)
-public class P08RestoreSession implements Packet {
+public class P08RestoreSession extends AbstractPacket {
 
     public long accountId;
     public byte[] keyHash;

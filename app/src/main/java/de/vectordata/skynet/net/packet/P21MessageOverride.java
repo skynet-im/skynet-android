@@ -6,6 +6,7 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
@@ -16,6 +17,8 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.OverrideAction;
 
 public class P21MessageOverride extends ChannelMessagePacket {
+
+    public static final long OVERWITE_TIMEOUT = 10 * 60 * 1000;
 
     public long messageId;
     public OverrideAction action;
@@ -52,7 +55,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
         PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
         messageId = decrypted.readInt64();
         action = OverrideAction.values()[decrypted.readByte()];
-        if(action == OverrideAction.EDIT)
+        if (action == OverrideAction.EDIT)
             newText = decrypted.readString();
     }
 
@@ -90,4 +93,15 @@ public class P21MessageOverride extends ChannelMessagePacket {
             Storage.getDatabase().chatMessageDao().update(message);
         }
     }
+
+    @Override
+    public boolean validatePacket() {
+        ChannelMessage targetMessage = Storage.getDatabase().channelMessageDao().getById(getParent().channelId, messageId);
+        long originalDate = targetMessage.getDispatchTime().toJavaDate().getTime();
+        long modifyDate = getParent().dispatchTime.toJavaDate().getTime();
+        if (modifyDate - originalDate > OVERWITE_TIMEOUT)
+            return false;
+        return getParent().senderId == targetMessage.getSenderId();
+    }
+
 }

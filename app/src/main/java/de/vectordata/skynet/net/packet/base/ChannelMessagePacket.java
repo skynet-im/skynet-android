@@ -3,7 +3,7 @@ package de.vectordata.skynet.net.packet.base;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
-public abstract class ChannelMessagePacket implements Packet {
+public abstract class ChannelMessagePacket extends AbstractPacket {
 
     private P0BChannelMessage parent;
 
