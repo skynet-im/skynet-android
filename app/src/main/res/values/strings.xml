@@ -22,7 +22,7 @@
     <string name="action_clear_chat">Clear chat</string>
     <string name="action_block">Block</string>
     <string name="action_add_contact">Add contact</string>
-    <string name="action_new_group">New group</string>
+    <string name="action_new_group">Create group</string>
     <string name="action_profile">Profile</string>
     <string name="action_settings">Settings</string>
     <string name="action_continue">Continue</string>
@@ -44,13 +44,13 @@
     <string name="error_invalid_credentials_restore">We could not restore your session, maybe you have changed your password. Please log in again.</string>
     <string name="error_invalid_session">Your session store was corrupted. Please log in again.</string>
     <string name="error_unconfirmed_account">Your account has not yet been confirmed. Please confirm your account by clicking the code we sent to you by email.</string>
-    <string name="error_account_name_taken">Sorry, this email address is already taken. Please try a different one.</string>
+    <string name="error_account_name_taken">Sorry, this email address is already in use. Please try a different one.</string>
     <string name="error_account_name_invalid">This email address is invalid. Please try a different one.</string>
     <string name="error_passwords_not_matching">The passwords you entered do not match.</string>
-    <string name="error_must_upgrade">The version of Skynet you are currently on is too old to connect. Please update to v%s.</string>
+    <string name="error_must_upgrade">Your Skynet version is too old. Please update to v%s.</string>
 
     <string name="warn_header_eol">End of life warning</string>
-    <string name="warn_can_upgrade">The version of Skynet you are currently using is reaching its end of life. We recommend updating to v%s.</string>
+    <string name="warn_can_upgrade">Your Skynet version is reaching its end of life. We recommend updating to v%s.</string>
 
     <string name="success_header_create_acc">Account created</string>
     <string name="success_create_acc">Your account has been created successfully. Please confirm it by clicking the code we sent to you by email.</string>
@@ -63,7 +63,7 @@
     <string name="tab_header_daystream">Daystream</string>
 
     <string name="activity_add_contact">Add contact</string>
-    <string name="activity_new_group">New group</string>
+    <string name="activity_new_group">Create group</string>
     <string name="activity_preferences">Settings</string>
 
     <string name="progress_header">Please wait</string>
@@ -79,14 +79,14 @@
     <string name="pref_animations">Animations</string>
     <string name="pref_sounds">Sounds</string>
     <string name="pref_enter_to_send">Enter to send</string>
-    <string name="pref_enter_to_send_summary">Enabling this will turn your enter key into a send key.</string>
+    <string name="pref_enter_to_send_summary">Turns your enter key into a send key.</string>
 
     <string name="pref_header_notifications">Notifications</string>
     <string name="pref_notifications">New message notifications</string>
     <string name="pref_ringtone">Ringtone</string>
     <string name="pref_vibrate">Vibrate</string>
     <string name="pref_status_led">Status LED</string>
-    <string name="pref_status_led_color">Status LED Color</string>
+    <string name="pref_status_led_color">Status LED color</string>
 
     <string name="pref_header_info">Info</string>
     <string name="pref_version">Version</string>
@@ -96,7 +96,7 @@
     <string name="pref_logoff_summary">Log off your account from this device.</string>
 
     <string name="tip_start_chatting">Tap here to send your first message</string>
-    <string name="tip_create_chats">Looks like you don\'t have any contacts yet. Add friends to Skynet via the contacts tab.</string>
+    <string name="tip_create_chats">Looks like you don\'t have any contacts yet. Add friends to Skynet via the Contacts tab.</string>
 
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
@@ -106,9 +106,9 @@
     <string name="header_editing">Editing message…</string>
 
     <string name="notification_channel_name">New message notifications</string>
-    <string name="notification_channel_desc">Notifications for new chat messages are posted to this notification channel</string>
+    <string name="notification_channel_desc">Notifications for new chat messages are posted to this notification channel.</string>
     <string name="notification_subtitle">%1$d messages from %2$d chats</string>
 
-    <string name="message_deleted">This message was deleted</string>
+    <string name="message_deleted">This message was deleted.</string>
 
 </resources>
