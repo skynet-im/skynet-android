@@ -24,10 +24,10 @@ public class JobEngine {
 
     private List<Job> runningJobs = new CopyOnWriteArrayList<>();
 
-    private RetryController retryController = new RetryController();
-
     public JobEngine() {
         EventBus.getDefault().register(this);
+
+        RetryController retryController = new RetryController();
         EventBus.getDefault().register(retryController);
     }
 

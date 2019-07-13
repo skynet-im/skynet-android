@@ -24,12 +24,13 @@ public class ChannelMessageJob extends Job<Void> {
     public void onExecute() {
         SkynetContext context = SkynetContext.getCurrent();
 
-        context.getNetworkManager().sendPacket(message).waitForPacket(P0CChannelMessageResponse.class, response ->
-                        reportState(response.errorCode == MessageSendError.SUCCESS ? JobState.SUCCESSFUL : JobState.FAILED),
+        context.getNetworkManager().sendPacket(message).waitForPacket(P0CChannelMessageResponse.class,
+                response -> reportState(response.errorCode == MessageSendError.SUCCESS ? JobState.SUCCESSFUL : JobState.FAILED),
                 () -> {
                     // No response from the server after 5 seconds, assume timeout
                     reportState(JobState.FAILED);
-                });
+                }
+        );
     }
 
     @Override

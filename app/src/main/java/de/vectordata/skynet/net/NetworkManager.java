@@ -21,6 +21,7 @@ import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
+import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
@@ -84,10 +85,19 @@ public class NetworkManager implements VSLClientListener {
     }
 
     private boolean shouldCache(Packet packet) {
+        // Never cache channel messages. They may be more complex than just sending a packet
+        // and are therefore handled by the JobEngine
+        if (packet instanceof P0BChannelMessage)
+            return false;
+
+        // If no connection is present, and the packet in question does not have an AllowState
+        // annotation for the current state, we cache the packet.
         if (connectionState != ConnectionState.AUTHENTICATED) {
             AllowState allowedState = packet.getClass().getAnnotation(AllowState.class);
             return allowedState == null || allowedState.value() != connectionState;
         }
+
+        // If there is a connection, there is no need to cache any packets
         return false;
     }
 
