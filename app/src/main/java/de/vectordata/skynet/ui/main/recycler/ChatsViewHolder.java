@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.main.recycler;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -62,10 +63,19 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
         else
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
-        message.setText(item.getContent());
 
-        item.getMessageState().apply(messageState);
-        item.getMessageSide().apply(messageState);
+        if (item.getContent().equals("\0")) {
+            message.setTypeface(null, Typeface.ITALIC);
+            message.setAlpha(0.75f);
+            message.setText(R.string.message_deleted);
+            messageState.setVisibility(View.GONE);
+        } else {
+            message.setTypeface(null, Typeface.NORMAL);
+            message.setAlpha(1.0f);
+            message.setText(item.getContent());
+            item.getMessageState().apply(messageState);
+            item.getMessageSide().apply(messageState);
+        }
     }
 
 }

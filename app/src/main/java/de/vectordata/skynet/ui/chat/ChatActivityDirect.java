@@ -47,6 +47,7 @@ import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
 import de.vectordata.skynet.ui.chat.recycler.QuotedMessage;
+import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
@@ -295,13 +296,14 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 mode.finish();
                 break;
             case R.id.action_delete:
-                // TODO Add confirmation dialog here
-                backgroundHandler.post(() -> {
-                    P21MessageOverride packet = new P21MessageOverride(selectedMessage.getMessageId(), OverrideAction.DELETE);
-                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
-                });
-                modifyMessageItem(messageActionController.getAffectedMessage(), data -> data.setContent("\0"));
-                mode.finish();
+                Dialogs.showYesNoBox(this, R.string.question_header_delete, R.string.question_delete, (dialog, which) -> {
+                    backgroundHandler.post(() -> {
+                        P21MessageOverride packet = new P21MessageOverride(selectedMessage.getMessageId(), OverrideAction.DELETE);
+                        getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.createDefault(), packet);
+                    });
+                    modifyMessageItem(selectedMessage.getMessageId(), data -> data.setContent("\0"));
+                    mode.finish();
+                }, null);
                 break;
             case R.id.action_info:
                 break;
