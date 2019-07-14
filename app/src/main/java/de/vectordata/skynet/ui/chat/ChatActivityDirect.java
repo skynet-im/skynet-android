@@ -8,8 +8,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.vanniktech.emoji.EmojiEditText;
 
@@ -73,6 +75,9 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
     private MessageActionController messageActionController;
 
+    private boolean isLoading;
+    private boolean isFullyLoaded;
+
     @Override
     public void initialize() {
         messageActionController = new MessageActionController(this);
@@ -110,7 +115,6 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                     getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
                     modifyMessageItem(messageActionController.getAffectedMessage(), data -> data.setContent(text));
                 }
-
                 runOnUiThread(() -> messageActionController.exit());
             });
 
@@ -131,7 +135,6 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
     private void setup() {
         long channelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
-        long myAccountId = Storage.getSession().getAccountId();
 
         backgroundHandler.post(() -> {
             messageChannel = Storage.getDatabase().channelDao().getById(channelId);
@@ -150,70 +153,25 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 profileImage.loadInto(avatarView);
             });
 
-            List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(channelId, 50);
-            Collections.reverse(messages);
-
-            ChannelMessage previous = null;
-            for (ChatMessage message : messages) {
-                ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
-                MessageSide messageSide = parent.getSenderId() == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-                DateTime dispatchTime = parent.getDispatchTime();
-
-                if (previous == null || !previous.getDispatchTime().isSameDay(dispatchTime))
-                    messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, dispatchTime)));
-
-                QuotedMessage quotedMessage = null;
-                if (message.getQuotedMessage() != 0)
-                    quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
-                messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage));
-                previous = parent;
-            }
-
-            runOnUiThread(() -> {
-                adapter.notifyDataSetChanged();
-                scrollToBottom();
-            });
+            loadMessages();
 
             List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(messageChannel.getChannelId());
             for (ChatMessage message : unread)
                 readMessage(message.getMessageId());
         });
-    }
 
-    private void insertMessage(P20ChatMessage msg, MessageState messageState) {
-        MessageItem oldLatest = messageItems.size() > 0 ? messageItems.get(messageItems.size() - 1) : null;
-
-        long myAccountId = Storage.getSession().getAccountId();
-        MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
-        QuotedMessage quotedMessage = null;
-        if (msg.quotedMessage != 0)
-            quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
-        MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide, quotedMessage);
-        runOnUiThread(() -> {
-            if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
-                messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));
-                adapter.notifyItemInserted(messageItems.size() - 1);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView v, int dx, int dy) {
+                if (dx == 0 && dy == 0) return;
+                if (recyclerView.getFirstVisiblePosition() <= 20 && adapter.getItemCount() > 0 && !isFullyLoaded) {
+                    MessageItem item = adapter.getItem(0);
+                    if (item.getMessageSide() == MessageSide.CENTER)
+                        loadMoreMessages(adapter.getItem(1).getMessageId());
+                    else loadMoreMessages(item.getMessageId());
+                }
             }
-            messageItems.add(newLatest);
-            adapter.notifyItemInserted(messageItems.size() - 1);
-            scrollToBottom();
         });
-    }
-
-    private void modifyMessageItem(long messageId, Callback<MessageItem> modifier) {
-        for (int i = 0; i < messageItems.size(); i++) {
-            MessageItem item = messageItems.get(i);
-            if (item.getMessageId() == messageId) {
-                modifier.onCallback(item);
-                int idx = i;
-                runOnUiThread(() -> adapter.notifyItemChanged(idx));
-                break;
-            }
-        }
-    }
-
-    private void scrollToBottom() {
-        recyclerView.scrollToPosition(messageItems.size() - 1);
     }
 
     @Subscribe
@@ -269,7 +227,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
                 MessageItem selectedMessage = getSelectedMessage();
                 if (selectedMessage != null) {
-                    boolean mayOverwrite = mayOverwite(selectedMessage);
+                    boolean mayOverwrite = mayOverwrite(selectedMessage);
 
                     mode.getMenu().findItem(R.id.action_delete).setVisible(mayOverwrite);
                     mode.getMenu().findItem(R.id.action_edit).setVisible(mayOverwrite);
@@ -351,6 +309,119 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
     }
 
+    private void insertMessage(P20ChatMessage msg, MessageState messageState) {
+        MessageItem oldLatest = messageItems.size() > 0 ? messageItems.get(messageItems.size() - 1) : null;
+
+        long myAccountId = Storage.getSession().getAccountId();
+        MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
+        QuotedMessage quotedMessage = null;
+        if (msg.quotedMessage != 0)
+            quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
+        MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide, quotedMessage);
+        runOnUiThread(() -> {
+            if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
+                messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));
+                adapter.notifyItemInserted(messageItems.size() - 1);
+            }
+            messageItems.add(newLatest);
+            adapter.notifyItemInserted(messageItems.size() - 1);
+            scrollToBottom();
+        });
+    }
+
+    private void modifyMessageItem(long messageId, Callback<MessageItem> modifier) {
+        for (int i = 0; i < messageItems.size(); i++) {
+            MessageItem item = messageItems.get(i);
+            if (item.getMessageId() == messageId) {
+                modifier.onCallback(item);
+                int idx = i;
+                runOnUiThread(() -> adapter.notifyItemChanged(idx));
+                break;
+            }
+        }
+    }
+
+    private void loadMessages() {
+        long myAccountId = Storage.getSession().getAccountId();
+
+        List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(messageChannel.getChannelId(), 20);
+        Collections.reverse(messages);
+
+        ChannelMessage previous = null;
+        for (ChatMessage message : messages) {
+            ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
+            MessageSide messageSide = parent.getSenderId() == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
+            DateTime dispatchTime = parent.getDispatchTime();
+
+            if (previous == null || !previous.getDispatchTime().isSameDay(dispatchTime))
+                messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, dispatchTime)));
+
+            QuotedMessage quotedMessage = null;
+            if (message.getQuotedMessage() != 0)
+                quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
+            messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage));
+            previous = parent;
+        }
+
+        runOnUiThread(() -> {
+            adapter.notifyDataSetChanged();
+            scrollToBottom();
+        });
+    }
+
+    private void loadMoreMessages(long firstMessage) {
+        if (isLoading || isFullyLoaded) return;
+        isLoading = true;
+        backgroundHandler.post(() -> {
+            long myAccountId = Storage.getSession().getAccountId();
+
+            List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(messageChannel.getChannelId(), firstMessage, 20);
+            if (messages.size() == 0) {
+                isFullyLoaded = true;
+                return;
+            }
+            Collections.reverse(messages);
+
+            int idx = 0;
+
+            ChannelMessage previous = null;
+            for (ChatMessage message : messages) {
+                ChannelMessage parent = Storage.getDatabase().channelMessageDao().getById(message.getChannelId(), message.getMessageId());
+                MessageSide messageSide = parent.getSenderId() == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
+                DateTime dispatchTime = parent.getDispatchTime();
+
+                if (previous == null || !previous.getDispatchTime().isSameDay(dispatchTime)) {
+                    messageItems.add(idx, MessageItem.newSystemMessage(DateUtil.toDateString(this, dispatchTime)));
+                    idx++;
+                }
+
+                QuotedMessage quotedMessage = null;
+                if (message.getQuotedMessage() != 0)
+                    quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
+                messageItems.add(idx, new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage));
+                idx++;
+                previous = parent;
+            }
+
+            final int lastIdx = idx;
+            runOnUiThread(() -> {
+                adapter.notifyItemRangeInserted(0, lastIdx);
+                MessageSide side = adapter.getItem(lastIdx).getMessageSide();
+                if (side == MessageSide.CENTER) {
+                    messageItems.remove(lastIdx);
+                    adapter.notifyItemRemoved(lastIdx);
+                }
+            });
+
+
+            isLoading = false;
+        });
+    }
+
+    private void scrollToBottom() {
+        recyclerView.scrollToPosition(messageItems.size() - 1);
+    }
+
     private String getFriendlySenderName(MessageItem item) {
         return item.getMessageSide() == MessageSide.LEFT ? nicknameView.getText().toString() : getString(R.string.you);
     }
@@ -365,7 +436,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         return message;
     }
 
-    private boolean mayOverwite(MessageItem messageItem) {
+    private boolean mayOverwrite(MessageItem messageItem) {
         boolean noTimeout = System.currentTimeMillis() - messageItem.getSentDate().toJavaDate().getTime() <= P21MessageOverride.OVERWITE_TIMEOUT;
         boolean ownMessage = messageItem.getMessageSide() == MessageSide.RIGHT;
         return noTimeout && ownMessage;

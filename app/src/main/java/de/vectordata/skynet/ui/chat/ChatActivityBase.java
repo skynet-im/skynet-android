@@ -47,6 +47,8 @@ public abstract class ChatActivityBase extends ThemedActivity {
      */
     Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
 
+    Handler foregroundHandler = new Handler();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

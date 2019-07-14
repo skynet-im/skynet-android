@@ -31,6 +31,9 @@ public interface ChatMessageDao {
     @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND chatMessages.channelId=:channelId ORDER BY dispatchTime DESC LIMIT :limit")
     List<ChatMessage> queryLast(long channelId, int limit);
 
+    @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND chatMessages.channelId=:channelId AND channelMessages.messageId<:firstMessage ORDER BY dispatchTime DESC LIMIT :limit")
+    List<ChatMessage> queryLast(long channelId, long firstMessage, int limit);
+
     @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND chatMessages.channelId=:channelId ORDER BY dispatchTime DESC LIMIT 1")
     ChatMessage queryLast(long channelId);
 
