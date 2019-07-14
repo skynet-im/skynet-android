@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -91,6 +92,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
+
+        boolean animations = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("animations", true);
+        if (!animations)
+            recyclerView.setItemAnimator(null);
 
         messageInput = findViewById(R.id.input_message);
 
