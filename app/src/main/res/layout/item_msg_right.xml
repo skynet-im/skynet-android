@@ -35,6 +35,7 @@
             android:layout_weight="1"
             android:textColor="@color/white"
             android:textSize="12sp"
+            app:layout_constrainedWidth="true"
             app:layout_constraintStart_toEndOf="@+id/quote_indicator"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Name" />
@@ -50,6 +51,7 @@
             android:maxLines="2"
             android:textColor="@color/white"
             android:textSize="12sp"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/quote_indicator"
