@@ -6,8 +6,11 @@
 
     <color name="white">#ffffffff</color>
     <color name="black">#000000</color>
+
     <color name="blueGray">#eaeaef</color>
     <color name="lightGray">#afafaf</color>
+    <color name="gray">#808080</color>
+
     <color name="transparent">#00000000</color>
 </resources>
 

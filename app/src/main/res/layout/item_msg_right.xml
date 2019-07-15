@@ -65,7 +65,7 @@
             android:layout_marginEnd="8dp"
             android:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/label_time"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/image_edited"
             app:layout_constraintTop_toTopOf="@+id/label_time"
             app:srcCompat="@drawable/ic_msg_sending" />
 
@@ -103,6 +103,17 @@
             android:layout_height="wrap_content"
             android:visibility="visible"
             app:constraint_referenced_ids="label_quoted_name, label_quoted_text, quote_indicator" />
+
+        <ImageView
+            android:id="@+id/image_edited"
+            android:layout_width="16dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/image_state"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/image_state"
+            app:srcCompat="@drawable/ic_edit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

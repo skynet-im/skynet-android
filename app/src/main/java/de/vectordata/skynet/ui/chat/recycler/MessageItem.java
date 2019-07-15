@@ -18,17 +18,20 @@ public class MessageItem {
 
     private QuotedMessage quotedMessage;
 
-    public MessageItem(long messageId, String content, DateTime sentDate, MessageState messageState, MessageSide messageSide, QuotedMessage quotedMessage) {
+    private boolean isEdited;
+
+    public MessageItem(long messageId, String content, DateTime sentDate, MessageState messageState, MessageSide messageSide, QuotedMessage quotedMessage, boolean isEdited) {
         this.messageId = messageId;
         this.content = content;
         this.sentDate = sentDate;
         this.messageState = messageState;
         this.messageSide = messageSide;
         this.quotedMessage = quotedMessage;
+        this.isEdited = isEdited;
     }
 
     public static MessageItem newSystemMessage(String content) {
-        return new MessageItem(0, content, null, MessageState.SYSTEM, MessageSide.CENTER, null);
+        return new MessageItem(0, content, null, MessageState.SYSTEM, MessageSide.CENTER, null, false);
     }
 
     public long getMessageId() {
@@ -71,4 +74,7 @@ public class MessageItem {
         return quotedMessage;
     }
 
+    boolean isEdited() {
+        return isEdited;
+    }
 }

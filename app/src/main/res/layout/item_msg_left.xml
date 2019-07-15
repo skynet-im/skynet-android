@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
@@ -62,7 +63,7 @@
             android:layout_marginEnd="8dp"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="@+id/label_message"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/image_edited"
             tools:text="06:44" />
 
         <com.vanniktech.emoji.EmojiTextView
@@ -88,6 +89,18 @@
             android:layout_height="wrap_content"
             android:visibility="visible"
             app:constraint_referenced_ids="label_quoted_name, label_quoted_text, quote_indicator" />
+
+        <ImageView
+            android:id="@+id/image_edited"
+            android:layout_width="16dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:tint="@color/gray"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/label_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/label_time"
+            app:srcCompat="@drawable/ic_edit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

@@ -19,6 +19,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     private final TextView message;
     private final TextView time;
     private final ImageView state;
+    private final ImageView edited;
 
     MessageViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -28,6 +29,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         quoteGroup = itemView.findViewById(R.id.group_quote);
         quotedName = itemView.findViewById(R.id.label_quoted_name);
         quotedMessage = itemView.findViewById(R.id.label_quoted_text);
+        edited = itemView.findViewById(R.id.image_edited);
     }
 
     void configure(MessageItem messageItem) {
@@ -44,6 +46,9 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
             if (state != null)
                 state.setVisibility(View.VISIBLE);
         }
+
+        if (edited != null)
+            edited.setVisibility(messageItem.isEdited() ? View.VISIBLE : View.GONE);
 
         if (time != null && messageItem.getSentDate() != null)
             time.setText(messageItem.getSentDate().toTimeString(time.getContext()));
