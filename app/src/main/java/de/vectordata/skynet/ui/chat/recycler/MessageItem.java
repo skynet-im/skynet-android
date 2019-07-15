@@ -77,4 +77,8 @@ public class MessageItem {
     boolean isEdited() {
         return isEdited;
     }
+
+    public void setEdited(boolean edited) {
+        this.isEdited = true;
+    }
 }

@@ -118,7 +118,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                     P21MessageOverride packet = new P21MessageOverride(messageActionController.getAffectedMessage(), OverrideAction.EDIT, text);
                     ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
                     getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
-                    modifyMessageItem(messageActionController.getAffectedMessage(), data -> data.setContent(text));
+                    modifyMessageItem(messageActionController.getAffectedMessage(), data -> {
+                        data.setContent(text);
+                        data.setEdited(true);
+                    });
                 }
                 runOnUiThread(() -> messageActionController.exit());
             });
