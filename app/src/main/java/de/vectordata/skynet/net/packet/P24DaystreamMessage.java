@@ -21,7 +21,7 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);
+        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByte((byte) messageType.ordinal());
         encrypted.writeString(text);
@@ -30,7 +30,7 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);
+        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
         PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
         messageType = MessageType.values()[decrypted.readByte()];
         text = decrypted.readString();

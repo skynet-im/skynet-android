@@ -53,7 +53,7 @@ public class P0BChannelMessage extends AbstractPacket {
         Log.d("P0BChannelMessage", String.format("Writing channel Message with content id %s: unencrypted=%s fileAttached=%s", contentPacketId, hasFlag(MessageFlags.UNENCRYPTED), hasFlag(MessageFlags.FILE_ATTACHED)));
         if (hasFlag(MessageFlags.UNENCRYPTED)) writeContents(buffer);
         else {
-            KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
+            KeyStore channelKeys = keyProvider.getMessageKeys(this);
             PacketBuffer encryptedBuffer = new PacketBuffer();
             writeContents(encryptedBuffer);
             AesStatic.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
@@ -82,7 +82,7 @@ public class P0BChannelMessage extends AbstractPacket {
         contentPacketVersion = buffer.readByte();
 
         if (!hasFlag(MessageFlags.UNENCRYPTED)) {
-            KeyStore channelKeys = keyProvider.getChannelKeys(channelId);
+            KeyStore channelKeys = keyProvider.getMessageKeys(this);
             byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
             readContents(new PacketBuffer(decryptedData));
         } else readContents(buffer);

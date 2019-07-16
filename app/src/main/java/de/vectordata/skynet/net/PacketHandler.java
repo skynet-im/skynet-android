@@ -196,7 +196,9 @@ public class PacketHandler {
                             new AsymmetricKey(KeyFormat.JAVA, derivation.getPrivateKey())
                     )
             );
-            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(loopbackChannel,
+
+            Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
+            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(accountDataChannel,
                     new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED),
                     new P18PublicKeys(
                             new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),

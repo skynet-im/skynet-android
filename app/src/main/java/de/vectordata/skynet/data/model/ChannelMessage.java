@@ -5,6 +5,7 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
@@ -36,6 +37,8 @@ public class ChannelMessage {
 
     private byte[] fileKey;
 
+    private int contentPacketId;
+
     public static ChannelMessage fromPacket(P0BChannelMessage packet) {
         ChannelMessage message = new ChannelMessage();
         message.channelId = packet.channelId;
@@ -45,6 +48,7 @@ public class ChannelMessage {
         message.messageFlags = packet.messageFlags;
         message.fileId = packet.fileId;
         message.fileKey = packet.fileKey;
+        message.contentPacketId = packet.contentPacketId;
         return message;
     }
 
@@ -111,4 +115,13 @@ public class ChannelMessage {
     public void setFileKey(byte[] fileKey) {
         this.fileKey = fileKey;
     }
+
+    public int getContentPacketId() {
+        return contentPacketId;
+    }
+
+    public void setContentPacketId(int contentPacketId) {
+        this.contentPacketId = contentPacketId;
+    }
+
 }

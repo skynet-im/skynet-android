@@ -11,6 +11,7 @@ import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.jobengine.JobEngine;
 import de.vectordata.skynet.net.messages.MessageInterface;
+import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.ui.notification.INotificationManager;
 import de.vectordata.skynet.ui.notification.NotificationManagerFactory;
 
@@ -53,15 +54,22 @@ public class SkynetContext implements KeyProvider {
     }
 
     @Override
-    public KeyStore getChannelKeys(long channelId) {
-        Channel channel = Storage.getDatabase().channelDao().getById(channelId);
+    public KeyStore getMessageKeys(P0BChannelMessage message) {
+        Channel channel = Storage.getDatabase().channelDao().getById(message.channelId);
         if (channel.getChannelType() == ChannelType.LOOPBACK)
             return Storage.getSession().getSessionKeys().getLoopbackChannelKeys();
+        if (channel.getChannelType() != ChannelType.DIRECT)
+            throw new IllegalStateException("Cannot request encryption keys for " + channel.getChannelType());
+
+        Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
         Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
-        ChannelKey publicKey = Storage.getDatabase().channelKeyDao().getLast(channelId, KeyType.PUBLIC);
+
         ChannelKey privateKey = Storage.getDatabase().channelKeyDao().getLast(loopbackChannel.getChannelId(), KeyType.PRIVATE);
+        ChannelKey publicKey = Storage.getDatabase().channelKeyDao().getLast(accountDataChannel.getChannelId(), KeyType.PUBLIC);
+
         byte[] ecKey = EC.deriveKey(privateKey.getDerivationKey(), publicKey.getDerivationKey());
         byte[] sha512 = HashProvider.sha512(ecKey);
+
         return KeyStore.from64ByteArray(sha512);
     }
 

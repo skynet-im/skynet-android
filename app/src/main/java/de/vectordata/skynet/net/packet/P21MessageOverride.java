@@ -40,7 +40,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);
+        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeInt64(messageId);
         encrypted.writeByte((byte) action.ordinal());
@@ -51,7 +51,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);
+        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
         PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
         messageId = decrypted.readInt64();
         action = OverrideAction.values()[decrypted.readByte()];

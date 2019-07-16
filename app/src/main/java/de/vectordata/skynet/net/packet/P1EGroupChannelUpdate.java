@@ -32,7 +32,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             buffer.writeInt64(member.accountId);
             buffer.writeByte(member.groupMemberFlags);
         }
-        KeyStore channelKeys = keyProvider.getChannelKeys(getParent().channelId);
+        KeyStore channelKeys = keyProvider.getMessageKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, true);
         encrypted.writeByteArray(historyKey, true);
@@ -47,7 +47,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         for (int i = 0; i < count; i++) {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
-        KeyStore keyStore = keyProvider.getChannelKeys(getParent().channelId);
+        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
         PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
 
     }
@@ -70,7 +70,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         long accountId;
         byte groupMemberFlags;
 
-        public Member(long accountId, byte groupMemberFlags) {
+        Member(long accountId, byte groupMemberFlags) {
             this.accountId = accountId;
             this.groupMemberFlags = groupMemberFlags;
         }

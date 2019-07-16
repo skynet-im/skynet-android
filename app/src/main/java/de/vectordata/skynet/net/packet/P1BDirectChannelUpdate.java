@@ -8,19 +8,12 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 public class P1BDirectChannelUpdate extends ChannelMessagePacket {
 
-    public long keyAccountId;
-    public byte[] keyHash;
-
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeInt64(keyAccountId);
-        buffer.writeByteArray(keyHash, false);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        keyAccountId = buffer.readInt64();
-        keyHash = buffer.readByteArray(32);
     }
 
     @Override
@@ -36,4 +29,5 @@ public class P1BDirectChannelUpdate extends ChannelMessagePacket {
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
     }
+
 }
