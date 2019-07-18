@@ -9,7 +9,7 @@ import de.vectordata.skynet.BuildConfig;
 public final class Version {
 
     public static final int PROTOCOL_VERSION = 2;
-    public static final String APPLICATION_IDENTIFIER = "skynet.android";
+    public static final String APPLICATION_IDENTIFIER = "android/de.vectordata.skynet";
     public static final int VERSION_CODE = BuildConfig.VERSION_CODE;
 
 }

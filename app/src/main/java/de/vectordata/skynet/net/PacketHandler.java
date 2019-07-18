@@ -195,16 +195,20 @@ public class PacketHandler {
                             new AsymmetricKey(KeyFormat.JAVA, signature.getPrivateKey()),
                             new AsymmetricKey(KeyFormat.JAVA, derivation.getPrivateKey())
                     )
-            );
+            ).waitForPacket(P0CChannelMessageResponse.class, respone -> {
+                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
+                SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(accountDataChannel,
+                        new ChannelMessageConfig()
+                                .addFlag(MessageFlags.UNENCRYPTED)
+                                .addDependency(Storage.getSession().getAccountId(), loopbackChannel.getChannelId(), respone.messageId),
+                        new P18PublicKeys(
+                                new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
+                                new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
+                        )
+                );
+            });
 
-            Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
-            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(accountDataChannel,
-                    new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED),
-                    new P18PublicKeys(
-                            new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
-                            new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
-                    )
-            );
+
         }
         inSync = true;
         EventBus.getDefault().post(new SyncFinishedEvent());
