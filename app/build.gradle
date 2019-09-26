@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 repositories {
-    maven { url 'https://skynet-messenger.com/artifactory-gradle/' }
+    maven { url 'https://skynet.app/maven' }
 }
 
 android {
@@ -35,10 +35,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta1' // beta2 is buggy, don't upgrade
     implementation 'androidx.room:room-runtime:2.1.0'
-    implementation 'androidx.preference:preference:1.1.0-rc01'
+    implementation 'androidx.preference:preference:1.1.0'
     implementation 'com.takisoft.colorpicker:colorpicker:1.0.0'
     implementation 'takisoft:preferencex:1.0.2@aar'
     implementation 'takisoft:preferencex-ringtone:1.0.1@aar'
@@ -47,9 +47,9 @@ dependencies {
     implementation 'vectordata:libargon2:1.0.1@aar'
     implementation 'de.ruedigermoeller:fst:2.56'
     implementation 'de.psdev.licensesdialog:licensesdialog:2.0.0'
-    implementation 'com.google.android.material:material:1.1.0-alpha07'
-    implementation 'com.google.firebase:firebase-core:17.0.0'
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
     implementation 'com.vanniktech:emoji-ios:0.6.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
