@@ -28,7 +28,7 @@ import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.P24DaystreamMessage;
 import de.vectordata.skynet.net.packet.P25Nickname;
-import de.vectordata.skynet.net.packet.P26PersonalMessage;
+import de.vectordata.skynet.net.packet.P26Bio;
 import de.vectordata.skynet.net.packet.P27ProfileImage;
 import de.vectordata.skynet.net.packet.P29DeviceList;
 import de.vectordata.skynet.net.packet.P2ABackgroundImage;
@@ -72,7 +72,7 @@ class PacketRegistry {
         register(new P23MessageRead());
         register(new P24DaystreamMessage());
         register(new P25Nickname());
-        register(new P26PersonalMessage());
+        register(new P26Bio());
         register(new P27ProfileImage());
         register(new P29DeviceList());
         register(new P2ABackgroundImage());

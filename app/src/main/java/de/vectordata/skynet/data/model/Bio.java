@@ -2,9 +2,10 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import de.vectordata.skynet.net.packet.P26PersonalMessage;
 
-@Entity(tableName = "personalMessages", foreignKeys = @ForeignKey(
+import de.vectordata.skynet.net.packet.P26Bio;
+
+@Entity(tableName = "bios", foreignKeys = @ForeignKey(
         entity = ChannelMessage.class,
         parentColumns = {"channelId", "messageId"},
         childColumns = {"channelId", "messageId"},
@@ -12,20 +13,20 @@ import de.vectordata.skynet.net.packet.P26PersonalMessage;
         onUpdate = ForeignKey.CASCADE),
         primaryKeys = {"channelId", "messageId"}
 )
-public class PersonalMessage {
+public class Bio {
 
     private long channelId;
 
     private long messageId;
 
-    private String personalMessage;
+    private String bio;
 
-    public static PersonalMessage fromPacket(P26PersonalMessage packet) {
-        PersonalMessage personalMessage = new PersonalMessage();
-        personalMessage.channelId = packet.getParent().channelId;
-        personalMessage.messageId = packet.getParent().messageId;
-        personalMessage.personalMessage = packet.personalMessage;
-        return personalMessage;
+    public static Bio fromPacket(P26Bio packet) {
+        Bio bio = new Bio();
+        bio.channelId = packet.getParent().channelId;
+        bio.messageId = packet.getParent().messageId;
+        bio.bio = packet.bio;
+        return bio;
     }
 
     public long getChannelId() {
@@ -44,11 +45,11 @@ public class PersonalMessage {
         this.messageId = messageId;
     }
 
-    public String getPersonalMessage() {
-        return personalMessage;
+    public String getBio() {
+        return bio;
     }
 
-    public void setPersonalMessage(String personalMessage) {
-        this.personalMessage = personalMessage;
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 }

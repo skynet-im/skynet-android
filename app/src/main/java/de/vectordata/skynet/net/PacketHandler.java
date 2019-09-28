@@ -47,7 +47,7 @@ import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.P24DaystreamMessage;
 import de.vectordata.skynet.net.packet.P25Nickname;
-import de.vectordata.skynet.net.packet.P26PersonalMessage;
+import de.vectordata.skynet.net.packet.P26Bio;
 import de.vectordata.skynet.net.packet.P27ProfileImage;
 import de.vectordata.skynet.net.packet.P29DeviceList;
 import de.vectordata.skynet.net.packet.P2ABackgroundImage;
@@ -332,7 +332,7 @@ public class PacketHandler {
 
     }
 
-    public void handlePacket(P26PersonalMessage packet) {
+    public void handlePacket(P26Bio packet) {
 
     }
 

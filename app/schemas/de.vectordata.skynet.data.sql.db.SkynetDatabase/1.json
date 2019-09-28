@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6b5ceee02e06d69b0952c505d0183b80",
+    "identityHash": "4d64beae95f8ed91a63ea51317dc41ba",
     "entities": [
       {
         "tableName": "channels",
@@ -735,8 +735,8 @@
         ]
       },
       {
-        "tableName": "personalMessages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `personalMessage` TEXT, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "tableName": "bios",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `bio` TEXT, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "channelId",
@@ -751,8 +751,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "personalMessage",
-            "columnName": "personalMessage",
+            "fieldPath": "bio",
+            "columnName": "bio",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -864,7 +864,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6b5ceee02e06d69b0952c505d0183b80')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4d64beae95f8ed91a63ea51317dc41ba')"
     ]
   }
 }

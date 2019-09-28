@@ -3,7 +3,7 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
-import de.vectordata.skynet.data.model.PersonalMessage;
+import de.vectordata.skynet.data.model.Bio;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.model.PacketDirection;
@@ -14,18 +14,18 @@ import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 @Flags(MessageFlags.UNENCRYPTED)
 @Channel(ChannelType.PROFILE_DATA)
-public class P26PersonalMessage extends ChannelMessagePacket {
+public class P26Bio extends ChannelMessagePacket {
 
-    public String personalMessage;
+    public String bio;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeString(personalMessage);
+        buffer.writeString(bio);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        personalMessage = buffer.readString();
+        bio = buffer.readString();
     }
 
     @Override
@@ -40,6 +40,6 @@ public class P26PersonalMessage extends ChannelMessagePacket {
 
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
-        Storage.getDatabase().personalMessageDao().insert(PersonalMessage.fromPacket(this));
+        Storage.getDatabase().bioDao().insert(Bio.fromPacket(this));
     }
 }
