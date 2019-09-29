@@ -30,12 +30,16 @@ import de.vectordata.skynet.net.packet.P24DaystreamMessage;
 import de.vectordata.skynet.net.packet.P25Nickname;
 import de.vectordata.skynet.net.packet.P26Bio;
 import de.vectordata.skynet.net.packet.P27ProfileImage;
+import de.vectordata.skynet.net.packet.P28BlockList;
 import de.vectordata.skynet.net.packet.P29DeviceList;
 import de.vectordata.skynet.net.packet.P2ABackgroundImage;
 import de.vectordata.skynet.net.packet.P2BOnlineState;
-import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
+import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
+import de.vectordata.skynet.net.packet.P31FileUploadResponse;
+import de.vectordata.skynet.net.packet.P33DeviceListResponse;
+import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.base.Packet;
 
 class PacketRegistry {
@@ -74,11 +78,16 @@ class PacketRegistry {
         register(new P25Nickname());
         register(new P26Bio());
         register(new P27ProfileImage());
+        register(new P28BlockList());
         register(new P29DeviceList());
         register(new P2ABackgroundImage());
         register(new P2BOnlineState());
-        register(new P2CDeviceListDetails());
+        register(new P2CChannelAction());
         register(new P2ESearchAccountResponse());
+        register(new P2FCreateChannelResponse());
+        register(new P31FileUploadResponse());
+        register(new P33DeviceListResponse());
+        register(new P34SetClientState());
     }
 
     private static void register(Packet packet) {
@@ -91,7 +100,7 @@ class PacketRegistry {
     }
 
     static Packet getPacket(byte id) {
-        return PACKETS[id];
+        return PACKETS[id & 0xFF];
     }
 
 }

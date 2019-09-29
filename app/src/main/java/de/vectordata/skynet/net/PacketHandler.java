@@ -49,13 +49,15 @@ import de.vectordata.skynet.net.packet.P24DaystreamMessage;
 import de.vectordata.skynet.net.packet.P25Nickname;
 import de.vectordata.skynet.net.packet.P26Bio;
 import de.vectordata.skynet.net.packet.P27ProfileImage;
+import de.vectordata.skynet.net.packet.P28BlockList;
 import de.vectordata.skynet.net.packet.P29DeviceList;
 import de.vectordata.skynet.net.packet.P2ABackgroundImage;
 import de.vectordata.skynet.net.packet.P2BOnlineState;
-import de.vectordata.skynet.net.packet.P2CDeviceListDetails;
+import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P31FileUploadResponse;
+import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
@@ -340,6 +342,10 @@ public class PacketHandler {
 
     }
 
+    public void handlePacket(P28BlockList packlet) {
+
+    }
+
     public void handlePacket(P29DeviceList packet) {
 
     }
@@ -348,12 +354,11 @@ public class PacketHandler {
 
     }
 
-    ////////////////////// Real time messages //////////////////////
     public void handlePacket(P2BOnlineState packet) {
 
     }
 
-    public void handlePacket(P2CDeviceListDetails packet) {
+    public void handlePacket(P2CChannelAction packet) {
 
     }
 
@@ -366,7 +371,12 @@ public class PacketHandler {
 
     }
 
+    public void handlePacket(P33DeviceListResponse packet) {
+
+    }
+
     boolean isInSync() {
         return inSync;
     }
+
 }

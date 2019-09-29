@@ -23,19 +23,30 @@ public class P28BlockList extends ChannelMessagePacket {
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeUInt16(blockedAccounts.size());
-        for(long acc : blockedAccounts)
+        for (long acc : blockedAccounts)
             buffer.writeInt64(acc);
         buffer.writeUInt16(blockedConversations.size());
-        for(long conv : blockedConversations)
+        for (long conv : blockedConversations)
             buffer.writeInt64(conv);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        this.blockedAccounts.clear();
+        this.blockedConversations.clear();
+
+        int size = buffer.readUInt16();
+        for (int i = 0; i < size; i++)
+            blockedAccounts.add(buffer.readInt64());
+
+        size = buffer.readUInt16();
+        for (int i = 0; i < size; i++)
+            blockedConversations.add(buffer.readInt64());
     }
 
     @Override
     public void handlePacket(PacketHandler handler) {
+        handler.handlePacket(this);
     }
 
     @Override
