@@ -5,6 +5,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -33,7 +34,7 @@ public class WelcomeActivity extends AppCompatActivity {
             new Thread(() -> {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 P25Nickname packet = new P25Nickname(nn);
-                SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(accountDataChannel, new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED), packet)
+                SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(), new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED), packet)
                         .waitForPacket(P0CChannelMessageResponse.class, p -> runOnUiThread(this::finish));
             }).start();
         });

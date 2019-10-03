@@ -9,7 +9,6 @@ import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
-import de.vectordata.skynet.net.packet.P10RealTimeMessage;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
 import de.vectordata.skynet.net.packet.P14MailAddress;
 import de.vectordata.skynet.net.packet.P15PasswordUpdate;
@@ -56,7 +55,6 @@ class PacketRegistry {
         register(new P0BChannelMessage());
         register(new P0CChannelMessageResponse());
         register(new P0FSyncFinished());
-        register(new P10RealTimeMessage());
         register(new P13QueueMailAddressChange());
         register(new P14MailAddress());
         register(new P15PasswordUpdate());

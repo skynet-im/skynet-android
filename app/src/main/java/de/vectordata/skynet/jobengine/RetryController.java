@@ -10,10 +10,9 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.event.SyncFinishedEvent;
-import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.messages.PersistenceMode;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.model.MessageType;
 
@@ -39,9 +38,7 @@ class RetryController {
         for (Dependency dependency : dependencies)
             config.addDependency(dependency.getDstAccountId(), dependency.getDstChannelId(), dependency.getDstMessageId());
 
-        P0BChannelMessage message = getSkynetContext().getMessageInterface().prepare(chatMessage.getChannelId(), chatMessage.getMessageId(), config, packet, false); // Do not save it to the database again
-
-        getSkynetContext().getJobEngine().schedule(new ChannelMessageJob(message));
+        getSkynetContext().getMessageInterface().schedule(chatMessage.getChannelId(), chatMessage.getMessageId(), config, packet, PersistenceMode.NONE);
     }
 
     private SkynetContext getSkynetContext() {

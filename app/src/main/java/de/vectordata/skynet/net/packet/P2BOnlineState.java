@@ -4,10 +4,10 @@ import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.OnlineState;
 
-public class P2BOnlineState extends RealtimeMessagePacket {
+public class P2BOnlineState extends AbstractPacket {
 
     public OnlineState onlineState;
 
@@ -36,4 +36,5 @@ public class P2BOnlineState extends RealtimeMessagePacket {
     public byte getId() {
         return 0x2B;
     }
+
 }

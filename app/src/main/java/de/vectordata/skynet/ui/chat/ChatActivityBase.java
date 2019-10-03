@@ -142,7 +142,7 @@ public abstract class ChatActivityBase extends ThemedActivity {
 
     void readMessage(long messageId) {
         SkynetContext.getCurrent().getMessageInterface()
-                .sendChannelMessage(messageChannel.getChannelId(),
+                .send(messageChannel.getChannelId(),
                         new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId),
                         new P23MessageRead()
                 );

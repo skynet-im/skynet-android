@@ -28,7 +28,6 @@ import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
-import de.vectordata.skynet.net.packet.P10RealTimeMessage;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
 import de.vectordata.skynet.net.packet.P14MailAddress;
 import de.vectordata.skynet.net.packet.P15PasswordUpdate;
@@ -61,7 +60,6 @@ import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
-import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
 import de.vectordata.skynet.net.packet.model.AsymmetricKey;
 import de.vectordata.skynet.net.packet.model.CreateChannelError;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
@@ -100,8 +98,6 @@ public class PacketHandler {
 
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
-        else if (packet instanceof RealtimeMessagePacket)
-            ((RealtimeMessagePacket) packet).setParent((P10RealTimeMessage) parent);
 
         packet.readPacket(new PacketBuffer(payload), keyProvider);
 
@@ -192,18 +188,18 @@ public class PacketHandler {
             if (signature == null || derivation == null)
                 return;
             Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
-            SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(loopbackChannel,
+            SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(),
                     new ChannelMessageConfig(),
                     new P17PrivateKeys(
                             new AsymmetricKey(KeyFormat.JAVA, signature.getPrivateKey()),
                             new AsymmetricKey(KeyFormat.JAVA, derivation.getPrivateKey())
                     )
-            ).waitForPacket(P0CChannelMessageResponse.class, respone -> {
+            ).waitForPacket(P0CChannelMessageResponse.class, response -> {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
-                SkynetContext.getCurrent().getMessageInterface().sendChannelMessage(accountDataChannel,
+                SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
                         new ChannelMessageConfig()
                                 .addFlag(MessageFlags.UNENCRYPTED)
-                                .addDependency(Storage.getSession().getAccountId(), loopbackChannel.getChannelId(), respone.messageId),
+                                .addDependency(Storage.getSession().getAccountId(), loopbackChannel.getChannelId(), response.messageId),
                         new P18PublicKeys(
                                 new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
                                 new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
@@ -227,9 +223,6 @@ public class PacketHandler {
         SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState()));
     }
 
-    public void handlePacket(P10RealTimeMessage packet) {
-        handlePacket(packet.contentPacketId, packet.contentPacket, packet);
-    }
 
     ////////////////////// Channel messages //////////////////////
 
@@ -311,7 +304,7 @@ public class PacketHandler {
 
     private void sendReceiveConfirmation(long channelId, long messageId) {
         SkynetContext.getCurrent().getMessageInterface()
-                .sendChannelMessage(channelId,
+                .send(channelId,
                         new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), channelId, messageId),
                         new P22MessageReceived()
                 );

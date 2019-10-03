@@ -5,20 +5,15 @@ import java.util.Random;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.Storage;
-import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
-import de.vectordata.skynet.net.packet.P10RealTimeMessage;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class MessageInterface {
 
-    private static final Random idRandom = new Random();
+    private static final Random random = new Random();
 
     private static final int PACKET_VERSION = 1;
 
@@ -28,25 +23,60 @@ public class MessageInterface {
         this.skynetContext = skynetContext;
     }
 
-    public ResponseAwaiter sendChannelMessage(Channel channel, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        return sendChannelMessage(channel.getChannelId(), config, packet);
+    /**
+     * Generates a random ID for a request message that is guaranteed to be negative and non-zero
+     *
+     * @return The random id
+     */
+    public static long newId() {
+        long id;
+        do id = random.nextLong(); while (id == 0);
+        return id > 0 ? -id : id;
     }
 
-    public ResponseAwaiter sendChannelMessage(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        P0BChannelMessage container = prepare(channelId, config, packet);
-        return skynetContext.getNetworkManager().sendPacket(container);
+    /**
+     * Send a channel message packet, generating a new random message ID, without
+     * using the job engine
+     *
+     * @param channelId The channel to send the message to
+     * @param config    The message config
+     * @param packet    The content packet
+     * @return An awaitable for the response
+     */
+    public ResponseAwaiter send(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+        PreparedMessage message = prepare(channelId, newId(), config, packet);
+        message.persist(PersistenceMode.DATABASE);
+        return skynetContext.getNetworkManager().sendPacket(message.getChannelMessage());
     }
 
+    /**
+     * Schedule sending a channel message packet, generating a new random message ID
+     *
+     * @param channelId The channel to send the message to
+     * @param config    The message config
+     * @param packet    The content packet
+     */
     public void schedule(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        P0BChannelMessage message = prepare(channelId, config, packet);
-        SkynetContext.getCurrent().getJobEngine().schedule(new ChannelMessageJob(message));
+        schedule(channelId, newId(), config, packet, PersistenceMode.DATABASE);
     }
 
-    private P0BChannelMessage prepare(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        return prepare(channelId, newId(), config, packet, true);
+    /**
+     * Schedule sending a channel message packet, using a custom message ID.
+     * This is useful to for example retry a previously failed message attempt
+     *
+     * @param channelId       The channel to send the message to
+     * @param messageId       The id number of the message
+     * @param config          The message config
+     * @param packet          The content packet
+     * @param persistenceMode Whether to save to the database
+     */
+    public void schedule(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet, PersistenceMode persistenceMode) {
+        PreparedMessage message = prepare(channelId, messageId, config, packet);
+        message.persist(persistenceMode);
+        skynetContext.getJobEngine().schedule(new ChannelMessageJob(message.getChannelMessage()));
     }
 
-    public P0BChannelMessage prepare(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet, boolean save) {
+    private PreparedMessage prepare(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet) {
         P0BChannelMessage container = new P0BChannelMessage();
         container.channelId = channelId;
         container.messageId = messageId;
@@ -65,34 +95,7 @@ public class MessageInterface {
         packet.writePacket(buffer, skynetContext);
         container.contentPacket = buffer.toArray();
 
-        if (save) {
-            container.writeToDatabase(PacketDirection.SEND);
-            packet.writeToDatabase(PacketDirection.SEND);
-        }
-
-        return container;
-    }
-
-    public ResponseAwaiter sendRealTimeMessage(long channelId, RealtimeMessagePacket packet) {
-        return sendRealTimeMessage(channelId, MessageFlags.NONE, packet);
-    }
-
-    private ResponseAwaiter sendRealTimeMessage(long channelId, byte flags, RealtimeMessagePacket packet) {
-        P10RealTimeMessage container = new P10RealTimeMessage();
-        container.channelId = channelId;
-        container.messageFlags = flags;
-        container.contentPacketId = packet.getId();
-        PacketBuffer buffer = new PacketBuffer();
-        packet.writePacket(buffer, skynetContext);
-        container.contentPacket = buffer.toArray();
-        return skynetContext.getNetworkManager().sendPacket(container);
-    }
-
-    public static long newId() {
-        long id;
-        do id = idRandom.nextLong(); while (id == 0);
-        if (id > 0) id = -id;
-        return id;
+        return new PreparedMessage(container, packet);
     }
 
 }
