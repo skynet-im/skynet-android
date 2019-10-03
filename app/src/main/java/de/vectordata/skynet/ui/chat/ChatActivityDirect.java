@@ -190,7 +190,17 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         } else if (packetIn instanceof P2CChannelAction) {
             P2CChannelAction packet = (P2CChannelAction) packetIn;
             if (packet.channelId != this.messageChannel.getChannelId()) return;
-
+            switch (packet.channelAction) {
+                case NONE:
+                    lastSeenView.setText(R.string.state_online);
+                    break;
+                case TYPING:
+                    lastSeenView.setText(R.string.state_typing);
+                    break;
+                case RECORDING_AUDIO:
+                    lastSeenView.setText(R.string.state_recording);
+                    break;
+            }
         }
     }
 

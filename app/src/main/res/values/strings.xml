@@ -115,4 +115,9 @@
 
     <string name="message_deleted">This message was deleted.</string>
 
+    <string name="state_online">online</string>
+    <string name="state_typing">typing…</string>
+    <string name="state_recording">recording…</string>
+    <string name="state_offline">last seen %s</string>
+
 </resources>
