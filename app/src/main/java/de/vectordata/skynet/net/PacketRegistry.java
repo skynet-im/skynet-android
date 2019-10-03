@@ -39,7 +39,6 @@ import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.P33DeviceListResponse;
-import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.base.Packet;
 
 class PacketRegistry {
@@ -87,7 +86,6 @@ class PacketRegistry {
         register(new P2FCreateChannelResponse());
         register(new P31FileUploadResponse());
         register(new P33DeviceListResponse());
-        register(new P34SetClientState());
     }
 
     private static void register(Packet packet) {

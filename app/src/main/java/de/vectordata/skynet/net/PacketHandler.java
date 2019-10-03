@@ -58,6 +58,7 @@ import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.P33DeviceListResponse;
+import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.base.RealtimeMessagePacket;
@@ -223,6 +224,7 @@ public class PacketHandler {
                 continue;
             SkynetContext.getCurrent().getNotificationManager().onMessageReceived(msg.getChannelId(), msg.getMessageId(), msg.getText());
         }
+        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState()));
     }
 
     public void handlePacket(P10RealTimeMessage packet) {

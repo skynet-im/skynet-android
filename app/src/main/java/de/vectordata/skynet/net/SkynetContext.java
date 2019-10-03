@@ -12,6 +12,7 @@ import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.jobengine.JobEngine;
 import de.vectordata.skynet.net.messages.MessageInterface;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.packet.model.OnlineState;
 import de.vectordata.skynet.ui.notification.INotificationManager;
 import de.vectordata.skynet.ui.notification.NotificationManagerFactory;
 
@@ -23,6 +24,7 @@ public class SkynetContext implements KeyProvider {
     private MessageInterface messageInterface;
     private NetworkManager networkManager;
     private INotificationManager notificationManager;
+    private OnlineState appState;
 
     private SkynetContext() {
         jobEngine = new JobEngine();
@@ -71,6 +73,14 @@ public class SkynetContext implements KeyProvider {
         byte[] sha512 = HashProvider.sha512(ecKey);
 
         return KeyStore.from64ByteArray(sha512);
+    }
+
+    public OnlineState getAppState() {
+        return appState;
+    }
+
+    public void setAppState(OnlineState appState) {
+        this.appState = appState;
     }
 
     public boolean isInSync() {

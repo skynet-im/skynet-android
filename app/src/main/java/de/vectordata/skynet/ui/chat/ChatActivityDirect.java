@@ -39,6 +39,8 @@ import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.P21MessageOverride;
 import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
+import de.vectordata.skynet.net.packet.P2BOnlineState;
+import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
@@ -212,6 +214,13 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         } else if (packet instanceof P21MessageOverride) {
             P21MessageOverride override = (P21MessageOverride) packet;
             modifyMessageItem(override.messageId, i -> i.setContent(override.newText));
+        } else if (packet instanceof P2BOnlineState) {
+            P2BOnlineState onlineState = (P2BOnlineState) packet;
+
+        } else if (packet instanceof P2CChannelAction) {
+            P2CChannelAction channelAction = (P2CChannelAction) packet;
+            if (channelAction.channelId != this.messageChannel.getChannelId()) return;
+
         }
     }
 
