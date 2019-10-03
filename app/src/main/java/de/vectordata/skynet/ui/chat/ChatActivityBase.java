@@ -25,6 +25,7 @@ import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.ui.base.ThemedActivity;
+import de.vectordata.skynet.ui.view.CheckableRecyclerView;
 import de.vectordata.skynet.util.Handlers;
 
 /**
@@ -34,6 +35,11 @@ import de.vectordata.skynet.util.Handlers;
 public abstract class ChatActivityBase extends ThemedActivity {
 
     public static final String EXTRA_CHANNEL_ID = "skynet.chat.channelId";
+
+    /**
+     * The ID of the {@see messageChannel}
+     */
+    long messageChannelId;
 
     /**
      * This is the channel over which the actual messages are transmitted, such as
@@ -49,17 +55,27 @@ public abstract class ChatActivityBase extends ThemedActivity {
 
     Handler foregroundHandler = new Handler();
 
+    ImageView avatarView;
+    TextView nicknameView;
+    TextView lastSeenView;
+
+    CheckableRecyclerView recyclerView;
+    EmojiEditText messageInput;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        EmojiEditText messageInput = findViewById(R.id.input_message);
+        messageChannelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
+
+        messageInput = findViewById(R.id.input_message);
+        recyclerView = findViewById(R.id.recycler_view);
+
         ImageButton emojiToggleButton = findViewById(R.id.button_emoji);
         ImageButton sendButton = findViewById(R.id.button_send);
 
         boolean enterToSend = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enter_to_send", false);
-
         messageInput.setSingleLine(enterToSend);
         messageInput.setImeOptions(enterToSend ? EditorInfo.IME_ACTION_SEND : EditorInfo.IME_ACTION_NONE);
         messageInput.setOnEditorActionListener((v, actionId, event) -> {
@@ -70,6 +86,10 @@ public abstract class ChatActivityBase extends ThemedActivity {
             return false;
         });
 
+        boolean animations = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("animations", true);
+        if (!animations)
+            recyclerView.setItemAnimator(null);
+
         EmojiPopup popup = EmojiPopup.Builder.fromRootView(findViewById(R.id.root_view))
                 .setOnEmojiPopupShownListener(() -> emojiToggleButton.setImageResource(R.drawable.ic_keyboard))
                 .setOnEmojiPopupDismissListener(() -> emojiToggleButton.setImageResource(R.drawable.ic_insert_emoji))
@@ -77,15 +97,12 @@ public abstract class ChatActivityBase extends ThemedActivity {
 
         emojiToggleButton.setOnClickListener(v -> popup.toggle());
         messageInput.setOnClickListener(v -> popup.dismiss());
-        initialize();
+
         setupActionBar();
+        initialize();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_chat, menu);
-        return true;
-    }
+    public abstract void initialize();
 
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -102,24 +119,25 @@ public abstract class ChatActivityBase extends ThemedActivity {
         ImageButton backButton = customView.findViewById(R.id.button_back);
         backButton.setOnClickListener(v -> onBackPressed());
 
-        ImageView avatar = customView.findViewById(R.id.image_avatar);
-        TextView nickname = customView.findViewById(R.id.label_nickname);
-        TextView onlineState = customView.findViewById(R.id.label_online_state);
-        configureActionBar(avatar, nickname, onlineState);
+        avatarView = customView.findViewById(R.id.image_avatar);
+        nicknameView = customView.findViewById(R.id.label_nickname);
+        lastSeenView = customView.findViewById(R.id.label_online_state);
 
         Toolbar parent = (Toolbar) customView.getParent();
         parent.setPadding(0, 0, 0, 0);
         parent.setContentInsetsAbsolute(0, 0);
     }
 
-    public abstract void initialize();
-
-    public abstract void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState);
-
     @Override
     protected void onPause() {
         super.onPause();
         SkynetContext.getCurrent().getNotificationManager().onBackground();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        return true;
     }
 
     void readMessage(long messageId) {
@@ -133,6 +151,10 @@ public abstract class ChatActivityBase extends ThemedActivity {
             message.setUnread(false);
             Storage.getDatabase().chatMessageDao().update(message);
         });
+    }
+
+    ChannelMessageConfig createConfigWithDependencyTo(long messageId) {
+        return ChannelMessageConfig.create().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId);
     }
 
 }

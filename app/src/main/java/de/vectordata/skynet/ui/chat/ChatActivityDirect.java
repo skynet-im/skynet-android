@@ -1,20 +1,15 @@
 package de.vectordata.skynet.ui.chat;
 
 import android.content.Intent;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.vanniktech.emoji.EmojiEditText;
 
 import org.greenrobot.eventbus.Subscribe;
 
@@ -58,7 +53,6 @@ import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
-import de.vectordata.skynet.ui.view.CheckableRecyclerView;
 import de.vectordata.skynet.util.Callback;
 
 public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceListener {
@@ -67,14 +61,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private Channel accountDataChannel;
 
     private List<MessageItem> messageItems;
-
-    private CheckableRecyclerView recyclerView;
     private MessageAdapter adapter;
-
-    private ImageView avatarView;
-    private TextView nicknameView;
-    private TextView lastSeenView;
-    private EmojiEditText messageInput;
 
     private MessageActionController messageActionController;
 
@@ -87,19 +74,11 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         findViewById(R.id.button_exit_message_action).setOnClickListener(v -> messageActionController.exit());
 
         messageItems = new ArrayList<>();
-
-        recyclerView = findViewById(R.id.recycler_view);
         adapter = new MessageAdapter(messageItems);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
-
-        boolean animations = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("animations", true);
-        if (!animations)
-            recyclerView.setItemAnimator(null);
-
-        messageInput = findViewById(R.id.input_message);
 
         findViewById(R.id.button_send).setOnClickListener(v -> {
             String text;
@@ -131,23 +110,27 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             messageInput.setText("");
         });
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView v, int dx, int dy) {
+                if (dx == 0 && dy == 0) return;
+                if (recyclerView.getFirstVisiblePosition() <= 20 && adapter.getItemCount() > 0 && !isFullyLoaded) {
+                    MessageItem item = adapter.getItem(0);
+                    if (item.getMessageSide() == MessageSide.CENTER)
+                        loadMoreMessages(adapter.getItem(1).getMessageId());
+                    else loadMoreMessages(item.getMessageId());
+                }
+            }
+        });
+
         KeyboardUtil.registerOnKeyboardOpen(recyclerView, this::scrollToBottom);
 
         setup();
     }
 
-    @Override
-    public void configureActionBar(ImageView avatar, TextView nickname, TextView onlineState) {
-        this.avatarView = avatar;
-        this.nicknameView = nickname;
-        this.lastSeenView = onlineState;
-    }
-
     private void setup() {
-        long channelId = getIntent().getLongExtra(EXTRA_CHANNEL_ID, 0);
-
         backgroundHandler.post(() -> {
-            messageChannel = Storage.getDatabase().channelDao().getById(channelId);
+            messageChannel = Storage.getDatabase().channelDao().getById(messageChannelId);
             if (messageChannel == null) return; // This should not happen in production
 
             profileDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
@@ -169,57 +152,44 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             for (ChatMessage message : unread)
                 readMessage(message.getMessageId());
         });
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView v, int dx, int dy) {
-                if (dx == 0 && dy == 0) return;
-                if (recyclerView.getFirstVisiblePosition() <= 20 && adapter.getItemCount() > 0 && !isFullyLoaded) {
-                    MessageItem item = adapter.getItem(0);
-                    if (item.getMessageSide() == MessageSide.CENTER)
-                        loadMoreMessages(adapter.getItem(1).getMessageId());
-                    else loadMoreMessages(item.getMessageId());
-                }
-            }
-        });
     }
 
     @Subscribe
     public void onPacketEvent(PacketEvent event) {
-        Packet packet = event.getPacket();
-        if (packet instanceof ChannelMessagePacket && ((ChannelMessagePacket) packet).getParent().channelId != messageChannel.getChannelId())
+        Packet packetIn = event.getPacket();
+        if (packetIn instanceof ChannelMessagePacket && ((ChannelMessagePacket) packetIn).getParent().channelId != messageChannel.getChannelId())
             return;
 
-        if (packet instanceof P20ChatMessage) {
-            P20ChatMessage chatMessage = (P20ChatMessage) packet;
+        if (packetIn instanceof P20ChatMessage) {
+            P20ChatMessage chatMessage = (P20ChatMessage) packetIn;
             insertMessage(chatMessage, MessageState.SENT);
             if (chatMessage.getParent().senderId != Storage.getSession().getAccountId())
                 readMessage(chatMessage.getParent().messageId);
-        } else if (packet instanceof P0CChannelMessageResponse) {
-            P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packet);
+        } else if (packetIn instanceof P0CChannelMessageResponse) {
+            P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packetIn);
             if (response.channelId != messageChannel.getChannelId()) return;
             modifyMessageItem(response.tempMessageId, i -> {
                 i.setMessageId(response.messageId);
                 i.setMessageState(MessageState.SENT);
             });
-        } else if (packet instanceof P22MessageReceived) {
-            P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packet).getParent().singleDependency();
+        } else if (packetIn instanceof P22MessageReceived) {
+            P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packetIn).getParent().singleDependency();
             modifyMessageItem(dependency.messageId, i -> {
                 if (i.getMessageState() != MessageState.SEEN)
                     i.setMessageState(MessageState.DELIVERED);
             });
-        } else if (packet instanceof P23MessageRead) {
-            P0BChannelMessage.Dependency dependency = ((P23MessageRead) packet).getParent().singleDependency();
+        } else if (packetIn instanceof P23MessageRead) {
+            P0BChannelMessage.Dependency dependency = ((P23MessageRead) packetIn).getParent().singleDependency();
             modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));
-        } else if (packet instanceof P21MessageOverride) {
-            P21MessageOverride override = (P21MessageOverride) packet;
+        } else if (packetIn instanceof P21MessageOverride) {
+            P21MessageOverride override = (P21MessageOverride) packetIn;
             modifyMessageItem(override.messageId, i -> i.setContent(override.newText));
-        } else if (packet instanceof P2BOnlineState) {
-            P2BOnlineState onlineState = (P2BOnlineState) packet;
+        } else if (packetIn instanceof P2BOnlineState) {
+            P2BOnlineState onlineState = (P2BOnlineState) packetIn;
 
-        } else if (packet instanceof P2CChannelAction) {
-            P2CChannelAction channelAction = (P2CChannelAction) packet;
-            if (channelAction.channelId != this.messageChannel.getChannelId()) return;
+        } else if (packetIn instanceof P2CChannelAction) {
+            P2CChannelAction packet = (P2CChannelAction) packetIn;
+            if (packet.channelId != this.messageChannel.getChannelId()) return;
 
         }
     }
@@ -457,10 +427,6 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         boolean noTimeout = System.currentTimeMillis() - messageItem.getSentDate().toJavaDate().getTime() <= P21MessageOverride.OVERWITE_TIMEOUT;
         boolean ownMessage = messageItem.getMessageSide() == MessageSide.RIGHT;
         return noTimeout && ownMessage;
-    }
-
-    private ChannelMessageConfig createConfigWithDependencyTo(long messageId) {
-        return ChannelMessageConfig.create().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId);
     }
 
 }
