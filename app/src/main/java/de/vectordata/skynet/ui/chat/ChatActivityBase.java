@@ -143,7 +143,7 @@ public abstract class ChatActivityBase extends ThemedActivity {
     void readMessage(long messageId) {
         SkynetContext.getCurrent().getMessageInterface()
                 .send(messageChannel.getChannelId(),
-                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId),
+                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageChannel.getChannelId(), messageId),
                         new P23MessageRead()
                 );
         backgroundHandler.post(() -> {
@@ -166,7 +166,7 @@ public abstract class ChatActivityBase extends ThemedActivity {
     }
 
     ChannelMessageConfig createConfigWithDependencyTo(long messageId) {
-        return ChannelMessageConfig.create().addDependency(Storage.getSession().getAccountId(), messageChannel.getChannelId(), messageId);
+        return ChannelMessageConfig.create().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageChannel.getChannelId(), messageId);
     }
 
 }

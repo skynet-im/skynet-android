@@ -8,6 +8,8 @@ import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 public class ChannelMessageConfig {
 
+    public static final long ANY_ACCOUNT = 0;
+
     private byte messageFlags;
 
     private long fileId;

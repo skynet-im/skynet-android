@@ -305,7 +305,7 @@ public class PacketHandler {
     private void sendReceiveConfirmation(long channelId, long messageId) {
         SkynetContext.getCurrent().getMessageInterface()
                 .send(channelId,
-                        new ChannelMessageConfig().addDependency(Storage.getSession().getAccountId(), channelId, messageId),
+                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, channelId, messageId),
                         new P22MessageReceived()
                 );
         setMessageState(channelId, messageId, MessageState.DELIVERED);
