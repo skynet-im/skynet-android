@@ -102,7 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:constraint_referenced_ids="label_quoted_name, label_quoted_text, quote_indicator" />
+            app:constraint_referenced_ids="label_quoted_name,label_quoted_text,quote_indicator" />
 
         <ImageView
             android:id="@+id/image_edited"

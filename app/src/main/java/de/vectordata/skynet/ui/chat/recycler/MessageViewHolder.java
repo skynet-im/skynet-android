@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.Group;
 import androidx.recyclerview.widget.RecyclerView;
 
 import de.vectordata.skynet.R;
+import de.vectordata.skynet.data.model.ChatMessage;
 
 class MessageViewHolder extends RecyclerView.ViewHolder {
 
@@ -33,7 +34,10 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     void configure(MessageItem messageItem) {
-        if (messageItem.getContent().equals("\0")) {
+
+        boolean isDeleted = messageItem.getContent().equals(ChatMessage.DELETED);
+
+        if (isDeleted) {
             message.setTypeface(null, Typeface.ITALIC);
             message.setAlpha(0.75f);
             message.setText(R.string.message_deleted);
@@ -48,7 +52,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (edited != null)
-            edited.setVisibility(messageItem.isEdited() ? View.VISIBLE : View.GONE);
+            edited.setVisibility(messageItem.isEdited() && !isDeleted ? View.VISIBLE : View.GONE);
 
         if (time != null && messageItem.getSentDate() != null)
             time.setText(messageItem.getSentDate().toTimeString(time.getContext()));
