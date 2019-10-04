@@ -32,4 +32,9 @@ public class P23MessageRead extends ChannelMessagePacket {
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
     }
+
+    @Override
+    public boolean validatePacket() {
+        return getParent().dependencies.size() > 0;
+    }
 }
