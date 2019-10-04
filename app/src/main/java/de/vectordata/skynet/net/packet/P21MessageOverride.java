@@ -85,6 +85,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
             ChatMessage message = Storage.getDatabase().chatMessageDao().query(getParent().channelId, messageId);
             if (action == OverrideAction.DELETE) {
                 message.setText(ChatMessage.DELETED);
+                message.setEdited(false);
                 SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(getParent().channelId, messageId);
             } else {
                 message.setText(newText);
