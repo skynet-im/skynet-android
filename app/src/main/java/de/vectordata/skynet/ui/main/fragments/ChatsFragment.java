@@ -30,6 +30,7 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
 import de.vectordata.skynet.event.PacketEvent;
+import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P14MailAddress;
@@ -38,7 +39,9 @@ import de.vectordata.skynet.net.packet.P21MessageOverride;
 import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.P25Nickname;
+import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.model.ChannelAction;
 import de.vectordata.skynet.ui.chat.ChatActivityBase;
 import de.vectordata.skynet.ui.chat.ChatActivityDirect;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
@@ -95,7 +98,7 @@ public class ChatsFragment extends Fragment {
         Packet packet = event.getPacket();
         if (packet instanceof P0FSyncFinished || packet instanceof P20ChatMessage || packet instanceof P0ACreateChannel
                 || packet instanceof P22MessageReceived || packet instanceof P23MessageRead || packet instanceof P21MessageOverride
-                || packet instanceof P14MailAddress || packet instanceof P25Nickname)
+                || packet instanceof P14MailAddress || packet instanceof P25Nickname || packet instanceof P2CChannelAction)
             reload();
     }
 
@@ -111,23 +114,29 @@ public class ChatsFragment extends Fragment {
             List<ChatsItem> items = new ArrayList<>();
             List<ChatMessage> unreadMessages = Storage.getDatabase().chatMessageDao().queryUnread();
             for (Channel channel : channels) {
+                ChannelAction action = SkynetContext.getCurrent().getAppState().getChannelAction(channel.getChannelId());
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
                 String friendlyName = NameUtil.getFriendlyName(channel.getCounterpartId(), accountDataChannel);
 
-                ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId());
-                ChatsItem item;
-                if (latestMessage != null) {
-                    int unread = 0;
-                    for (ChatMessage message : unreadMessages)
-                        if (message.getChannelId() == channel.getChannelId())
-                            unread++;
+                if (action == ChannelAction.NONE) {
+                    ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId());
+                    ChatsItem item;
+                    if (latestMessage != null) {
+                        int unread = 0;
+                        for (ChatMessage message : unreadMessages)
+                            if (message.getChannelId() == channel.getChannelId())
+                                unread++;
 
-                    ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
-                    MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
-                    item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId());
-                } else
-                    item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
-                items.add(item);
+                        ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
+                        MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
+                        item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId());
+                    } else
+                        item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
+                    items.add(item);
+                } else if (action == ChannelAction.TYPING)
+                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_typing), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted());
+                else
+                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_recording), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted());
             }
             Collections.sort(items, (a, b) -> -Long.compare(a.getLastActiveDate().toBinary(), b.getLastActiveDate().toBinary()));
             context.runOnUiThread(() -> {

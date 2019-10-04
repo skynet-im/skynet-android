@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.main.recycler;
 
 import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.ui.util.MessageSide;
 
@@ -27,6 +28,8 @@ public class ChatsItem {
     private long channelId;
 
     private long counterpartId;
+
+    private boolean highlighted;
 
     public ChatsItem(String header, DateTime lastActiveDate, long counterpartId, long channelId) {
         this.header = header;
@@ -94,4 +97,18 @@ public class ChatsItem {
     public long getCounterpartId() {
         return counterpartId;
     }
+
+    boolean isDeleted() {
+        return content.equals(ChatMessage.DELETED);
+    }
+
+    boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public ChatsItem setHighlighted() {
+        this.highlighted = true;
+        return this;
+    }
+
 }

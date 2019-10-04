@@ -179,12 +179,12 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
 
     @Override
     public void onStartTyping() {
-        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState(), ChannelAction.TYPING, messageChannelId));
+        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState(), ChannelAction.TYPING, messageChannelId));
     }
 
     @Override
     public void onStopTyping() {
-        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState(), ChannelAction.NONE, 0));
+        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState(), ChannelAction.NONE, 0));
     }
 
 }

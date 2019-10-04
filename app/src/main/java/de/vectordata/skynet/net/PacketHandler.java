@@ -220,7 +220,7 @@ public class PacketHandler {
                 continue;
             SkynetContext.getCurrent().getNotificationManager().onMessageReceived(msg.getChannelId(), msg.getMessageId(), msg.getText());
         }
-        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState()));
+        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState()));
     }
 
 
@@ -354,7 +354,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P2CChannelAction packet) {
-
+        SkynetContext.getCurrent().getAppState().setChannelAction(packet.channelId, packet.accountId, packet.channelAction);
     }
 
     ////////////////////// On demand packets //////////////////////

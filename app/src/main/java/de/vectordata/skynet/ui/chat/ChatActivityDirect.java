@@ -39,6 +39,7 @@ import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.model.ChannelAction;
 import de.vectordata.skynet.net.packet.model.MessageType;
 import de.vectordata.skynet.net.packet.model.OnlineState;
 import de.vectordata.skynet.net.packet.model.OverrideAction;
@@ -110,6 +111,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             });
 
             messageInput.setText("");
+            onStopTyping();
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -154,8 +156,12 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 readMessage(message.getMessageId());
 
             OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
+            ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
+
             if (onlineState == null)
                 subtitleView.setVisibility(View.GONE);
+            else if (channelAction != ChannelAction.NONE)
+                applyChannelAction(channelAction);
             else if (onlineState.getOnlineState() == OnlineState.ACTIVE)
                 setSubtitle(R.string.state_online);
             else if (onlineState.getOnlineState() == OnlineState.INACTIVE)
@@ -216,17 +222,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
         } else if (packetIn instanceof P2CChannelAction) {
             P2CChannelAction packet = (P2CChannelAction) packetIn;
-            switch (packet.channelAction) {
-                case NONE:
-                    setSubtitle(R.string.state_online);
-                    break;
-                case TYPING:
-                    setSubtitle(R.string.state_typing);
-                    break;
-                case RECORDING_AUDIO:
-                    setSubtitle(R.string.state_recording);
-                    break;
-            }
+            applyChannelAction(packet.channelAction);
         }
     }
 
@@ -297,7 +293,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                         ChannelMessageConfig config = createConfigWithDependencyTo(selectedMessage.getMessageId());
                         getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
                     });
-                    modifyMessageItem(selectedMessage.getMessageId(), data -> data.setContent("\0"));
+                    modifyMessageItem(selectedMessage.getMessageId(), data -> data.setContent(ChatMessage.DELETED));
                     mode.finish();
                 }, null);
                 break;
@@ -330,6 +326,20 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     protected void onResume() {
         super.onResume();
         SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
+    }
+
+    private void applyChannelAction(ChannelAction channelAction) {
+        switch (channelAction) {
+            case NONE:
+                setSubtitle(R.string.state_online);
+                break;
+            case TYPING:
+                setSubtitle(R.string.state_typing);
+                break;
+            case RECORDING_AUDIO:
+                setSubtitle(R.string.state_recording);
+                break;
+        }
     }
 
     private void insertMessage(P20ChatMessage msg, MessageState messageState) {

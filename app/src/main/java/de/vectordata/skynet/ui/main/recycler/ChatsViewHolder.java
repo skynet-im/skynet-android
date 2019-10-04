@@ -7,12 +7,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
+import de.vectordata.skynet.ui.util.ThemeUtil;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -64,12 +66,19 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
 
-        if (item.getContent().equals("\0")) {
+        if (item.isDeleted()) {
+            ThemeUtil.resetTextViewColor(message);
             message.setTypeface(null, Typeface.ITALIC);
             message.setAlpha(0.75f);
             message.setText(R.string.message_deleted);
             messageState.setVisibility(View.GONE);
+        } else if (item.isHighlighted()) {
+            message.setTypeface(null, Typeface.NORMAL);
+            message.setTextColor(ContextCompat.getColor(message.getContext(), R.color.colorAccent));
+            message.setText(item.getContent());
+            messageState.setVisibility(View.GONE);
         } else {
+            ThemeUtil.resetTextViewColor(message);
             message.setTypeface(null, Typeface.NORMAL);
             message.setAlpha(1.0f);
             message.setText(item.getContent());

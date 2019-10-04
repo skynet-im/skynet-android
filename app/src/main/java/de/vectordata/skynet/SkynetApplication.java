@@ -36,19 +36,19 @@ public class SkynetApplication extends Application implements DefaultLifecycleOb
 
     @Override
     public void onResume(@NonNull LifecycleOwner owner) {
-        SkynetContext.getCurrent().setAppState(OnlineState.ACTIVE);
+        SkynetContext.getCurrent().getAppState().setOnlineState(OnlineState.ACTIVE);
         updateOnlineState();
     }
 
     @Override
     public void onPause(@NonNull LifecycleOwner owner) {
-        SkynetContext.getCurrent().setAppState(OnlineState.INACTIVE);
+        SkynetContext.getCurrent().getAppState().setOnlineState(OnlineState.INACTIVE);
         updateOnlineState();
     }
 
     private void updateOnlineState() {
         if (SkynetContext.getCurrent().isInSync())
-            SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState()));
+            SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState()));
     }
 
 }
