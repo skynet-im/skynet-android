@@ -7,6 +7,15 @@ import de.vectordata.skynet.R;
 
 public class DateUtil {
 
+    public static String toLastSeen(Context context, DateTime dateTime) {
+        if (dateTime.isToday())
+            return String.format(context.getString(R.string.state_last_seen_today), dateTime.toTimeString(context));
+        else if (dateTime.isYesterday())
+            return String.format(context.getString(R.string.state_last_seen_yesterday), dateTime.toTimeString(context));
+        else
+            return String.format(context.getString(R.string.state_last_seen), dateTime.toDateTimeString(context));
+    }
+
     public static String toDateString(Context context, DateTime dateTime) {
         if (dateTime.isToday())
             return context.getString(R.string.today);

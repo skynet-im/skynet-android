@@ -56,8 +56,8 @@ public abstract class ChatActivityBase extends ThemedActivity {
     Handler foregroundHandler = new Handler();
 
     ImageView avatarView;
-    TextView nicknameView;
-    TextView lastSeenView;
+    TextView titleView;
+    TextView subtitleView;
 
     CheckableRecyclerView recyclerView;
     EmojiEditText messageInput;
@@ -120,8 +120,8 @@ public abstract class ChatActivityBase extends ThemedActivity {
         backButton.setOnClickListener(v -> onBackPressed());
 
         avatarView = customView.findViewById(R.id.image_avatar);
-        nicknameView = customView.findViewById(R.id.label_nickname);
-        lastSeenView = customView.findViewById(R.id.label_online_state);
+        titleView = customView.findViewById(R.id.label_title);
+        subtitleView = customView.findViewById(R.id.label_subtitle);
 
         Toolbar parent = (Toolbar) customView.getParent();
         parent.setPadding(0, 0, 0, 0);
@@ -150,6 +150,18 @@ public abstract class ChatActivityBase extends ThemedActivity {
             ChatMessage message = Storage.getDatabase().chatMessageDao().query(messageChannel.getChannelId(), messageId);
             message.setUnread(false);
             Storage.getDatabase().chatMessageDao().update(message);
+        });
+    }
+
+    void setSubtitle(String subtitle) {
+        runOnUiThread(() -> subtitleView.setText(subtitle));
+    }
+
+    void setSubtitle(int resId) {
+        runOnUiThread(() -> {
+            if (subtitleView.getVisibility() != subtitleView.getVisibility())
+                subtitleView.setVisibility(View.VISIBLE);
+            subtitleView.setText(resId);
         });
     }
 

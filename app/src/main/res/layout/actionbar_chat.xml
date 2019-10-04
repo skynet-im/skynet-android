@@ -48,8 +48,8 @@
         app:layout_constraintStart_toEndOf="@+id/image_avatar"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.vanniktech.emoji.EmojiTextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/label_nickname"
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/label_title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
@@ -57,8 +57,8 @@
             android:textColor="@color/white"
             tools:text="Contact's nickname" />
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/label_online_state"
+        <TextView
+            android:id="@+id/label_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"

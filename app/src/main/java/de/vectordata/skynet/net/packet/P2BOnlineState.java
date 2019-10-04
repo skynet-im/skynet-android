@@ -3,11 +3,14 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
+import de.vectordata.skynet.data.Storage;
+import de.vectordata.skynet.data.model.OnlineStateDb;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.packet.base.AbstractPacket;
+import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.OnlineState;
 
-public class P2BOnlineState extends AbstractPacket {
+public class P2BOnlineState extends ChannelMessagePacket {
 
     public OnlineState onlineState;
 
@@ -15,9 +18,6 @@ public class P2BOnlineState extends AbstractPacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByte((byte) onlineState.ordinal());
-        if (onlineState == OnlineState.INACTIVE)
-            buffer.writeDate(lastActive);
     }
 
     @Override
@@ -35,6 +35,12 @@ public class P2BOnlineState extends AbstractPacket {
     @Override
     public byte getId() {
         return 0x2B;
+    }
+
+    @Override
+    public void writeToDatabase(PacketDirection packetDirection) {
+        Storage.getDatabase().onlineStateDao().clear(getParent().channelId);
+        Storage.getDatabase().onlineStateDao().insert(OnlineStateDb.fromPacket(this));
     }
 
 }

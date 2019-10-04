@@ -24,7 +24,7 @@ public class SkynetContext implements KeyProvider {
     private MessageInterface messageInterface;
     private NetworkManager networkManager;
     private INotificationManager notificationManager;
-    private OnlineState appState;
+    private OnlineState appState = OnlineState.ACTIVE;
 
     private SkynetContext() {
         jobEngine = new JobEngine();

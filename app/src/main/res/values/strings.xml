@@ -118,6 +118,9 @@
     <string name="state_online">online</string>
     <string name="state_typing">typing…</string>
     <string name="state_recording">recording…</string>
-    <string name="state_offline">last seen %s</string>
+    <string name="state_last_seen_today">last seen today %s</string>
+    <string name="state_last_seen_yesterday">last seen yesterday %s</string>
+    <string name="state_last_seen">last seen %s</string>
 
 </resources>
+

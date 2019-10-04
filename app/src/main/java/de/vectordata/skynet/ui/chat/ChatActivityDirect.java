@@ -23,6 +23,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.OnlineStateDb;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.PacketEvent;
@@ -39,6 +40,7 @@ import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.MessageType;
+import de.vectordata.skynet.net.packet.model.OnlineState;
 import de.vectordata.skynet.net.packet.model.OverrideAction;
 import de.vectordata.skynet.ui.ForwardActivity;
 import de.vectordata.skynet.ui.chat.action.MessageAction;
@@ -141,8 +143,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             String friendlyName = NameUtil.getFriendlyName(messageChannel.getCounterpartId(), accountDataChannel);
             DefaultProfileImage profileImage = DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128);
             runOnUiThread(() -> {
-                nicknameView.setText(friendlyName);
-                lastSeenView.setVisibility(View.GONE);
+                titleView.setText(friendlyName);
                 profileImage.loadInto(avatarView);
             });
 
@@ -151,14 +152,25 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(messageChannel.getChannelId());
             for (ChatMessage message : unread)
                 readMessage(message.getMessageId());
+
+            OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
+            if (onlineState == null)
+                subtitleView.setVisibility(View.GONE);
+            else if (onlineState.getOnlineState() == OnlineState.ACTIVE)
+                setSubtitle(R.string.state_online);
+            else if (onlineState.getOnlineState() == OnlineState.INACTIVE)
+                setSubtitle(DateUtil.toLastSeen(this, onlineState.getLastSeen()));
         });
     }
 
     @Subscribe
     public void onPacketEvent(PacketEvent event) {
         Packet packetIn = event.getPacket();
-        if (packetIn instanceof ChannelMessagePacket && ((ChannelMessagePacket) packetIn).getParent().channelId != messageChannel.getChannelId())
-            return;
+        if (packetIn instanceof ChannelMessagePacket) {
+            long channelId = ((ChannelMessagePacket) packetIn).getParent().channelId;
+            if (channelId != messageChannel.getChannelId() && channelId != accountDataChannel.getChannelId() && channelId != profileDataChannel.getChannelId())
+                return;
+        }
 
         if (packetIn instanceof P20ChatMessage) {
             P20ChatMessage chatMessage = (P20ChatMessage) packetIn;
@@ -185,20 +197,29 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             P21MessageOverride override = (P21MessageOverride) packetIn;
             modifyMessageItem(override.messageId, i -> i.setContent(override.newText));
         } else if (packetIn instanceof P2BOnlineState) {
-            P2BOnlineState onlineState = (P2BOnlineState) packetIn;
+            P2BOnlineState packet = (P2BOnlineState) packetIn;
+            if (packet.getParent().channelId != this.accountDataChannel.getChannelId()) return;
+
+            switch (packet.onlineState) {
+                case ACTIVE:
+                    setSubtitle(R.string.state_online);
+                    break;
+                case INACTIVE:
+                    setSubtitle(DateUtil.toLastSeen(this, packet.lastActive));
+                    break;
+            }
 
         } else if (packetIn instanceof P2CChannelAction) {
             P2CChannelAction packet = (P2CChannelAction) packetIn;
-            if (packet.channelId != this.messageChannel.getChannelId()) return;
             switch (packet.channelAction) {
                 case NONE:
-                    lastSeenView.setText(R.string.state_online);
+                    setSubtitle(R.string.state_online);
                     break;
                 case TYPING:
-                    lastSeenView.setText(R.string.state_typing);
+                    setSubtitle(R.string.state_typing);
                     break;
                 case RECORDING_AUDIO:
-                    lastSeenView.setText(R.string.state_recording);
+                    setSubtitle(R.string.state_recording);
                     break;
             }
         }
@@ -420,7 +441,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     }
 
     private String getFriendlySenderName(MessageItem item) {
-        return item.getMessageSide() == MessageSide.LEFT ? nicknameView.getText().toString() : getString(R.string.you);
+        return item.getMessageSide() == MessageSide.LEFT ? titleView.getText().toString() : getString(R.string.you);
     }
 
     private MessageItem getSelectedMessage() {
