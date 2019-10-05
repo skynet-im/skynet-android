@@ -14,6 +14,7 @@ import com.vanniktech.emoji.ios.IosEmojiProvider;
 
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.connect.ConnectionListener;
 import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.model.OnlineState;
 
@@ -27,11 +28,17 @@ public class SkynetApplication extends Application implements DefaultLifecycleOb
         Log.i(TAG, "Initializing application");
         Storage.initialize(getApplicationContext());
         FirebaseApp.initializeApp(this);
-        SkynetContext.getCurrent().getNetworkManager().connect();
         EmojiManager.install(new IosEmojiProvider());
+        SkynetContext.getCurrent().getNetworkManager().connect();
         SkynetContext.getCurrent().getNotificationManager().onInitialize(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+        ConnectionListener.register(this);
         Log.i(TAG, "Application init completed");
+    }
+
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
+        ConnectionListener.unregister(this);
     }
 
     @Override

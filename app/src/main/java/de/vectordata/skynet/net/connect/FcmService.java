@@ -1,4 +1,4 @@
-package de.vectordata.skynet.fcm;
+package de.vectordata.skynet.net.connect;
 
 import android.util.Log;
 
@@ -9,6 +9,10 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import de.vectordata.skynet.net.SkynetContext;
 
+/**
+ * Registers events to reconnect to the Skynet server instantly when
+ * a FCM message is received
+ */
 public class FcmService extends FirebaseMessagingService {
 
     private static final String TAG = "FcmService";
