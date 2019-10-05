@@ -2,6 +2,10 @@ package de.vectordata.skynet.net.state;
 
 import android.util.LongSparseArray;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.net.packet.model.ChannelAction;
 import de.vectordata.skynet.net.packet.model.OnlineState;
 
@@ -10,6 +14,10 @@ public class AppState {
     private OnlineState onlineState = OnlineState.ACTIVE;
 
     private LongSparseArray<ChannelAction> channelActions = new LongSparseArray<>();
+
+    public AppState() {
+        EventBus.getDefault().register(this);
+    }
 
     public ChannelAction getChannelAction(long channelId) {
         ChannelAction action = channelActions.get(channelId);
@@ -30,6 +38,11 @@ public class AppState {
 
     public void setOnlineState(OnlineState onlineState) {
         this.onlineState = onlineState;
+    }
+
+    @Subscribe
+    public void onConnectionLost(ConnectionFailedEvent event) {
+        channelActions.clear();
     }
 
 }

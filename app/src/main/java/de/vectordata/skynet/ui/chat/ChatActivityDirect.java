@@ -26,9 +26,12 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.OnlineStateDb;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
+import de.vectordata.skynet.event.AuthenticationSuccessfulEvent;
+import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
+import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
@@ -166,7 +169,20 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 setSubtitle(R.string.state_online);
             else if (onlineState.getOnlineState() == OnlineState.INACTIVE)
                 setSubtitle(DateUtil.toLastSeen(this, onlineState.getLastSeen()));
+
+            if (SkynetContext.getCurrent().getNetworkManager().getConnectionState() != ConnectionState.AUTHENTICATED)
+                subtitleView.setVisibility(View.GONE);
         });
+    }
+
+    @Subscribe
+    public void onConnectionLost(ConnectionFailedEvent event) {
+        runOnUiThread(() -> subtitleView.setVisibility(View.GONE));
+    }
+
+    @Subscribe
+    public void onConnected(AuthenticationSuccessfulEvent event) {
+        runOnUiThread(() -> subtitleView.setVisibility(View.VISIBLE));
     }
 
     @Subscribe

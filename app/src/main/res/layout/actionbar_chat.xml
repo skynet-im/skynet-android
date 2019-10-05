@@ -44,6 +44,7 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="vertical"
+        android:animateLayoutChanges="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/image_avatar"
         app:layout_constraintTop_toTopOf="parent">
