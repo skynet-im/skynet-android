@@ -131,11 +131,10 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         });
 
         KeyboardUtil.registerOnKeyboardOpen(recyclerView, this::scrollToBottom);
-
-        setup();
     }
 
-    private void setup() {
+    @Override
+    public void loadData() {
         backgroundHandler.post(() -> {
             messageChannel = Storage.getDatabase().channelDao().getById(messageChannelId);
             if (messageChannel == null) return; // This should not happen in production
@@ -151,7 +150,12 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 titleView.setText(friendlyName);
                 profileImage.loadInto(avatarView);
             });
+        });
+    }
 
+    @Override
+    public void reload() {
+        backgroundHandler.post(() -> {
             loadMessages();
 
             List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(messageChannel.getChannelId());
@@ -338,12 +342,6 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         else super.onBackPressed();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
-    }
-
     private void applyChannelAction(ChannelAction channelAction) {
         switch (channelAction) {
             case NONE:
@@ -395,6 +393,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
         List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(messageChannel.getChannelId(), 20);
         Collections.reverse(messages);
+
+        messageItems.clear();
 
         ChannelMessage previous = null;
         for (ChatMessage message : messages) {

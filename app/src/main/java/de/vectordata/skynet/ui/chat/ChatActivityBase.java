@@ -108,9 +108,14 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
 
         setupActionBar();
         initialize();
+        loadData();
     }
 
     public abstract void initialize();
+
+    public abstract void loadData();
+
+    public abstract void reload();
 
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -134,6 +139,13 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
         Toolbar parent = (Toolbar) customView.getParent();
         parent.setPadding(0, 0, 0, 0);
         parent.setContentInsetsAbsolute(0, 0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannelId);
+        reload();
     }
 
     @Override
