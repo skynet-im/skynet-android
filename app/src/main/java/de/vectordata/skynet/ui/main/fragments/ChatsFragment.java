@@ -43,6 +43,7 @@ import de.vectordata.skynet.net.packet.P22MessageReceived;
 import de.vectordata.skynet.net.packet.P23MessageRead;
 import de.vectordata.skynet.net.packet.P25Nickname;
 import de.vectordata.skynet.net.packet.P2CChannelAction;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.ChannelAction;
 import de.vectordata.skynet.ui.chat.ChatActivityBase;
@@ -86,6 +87,7 @@ public class ChatsFragment extends Fragment {
             context.startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(null);
 
         return rootView;
     }
@@ -93,10 +95,14 @@ public class ChatsFragment extends Fragment {
     @Subscribe
     public void onPacket(PacketEvent event) {
         Packet packet = event.getPacket();
-        if (packet instanceof P0FSyncFinished || packet instanceof P20ChatMessage || packet instanceof P0ACreateChannel
-                || packet instanceof P22MessageReceived || packet instanceof P23MessageRead || packet instanceof P21MessageOverride
-                || packet instanceof P14MailAddress || packet instanceof P25Nickname || packet instanceof P2CChannelAction)
+        if (packet instanceof P0FSyncFinished || packet instanceof P0ACreateChannel)
             reload();
+
+        if (packet instanceof P20ChatMessage || packet instanceof P22MessageReceived || packet instanceof P23MessageRead || packet instanceof P21MessageOverride || packet instanceof P14MailAddress || packet instanceof P25Nickname)
+            reloadSingle(((ChannelMessagePacket) packet).getParent().channelId);
+
+        if (packet instanceof P2CChannelAction)
+            reloadSingle(((P2CChannelAction) packet).channelId);
     }
 
     @Subscribe
@@ -121,6 +127,25 @@ public class ChatsFragment extends Fragment {
                 dataset.addAll(items);
                 adapter.notifyDataSetChanged();
             });
+        });
+    }
+
+    private void reloadSingle(long channelId) {
+        if (handler == null) return;
+        handler.post(() -> {
+            for (int i = 0; i < dataset.size(); i++) {
+                ChatsItem item = dataset.get(i);
+                if (item.getChannelId() == channelId) {
+                    final int idx = i;
+
+                    Channel channel = Storage.getDatabase().channelDao().getById(channelId);
+                    List<ChatMessage> unreadMessages = Storage.getDatabase().chatMessageDao().queryUnread();
+                    dataset.set(idx, createItem(channel, unreadMessages));
+
+                    context.runOnUiThread(() -> adapter.notifyItemChanged(idx));
+                    return;
+                }
+            }
         });
     }
 
