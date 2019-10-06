@@ -3,6 +3,7 @@ package de.vectordata.skynet.ui.chat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -21,6 +22,7 @@ import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.MessageDraft;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P23MessageRead;
@@ -108,7 +110,7 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
 
         setupActionBar();
         initialize();
-        loadData();
+        backgroundHandler.post(this::loadData);
     }
 
     public abstract void initialize();
@@ -145,13 +147,26 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
     protected void onResume() {
         super.onResume();
         SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannelId);
-        reload();
+        backgroundHandler.post(() -> {
+            MessageDraft draft = Storage.getDatabase().messageDraftDao().query(messageChannelId);
+            if (draft != null)
+                runOnUiThread(() -> this.messageInput.setText(draft.getText()));
+
+            this.reload();
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         SkynetContext.getCurrent().getNotificationManager().onBackground();
+        Editable text = messageInput.getText();
+        backgroundHandler.post(() -> {
+            if (text != null && text.toString().trim().length() > 0)
+                Storage.getDatabase().messageDraftDao().insert(new MessageDraft(messageChannelId, text.toString().trim()));
+            else
+                clearDraft();
+        });
     }
 
     @Override
@@ -171,6 +186,10 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
             message.setUnread(false);
             Storage.getDatabase().chatMessageDao().update(message);
         });
+    }
+
+    void clearDraft() {
+        Storage.getDatabase().messageDraftDao().delete(messageChannelId);
     }
 
     void setSubtitle(String subtitle) {

@@ -27,6 +27,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.MessageDraft;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
 import de.vectordata.skynet.event.PacketEvent;
@@ -116,6 +117,8 @@ public class ChatsFragment extends Fragment {
             for (Channel channel : channels) {
                 ChannelAction action = SkynetContext.getCurrent().getAppState().getChannelAction(channel.getChannelId());
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
+                MessageDraft draft = Storage.getDatabase().messageDraftDao().query(channel.getChannelId());
+                boolean isDraft = draft != null && !draft.getText().isEmpty();
                 String friendlyName = NameUtil.getFriendlyName(channel.getCounterpartId(), accountDataChannel);
 
                 if (action == ChannelAction.NONE) {
@@ -129,14 +132,14 @@ public class ChatsFragment extends Fragment {
 
                         ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
                         MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
-                        item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId());
+                        item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId()).setDraft(isDraft);
                     } else
-                        item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId());
+                        item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setDraft(isDraft);
                     items.add(item);
                 } else if (action == ChannelAction.TYPING)
-                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_typing), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted());
+                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_typing), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted().setDraft(isDraft));
                 else
-                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_recording), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted());
+                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_recording), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted().setDraft(isDraft));
             }
             Collections.sort(items, (a, b) -> -Long.compare(a.getLastActiveDate().toBinary(), b.getLastActiveDate().toBinary()));
             context.runOnUiThread(() -> {

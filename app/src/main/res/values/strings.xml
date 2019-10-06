@@ -104,6 +104,7 @@
 
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
+    <string name="draft">Draft</string>
 
     <string name="header_welcome">Welcome to Skynet!</string>
     <string name="header_nickname">Complete your registration by entering a nickname below.</string>

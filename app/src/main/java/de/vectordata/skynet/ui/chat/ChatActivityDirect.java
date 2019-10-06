@@ -111,6 +111,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                     });
                 }
                 runOnUiThread(() -> messageActionController.exit());
+                clearDraft();
             });
 
             messageInput.setText("");
@@ -135,48 +136,44 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
     @Override
     public void loadData() {
-        backgroundHandler.post(() -> {
-            messageChannel = Storage.getDatabase().channelDao().getById(messageChannelId);
-            if (messageChannel == null) return; // This should not happen in production
+        messageChannel = Storage.getDatabase().channelDao().getById(messageChannelId);
+        if (messageChannel == null) return; // This should not happen in production
 
-            profileDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
-            accountDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
+        profileDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.PROFILE_DATA);
+        accountDataChannel = Storage.getDatabase().channelDao().getByType(messageChannel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
 
-            SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
+        SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
 
-            String friendlyName = NameUtil.getFriendlyName(messageChannel.getCounterpartId(), accountDataChannel);
-            DefaultProfileImage profileImage = DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128);
-            runOnUiThread(() -> {
-                titleView.setText(friendlyName);
-                profileImage.loadInto(avatarView);
-            });
+        String friendlyName = NameUtil.getFriendlyName(messageChannel.getCounterpartId(), accountDataChannel);
+        DefaultProfileImage profileImage = DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128);
+        runOnUiThread(() -> {
+            titleView.setText(friendlyName);
+            profileImage.loadInto(avatarView);
         });
     }
 
     @Override
     public void reload() {
-        backgroundHandler.post(() -> {
-            loadMessages();
+        loadMessages();
 
-            List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(messageChannel.getChannelId());
-            for (ChatMessage message : unread)
-                readMessage(message.getMessageId());
+        List<ChatMessage> unread = Storage.getDatabase().chatMessageDao().queryUnread(messageChannel.getChannelId());
+        for (ChatMessage message : unread)
+            readMessage(message.getMessageId());
 
-            OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
-            ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
+        OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
+        ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
 
-            if (onlineState == null)
-                subtitleView.setVisibility(View.GONE);
-            else if (channelAction != ChannelAction.NONE)
-                applyChannelAction(channelAction);
-            else if (onlineState.getOnlineState() == OnlineState.ACTIVE)
-                setSubtitle(R.string.state_online);
-            else if (onlineState.getOnlineState() == OnlineState.INACTIVE)
-                setSubtitle(DateUtil.toLastSeen(this, onlineState.getLastSeen()));
+        if (onlineState == null)
+            subtitleView.setVisibility(View.GONE);
+        else if (channelAction != ChannelAction.NONE)
+            applyChannelAction(channelAction);
+        else if (onlineState.getOnlineState() == OnlineState.ACTIVE)
+            setSubtitle(R.string.state_online);
+        else if (onlineState.getOnlineState() == OnlineState.INACTIVE)
+            setSubtitle(DateUtil.toLastSeen(this, onlineState.getLastSeen()));
 
-            if (SkynetContext.getCurrent().getNetworkManager().getConnectionState() != ConnectionState.AUTHENTICATED)
-                subtitleView.setVisibility(View.GONE);
-        });
+        if (SkynetContext.getCurrent().getNetworkManager().getConnectionState() != ConnectionState.AUTHENTICATED)
+            subtitleView.setVisibility(View.GONE);
     }
 
     @Subscribe

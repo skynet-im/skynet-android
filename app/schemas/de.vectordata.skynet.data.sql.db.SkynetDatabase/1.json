@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d617059e39bbd4992d8757982b8d69b8",
+    "identityHash": "5b28692a9caf350543a476c6ad7bb5f2",
     "entities": [
       {
         "tableName": "channels",
@@ -912,12 +912,59 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "messageDrafts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `text` TEXT, PRIMARY KEY(`channelId`), FOREIGN KEY(`channelId`) REFERENCES `channels`(`channelId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_messageDrafts_channelId",
+            "unique": true,
+            "columnNames": [
+              "channelId"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_messageDrafts_channelId` ON `${TABLE_NAME}` (`channelId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "channels",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "channelId"
+            ],
+            "referencedColumns": [
+              "channelId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd617059e39bbd4992d8757982b8d69b8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b28692a9caf350543a476c6ad7bb5f2')"
     ]
   }
 }

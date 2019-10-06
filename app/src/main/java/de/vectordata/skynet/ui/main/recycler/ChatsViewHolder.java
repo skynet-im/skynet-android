@@ -66,6 +66,11 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
 
+        if (item.isDraft()) {
+            date.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            date.setText(R.string.draft);
+        } else ThemeUtil.resetTextViewColor(date);
+
         if (item.isDeleted()) {
             ThemeUtil.resetTextViewColor(message);
             message.setTypeface(null, Typeface.ITALIC);
@@ -74,7 +79,7 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             messageState.setVisibility(View.GONE);
         } else if (item.isHighlighted()) {
             message.setTypeface(null, Typeface.NORMAL);
-            message.setTextColor(ContextCompat.getColor(message.getContext(), R.color.colorAccent));
+            message.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
             message.setText(item.getContent());
             messageState.setVisibility(View.GONE);
         } else {

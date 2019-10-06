@@ -15,6 +15,7 @@ import de.vectordata.skynet.data.model.DirectChannelCustomization;
 import de.vectordata.skynet.data.model.GroupChannelKeyNotify;
 import de.vectordata.skynet.data.model.LoopbackKeyNotify;
 import de.vectordata.skynet.data.model.MailAddress;
+import de.vectordata.skynet.data.model.MessageDraft;
 import de.vectordata.skynet.data.model.Nickname;
 import de.vectordata.skynet.data.model.OnlineStateDb;
 import de.vectordata.skynet.data.model.PasswordUpdate;
@@ -31,6 +32,7 @@ import de.vectordata.skynet.data.sql.dao.DirectChannelCustomizationDao;
 import de.vectordata.skynet.data.sql.dao.GroupChannelKeyNotifyDao;
 import de.vectordata.skynet.data.sql.dao.LoopbackKeyNotifyDao;
 import de.vectordata.skynet.data.sql.dao.MailAddressDao;
+import de.vectordata.skynet.data.sql.dao.MessageDraftDao;
 import de.vectordata.skynet.data.sql.dao.NicknameDao;
 import de.vectordata.skynet.data.sql.dao.OnlineStateDao;
 import de.vectordata.skynet.data.sql.dao.PasswordUpdateDao;
@@ -38,7 +40,7 @@ import de.vectordata.skynet.data.sql.dao.ProfileImageDao;
 
 @Database(entities = {Channel.class, ChannelMessage.class, Dependency.class, ChatMessage.class, DaystreamMessage.class,
         ChannelKey.class, MailAddress.class, PasswordUpdate.class, LoopbackKeyNotify.class, DirectChannelCustomization.class,
-        GroupChannelKeyNotify.class, Nickname.class, Bio.class, ProfileImage.class, Device.class, OnlineStateDb.class
+        GroupChannelKeyNotify.class, Nickname.class, Bio.class, ProfileImage.class, Device.class, OnlineStateDb.class, MessageDraft.class
 }, version = 1)
 public abstract class SkynetDatabase extends RoomDatabase {
 
@@ -73,5 +75,7 @@ public abstract class SkynetDatabase extends RoomDatabase {
     public abstract DeviceListDao deviceListDao();
 
     public abstract OnlineStateDao onlineStateDao();
+
+    public abstract MessageDraftDao messageDraftDao();
 
 }

@@ -31,6 +31,8 @@ public class ChatsItem {
 
     private boolean highlighted;
 
+    private boolean draft;
+
     public ChatsItem(String header, DateTime lastActiveDate, long counterpartId, long channelId) {
         this.header = header;
         this.lastActiveDate = lastActiveDate;
@@ -106,8 +108,17 @@ public class ChatsItem {
         return highlighted;
     }
 
+    boolean isDraft() {
+        return draft;
+    }
+
     public ChatsItem setHighlighted() {
         this.highlighted = true;
+        return this;
+    }
+
+    public ChatsItem setDraft(boolean draft) {
+        this.draft = draft;
         return this;
     }
 
