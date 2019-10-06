@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -81,12 +82,9 @@ public class ForwardActivity extends ThemedActivity {
 
             List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             for (Channel channel : channels) {
-                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
-                String friendlyName = NameUtil.getFriendlyName(channel.getCounterpartId(), accountDataChannel);
-
+                String friendlyName = NameUtil.getFriendlyName(channel.getChannelId());
                 ChannelMessage latestMessage = Storage.getDatabase().channelMessageDao().queryLast(channel.getChannelId());
-
-                ChatsItem item = new ChatsItem(friendlyName, latestMessage.getDispatchTime(), channel.getCounterpartId(), channel.getChannelId());
+                ChatsItem item = new ChatsItem(friendlyName, latestMessage != null ? latestMessage.getDispatchTime() : DateTime.now(), channel);
                 dataset.add(item);
             }
             Collections.sort(dataset, (a, b) -> -Long.compare(a.getLastActiveDate().toBinary(), b.getLastActiveDate().toBinary()));

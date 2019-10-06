@@ -29,6 +29,8 @@ import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.MessageDraft;
 import de.vectordata.skynet.data.model.enums.ChannelType;
+import de.vectordata.skynet.data.model.enums.MessageState;
+import de.vectordata.skynet.data.sql.db.SkynetDatabase;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
 import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.SkynetContext;
@@ -88,12 +90,6 @@ public class ChatsFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        reload();
-    }
-
     @Subscribe
     public void onPacket(PacketEvent event) {
         Packet packet = event.getPacket();
@@ -111,36 +107,14 @@ public class ChatsFragment extends Fragment {
     private void reload() {
         if (handler == null) return;
         handler.post(() -> {
-            List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatsItem> items = new ArrayList<>();
+            List<Channel> channels = Storage.getDatabase().channelDao().getAllOfType(ChannelType.DIRECT);
             List<ChatMessage> unreadMessages = Storage.getDatabase().chatMessageDao().queryUnread();
+
             for (Channel channel : channels) {
-                ChannelAction action = SkynetContext.getCurrent().getAppState().getChannelAction(channel.getChannelId());
-                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA);
-                MessageDraft draft = Storage.getDatabase().messageDraftDao().query(channel.getChannelId());
-                boolean isDraft = draft != null && !draft.getText().isEmpty();
-                String friendlyName = NameUtil.getFriendlyName(channel.getCounterpartId(), accountDataChannel);
-
-                if (action == ChannelAction.NONE) {
-                    ChatMessage latestMessage = Storage.getDatabase().chatMessageDao().queryLast(channel.getChannelId());
-                    ChatsItem item;
-                    if (latestMessage != null) {
-                        int unread = 0;
-                        for (ChatMessage message : unreadMessages)
-                            if (message.getChannelId() == channel.getChannelId())
-                                unread++;
-
-                        ChannelMessage channelMessage = Storage.getDatabase().channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
-                        MessageSide side = channelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
-                        item = new ChatsItem(friendlyName, latestMessage.getText(), channelMessage.getDispatchTime(), 0, side, latestMessage.getMessageState(), unread, channel.getChannelId(), channel.getCounterpartId()).setDraft(isDraft);
-                    } else
-                        item = new ChatsItem(friendlyName, context.getString(R.string.tip_start_chatting), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setDraft(isDraft);
-                    items.add(item);
-                } else if (action == ChannelAction.TYPING)
-                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_typing), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted().setDraft(isDraft));
-                else
-                    items.add(new ChatsItem(friendlyName, context.getString(R.string.state_recording), DateTime.now(), 0, 0, channel.getChannelId(), channel.getCounterpartId()).setHighlighted().setDraft(isDraft));
+                items.add(createItem(channel, unreadMessages));
             }
+
             Collections.sort(items, (a, b) -> -Long.compare(a.getLastActiveDate().toBinary(), b.getLastActiveDate().toBinary()));
             context.runOnUiThread(() -> {
                 dataset.clear();
@@ -150,6 +124,56 @@ public class ChatsFragment extends Fragment {
         });
     }
 
+    private ChatsItem createItem(Channel channel, List<ChatMessage> unreadMessages) {
+        SkynetDatabase db = Storage.getDatabase();
+
+        ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(channel.getChannelId());
+        ChatMessage latestMessage = db.chatMessageDao().queryLast(channel.getChannelId());
+        MessageDraft messageDraft = db.messageDraftDao().query(channel.getChannelId());
+        boolean hasContent = latestMessage != null;
+
+        String header = NameUtil.getFriendlyName(channel.getChannelId());
+        DateTime lastActive = DateTime.now();
+        String content = context.getString(R.string.tip_start_chatting);
+        MessageSide side = MessageSide.CENTER;
+        MessageState state = MessageState.NONE;
+
+        if (hasContent) {
+            ChannelMessage latestChannelMessage = db.channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
+            lastActive = latestChannelMessage.getDispatchTime();
+            content = latestMessage.getText();
+            side = latestChannelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
+            state = latestMessage.getMessageState();
+        }
+
+        ChatsItem item = new ChatsItem(header, lastActive, channel);
+        if (channelAction == ChannelAction.NONE) {
+            item.setContent(content);
+            item.setUnreadMessages(countUnreadMessages(channel, unreadMessages));
+            item.setMessageSide(side);
+            item.setMessageState(state);
+        } else if (channelAction == ChannelAction.TYPING) {
+            item.setType(ChatsItem.Type.HIGHLIGHTED);
+            item.setContent(context.getString(R.string.state_typing));
+        } else {
+            item.setType(ChatsItem.Type.HIGHLIGHTED);
+            item.setContent(context.getString(R.string.state_recording));
+        }
+
+        if (messageDraft != null && !messageDraft.getText().isEmpty())
+            item.setType(ChatsItem.Type.DRAFT);
+
+        return item;
+    }
+
+    private int countUnreadMessages(Channel channel, List<ChatMessage> unreadMessages) {
+        int unread = 0;
+        for (ChatMessage message : unreadMessages)
+            if (message.getChannelId() == channel.getChannelId())
+                unread++;
+        return unread;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -157,8 +181,16 @@ public class ChatsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        reload();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
+
+
 }

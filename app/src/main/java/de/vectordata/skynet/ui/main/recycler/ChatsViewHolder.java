@@ -66,29 +66,32 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
             bubble.setVisibility(View.VISIBLE);
         bubble.setText(String.valueOf(item.getUnreadMessages()));
 
-        if (item.isDraft()) {
-            date.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-            date.setText(R.string.draft);
-        } else ThemeUtil.resetTextViewColor(date);
-
-        if (item.isDeleted()) {
-            ThemeUtil.resetTextViewColor(message);
-            message.setTypeface(null, Typeface.ITALIC);
-            message.setAlpha(0.75f);
-            message.setText(R.string.message_deleted);
-            messageState.setVisibility(View.GONE);
-        } else if (item.isHighlighted()) {
-            message.setTypeface(null, Typeface.NORMAL);
-            message.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-            message.setText(item.getContent());
-            messageState.setVisibility(View.GONE);
-        } else {
-            ThemeUtil.resetTextViewColor(message);
-            message.setTypeface(null, Typeface.NORMAL);
-            message.setAlpha(1.0f);
-            message.setText(item.getContent());
-            item.getMessageState().apply(messageState);
-            item.getMessageSide().apply(messageState);
+        ThemeUtil.resetTextViewColor(message);
+        ThemeUtil.resetTextViewColor(date);
+        switch (item.getType()) {
+            case NORMAL:
+                message.setTypeface(null, Typeface.NORMAL);
+                message.setAlpha(1.0f);
+                message.setText(item.getContent());
+                item.getMessageState().apply(messageState);
+                item.getMessageSide().apply(messageState);
+                break;
+            case DRAFT:
+                date.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                date.setText(R.string.draft);
+                break;
+            case DELETED:
+                message.setTypeface(null, Typeface.ITALIC);
+                message.setAlpha(0.75f);
+                message.setText(R.string.message_deleted);
+                messageState.setVisibility(View.GONE);
+                break;
+            case HIGHLIGHTED:
+                message.setTypeface(null, Typeface.NORMAL);
+                message.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                message.setText(item.getContent());
+                messageState.setVisibility(View.GONE);
+                break;
         }
     }
 

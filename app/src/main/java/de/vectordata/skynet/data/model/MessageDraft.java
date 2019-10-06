@@ -24,9 +24,6 @@ public class MessageDraft {
         this.text = text;
     }
 
-    public MessageDraft() {
-    }
-
     public long getChannelId() {
         return channelId;
     }

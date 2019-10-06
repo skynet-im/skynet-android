@@ -26,7 +26,6 @@ public class ConnectionListener extends BroadcastReceiver {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
             networkCallback = new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
@@ -34,7 +33,6 @@ public class ConnectionListener extends BroadcastReceiver {
                 }
             };
             manager.registerNetworkCallback(new NetworkRequest.Builder().build(), networkCallback);
-
         } else {
             IntentFilter filter = new IntentFilter();
             filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);

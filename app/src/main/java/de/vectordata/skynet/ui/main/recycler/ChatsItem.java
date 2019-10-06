@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.main.recycler;
 
 import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.ui.util.MessageSide;
@@ -29,15 +30,14 @@ public class ChatsItem {
 
     private long counterpartId;
 
-    private boolean highlighted;
+    private Type type;
 
-    private boolean draft;
-
-    public ChatsItem(String header, DateTime lastActiveDate, long counterpartId, long channelId) {
+    public ChatsItem(String header, DateTime lastActiveDate, Channel channel) {
         this.header = header;
         this.lastActiveDate = lastActiveDate;
-        this.counterpartId = counterpartId;
-        this.channelId = channelId;
+        this.channelId = channel.getChannelId();
+        this.counterpartId = channel.getCounterpartId();
+        this.type = Type.NORMAL;
     }
 
     public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, int unreadMessages, long channelId, long counterpartId) {
@@ -50,18 +50,7 @@ public class ChatsItem {
         this.messageSide = MessageSide.LEFT;
         this.channelId = channelId;
         this.counterpartId = counterpartId;
-    }
-
-    public ChatsItem(String header, String content, DateTime lastActiveDate, long profileImageId, MessageSide messageSide, MessageState messageState, int unreadMessages, long channelId, long counterpartId) {
-        this.header = header;
-        this.content = content;
-        this.lastActiveDate = lastActiveDate;
-        this.profileImageId = profileImageId;
-        this.unreadMessages = unreadMessages;
-        this.messageState = messageState;
-        this.messageSide = messageSide;
-        this.channelId = channelId;
-        this.counterpartId = counterpartId;
+        this.type = Type.NORMAL;
     }
 
     String getHeader() {
@@ -70,6 +59,22 @@ public class ChatsItem {
 
     String getContent() {
         return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setUnreadMessages(int unreadMessages) {
+        this.unreadMessages = unreadMessages;
+    }
+
+    public void setMessageState(MessageState messageState) {
+        this.messageState = messageState;
+    }
+
+    public void setMessageSide(MessageSide messageSide) {
+        this.messageSide = messageSide;
     }
 
     public DateTime getLastActiveDate() {
@@ -100,26 +105,21 @@ public class ChatsItem {
         return counterpartId;
     }
 
-    boolean isDeleted() {
-        return content.equals(ChatMessage.DELETED);
+    public Type getType() {
+        if (content.equals(ChatMessage.DELETED))
+            return Type.DELETED;
+        else return type;
     }
 
-    boolean isHighlighted() {
-        return highlighted;
+    public void setType(Type type) {
+        this.type = type;
     }
 
-    boolean isDraft() {
-        return draft;
-    }
-
-    public ChatsItem setHighlighted() {
-        this.highlighted = true;
-        return this;
-    }
-
-    public ChatsItem setDraft(boolean draft) {
-        this.draft = draft;
-        return this;
+    public enum Type {
+        NORMAL,
+        DELETED,
+        HIGHLIGHTED,
+        DRAFT
     }
 
 }
