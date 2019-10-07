@@ -46,6 +46,45 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
         registerListener();
     }
 
+    @Override
+    public void setAdapter(@Nullable Adapter adapter) {
+        super.setAdapter(adapter);
+        if (adapter != null)
+            adapter.registerAdapterDataObserver(new AdapterDataObserver() {
+                @Override
+                public void onChanged() {
+                    super.onChanged();
+                }
+
+                @Override
+                public void onItemRangeChanged(int positionStart, int itemCount) {
+                    super.onItemRangeChanged(positionStart, itemCount);
+                }
+
+                @Override
+                public void onItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload) {
+                    super.onItemRangeChanged(positionStart, itemCount, payload);
+                }
+
+                @Override
+                public void onItemRangeInserted(int positionStart, int itemCount) {
+                    super.onItemRangeInserted(positionStart, itemCount);
+                    shiftChecked(itemCount);
+                }
+
+                @Override
+                public void onItemRangeRemoved(int positionStart, int itemCount) {
+                    super.onItemRangeRemoved(positionStart, itemCount);
+                    shiftChecked(-itemCount);
+                }
+
+                @Override
+                public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+                    super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+                }
+            });
+    }
+
     public void setBehavior(CheckableBehavior behavior) {
         this.behavior = behavior;
     }
@@ -83,6 +122,12 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
             if (child != null)
                 child.setActivated(activated);
         }
+    }
+
+    private void shiftChecked(int num) {
+        Set<Integer> newChecked = new HashSet<>(checkedItems.size());
+        for (int i : checkedItems) newChecked.add(i + num);
+        this.checkedItems = newChecked;
     }
 
     public void toggleItem(int position) {
@@ -139,13 +184,17 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
         int currentVisiblePosition = getFirstVisiblePosition();
 
         if (lastVisiblePosition != currentVisiblePosition)
-            for (int i = 0; i < getChildCount(); i++) {
-                View child = getChildAt(i);
-                int adapterIdx = getChildAdapterPosition(child);
-                child.setActivated(isItemChecked(adapterIdx));
-            }
+            refreshChecked();
 
         lastVisiblePosition = currentVisiblePosition;
+    }
+
+    private void refreshChecked() {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            int adapterIdx = getChildAdapterPosition(child);
+            child.setActivated(isItemChecked(adapterIdx));
+        }
     }
 
     public int getFirstVisiblePosition() {
