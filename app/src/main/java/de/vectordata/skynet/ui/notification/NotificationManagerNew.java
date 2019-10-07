@@ -170,7 +170,7 @@ public class NotificationManagerNew implements INotificationManager {
             extras.putLong(EXTRA_CHANNEL, channelId);
 
             Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.skynet_icon) // TODO Use different notification icon
+                    .setSmallIcon(R.drawable.notification_icon)
                     .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setStyle(style)
