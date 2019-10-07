@@ -73,7 +73,16 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
             }
             actionModeCallback.onItemCheckedStateChanged(actionMode, position, checked);
         }
-        getChildAt(position - getFirstVisiblePosition()).setActivated(checked);
+
+        setChildActivated(position, checked);
+    }
+
+    private void setChildActivated(int position, boolean activated) {
+        if (getLayoutManager() != null) {
+            View child = getLayoutManager().findViewByPosition(position);
+            if (child != null)
+                child.setActivated(activated);
+        }
     }
 
     public void toggleItem(int position) {
@@ -176,7 +185,6 @@ public class CheckableRecyclerView extends RecyclerView implements View.OnClickL
             }
         });
     }
-
 
 
 }

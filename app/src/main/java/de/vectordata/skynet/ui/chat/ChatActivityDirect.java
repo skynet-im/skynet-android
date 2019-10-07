@@ -386,6 +386,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     }
 
     private void loadMessages() {
+        isLoading = true;
         long myAccountId = Storage.getSession().getAccountId();
 
         List<ChatMessage> messages = Storage.getDatabase().chatMessageDao().queryLast(messageChannel.getChannelId(), 20);
@@ -412,6 +413,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         runOnUiThread(() -> {
             adapter.notifyDataSetChanged();
             scrollToBottom();
+            isLoading = false;
         });
     }
 
