@@ -4,6 +4,7 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;

@@ -3,6 +3,7 @@ package de.vectordata.skynet.data.sql.dao;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+
 import de.vectordata.skynet.data.model.Device;
 
 @Dao

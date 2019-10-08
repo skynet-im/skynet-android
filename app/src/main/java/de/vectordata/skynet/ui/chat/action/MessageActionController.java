@@ -53,10 +53,6 @@ public class MessageActionController {
         return currentAction;
     }
 
-    public boolean isOpen() {
-        return currentAction != MessageAction.NONE;
-    }
-
     private void setAction(MessageAction action) {
         this.currentAction = action;
 
@@ -71,6 +67,10 @@ public class MessageActionController {
                 imageView.setImageResource(R.drawable.ic_quote);
                 break;
         }
+    }
+
+    public boolean isOpen() {
+        return currentAction != MessageAction.NONE;
     }
 
 }

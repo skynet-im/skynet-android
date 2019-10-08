@@ -2,6 +2,7 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+
 import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 
 @Entity(tableName = "loopbackKeyNotifys", foreignKeys = @ForeignKey(

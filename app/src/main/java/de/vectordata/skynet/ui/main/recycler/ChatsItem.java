@@ -65,18 +65,6 @@ public class ChatsItem {
         this.content = content;
     }
 
-    public void setUnreadMessages(int unreadMessages) {
-        this.unreadMessages = unreadMessages;
-    }
-
-    public void setMessageState(MessageState messageState) {
-        this.messageState = messageState;
-    }
-
-    public void setMessageSide(MessageSide messageSide) {
-        this.messageSide = messageSide;
-    }
-
     public DateTime getLastActiveDate() {
         return lastActiveDate;
     }
@@ -89,12 +77,24 @@ public class ChatsItem {
         return unreadMessages;
     }
 
+    public void setUnreadMessages(int unreadMessages) {
+        this.unreadMessages = unreadMessages;
+    }
+
     MessageState getMessageState() {
         return messageState;
     }
 
+    public void setMessageState(MessageState messageState) {
+        this.messageState = messageState;
+    }
+
     MessageSide getMessageSide() {
         return messageSide;
+    }
+
+    public void setMessageSide(MessageSide messageSide) {
+        this.messageSide = messageSide;
     }
 
     public long getChannelId() {

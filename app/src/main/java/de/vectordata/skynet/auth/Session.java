@@ -20,20 +20,20 @@ public class Session implements Serializable {
         return accountId;
     }
 
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    public KeyCollection getSessionKeys() {
-        return sessionKeys;
-    }
-
     public void setAccountId(long accountId) {
         this.accountId = accountId;
     }
 
+    public long getSessionId() {
+        return sessionId;
+    }
+
     public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public KeyCollection getSessionKeys() {
+        return sessionKeys;
     }
 
     public boolean isAuthenticated() {

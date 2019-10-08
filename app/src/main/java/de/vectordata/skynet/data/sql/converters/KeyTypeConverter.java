@@ -1,6 +1,7 @@
 package de.vectordata.skynet.data.sql.converters;
 
 import androidx.room.TypeConverter;
+
 import de.vectordata.skynet.data.model.enums.KeyType;
 
 public class KeyTypeConverter {

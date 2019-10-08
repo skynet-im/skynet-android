@@ -3,6 +3,7 @@ package de.vectordata.skynet.data.model;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.TypeConverters;
+
 import de.vectordata.skynet.data.sql.converters.MessageTypeConverter;
 import de.vectordata.skynet.net.packet.P24DaystreamMessage;
 import de.vectordata.skynet.net.packet.model.MessageType;

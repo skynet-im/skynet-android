@@ -4,11 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.MenuItem;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import androidx.appcompat.app.AppCompatActivity;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.event.AuthenticationFailedEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
@@ -32,7 +33,7 @@ public abstract class SkynetActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHandshakeFailed(HandshakeFailedEvent event){
+    public void onHandshakeFailed(HandshakeFailedEvent event) {
         if (event.getState() == HandshakeState.CAN_UPGRADE)
             Dialogs.showMessageBox(this, R.string.error_header_connect, String.format(getString(R.string.warn_can_upgrade), event.getNewVersion()));
         else if (event.getState() == HandshakeState.MUST_UPGRADE)
@@ -40,7 +41,7 @@ public abstract class SkynetActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAuthenticationFailed(AuthenticationFailedEvent event){
+    public void onAuthenticationFailed(AuthenticationFailedEvent event) {
         if (event.getError() == RestoreSessionError.INVALID_CREDENTIALS)
             Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
         else if (event.getError() == RestoreSessionError.INVALID_SESSION)

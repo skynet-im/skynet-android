@@ -31,6 +31,10 @@ public class DefaultProfileImage {
 
     private Bitmap bitmap;
 
+    private DefaultProfileImage(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
     public static DefaultProfileImage create(String initials, long accountId, int width, int height) {
         int color = COLORS[(int) Math.abs(accountId % COLORS.length)];
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -49,10 +53,6 @@ public class DefaultProfileImage {
 
         canvas.drawText(initials, bitmap.getWidth() / 2f, bitmap.getHeight() / 2f + textHeight / 2f, paint);
         return new DefaultProfileImage(bitmap);
-    }
-
-    private DefaultProfileImage(Bitmap bitmap) {
-        this.bitmap = bitmap;
     }
 
     public void loadInto(ImageView view) {

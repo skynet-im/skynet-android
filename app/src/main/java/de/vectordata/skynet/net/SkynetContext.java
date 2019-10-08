@@ -35,6 +35,12 @@ public class SkynetContext implements KeyProvider {
         networkManager.connect();
     }
 
+    public static SkynetContext getCurrent() {
+        if (currentContext == null)
+            currentContext = new SkynetContext();
+        return currentContext;
+    }
+
     public void recreateNetworkManager() {
         this.networkManager = new NetworkManager(this);
         this.networkManager.connect();
@@ -82,12 +88,6 @@ public class SkynetContext implements KeyProvider {
 
     public boolean isInSync() {
         return getNetworkManager().isInSync();
-    }
-
-    public static SkynetContext getCurrent() {
-        if (currentContext == null)
-            currentContext = new SkynetContext();
-        return currentContext;
     }
 
 }

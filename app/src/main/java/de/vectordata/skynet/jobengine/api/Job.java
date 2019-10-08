@@ -32,9 +32,9 @@ public abstract class Job<R> {
 
     private JobAwaiter<Job<R>> awaiter;
 
-    private boolean hasEvents = false;
+    private boolean hasEvents;
 
-    public Job() {
+    protected Job() {
         id = idRandom.nextLong();
         Retry annotation = getClass().getAnnotation(Retry.class);
         if (annotation != null)
@@ -51,10 +51,6 @@ public abstract class Job<R> {
     public abstract void onExecute();
 
     public abstract void onCancel();
-
-    protected final void setResult(R result) {
-        this.result = result;
-    }
 
     public final void cancel() {
         onCancel();
@@ -95,6 +91,10 @@ public abstract class Job<R> {
 
     public R getResult() {
         return result;
+    }
+
+    protected final void setResult(R result) {
+        this.result = result;
     }
 
     public Retry.Mode getRetryMode() {

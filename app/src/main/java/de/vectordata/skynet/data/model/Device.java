@@ -3,6 +3,7 @@ package de.vectordata.skynet.data.model;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
 import de.vectordata.skynet.net.packet.P29DeviceList;

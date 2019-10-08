@@ -34,7 +34,7 @@ public class P1CDirectChannelCustomization extends ChannelMessagePacket {
 
     @Override
     public void handlePacket(PacketHandler handler) {
-    handler.handlePacket(this);
+        handler.handlePacket(this);
     }
 
     @Override

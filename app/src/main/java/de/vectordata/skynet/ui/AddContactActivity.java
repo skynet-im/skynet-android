@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.EditText;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;

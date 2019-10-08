@@ -9,7 +9,7 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 @Flags(MessageFlags.UNENCRYPTED)
-public class P22MessageReceived  extends ChannelMessagePacket {
+public class P22MessageReceived extends ChannelMessagePacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {

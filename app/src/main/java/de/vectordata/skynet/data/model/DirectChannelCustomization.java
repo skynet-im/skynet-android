@@ -3,6 +3,7 @@ package de.vectordata.skynet.data.model;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.TypeConverters;
+
 import de.vectordata.skynet.data.sql.converters.ImageShapeConverter;
 import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
 import de.vectordata.skynet.net.packet.model.ImageShape;

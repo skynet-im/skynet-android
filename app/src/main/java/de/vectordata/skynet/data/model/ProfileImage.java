@@ -2,6 +2,7 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+
 import de.vectordata.skynet.net.packet.P27ProfileImage;
 
 @Entity(tableName = "profileImages", foreignKeys = @ForeignKey(

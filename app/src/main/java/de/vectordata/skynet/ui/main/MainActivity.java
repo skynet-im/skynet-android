@@ -39,11 +39,9 @@ import de.vectordata.skynet.ui.main.fab.FabState;
 
 public class MainActivity extends ThemedActivity {
 
-    private static final String TAG = "MainActivity";
-
     public static final String ACTION_OPEN_CHAT = "skynet.open_chat";
     public static final String EXTRA_CHANNEL_ID = "skynet.open_chat.channel";
-
+    private static final String TAG = "MainActivity";
     private boolean leftForLogin;
 
     @Override

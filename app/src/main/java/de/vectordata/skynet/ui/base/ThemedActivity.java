@@ -2,9 +2,10 @@ package de.vectordata.skynet.ui.base;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
+
 import java.util.Objects;
 
-import androidx.annotation.Nullable;
 import de.vectordata.skynet.ui.themes.Theme;
 import de.vectordata.skynet.ui.themes.ThemeManager;
 

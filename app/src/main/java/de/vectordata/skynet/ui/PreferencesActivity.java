@@ -5,14 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.annotation.Nullable;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
 import java.util.Locale;
 import java.util.Objects;
 
-import androidx.annotation.Nullable;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
 import de.psdev.licensesdialog.LicensesDialog;
 import de.vectordata.skynet.BuildConfig;
 import de.vectordata.skynet.R;

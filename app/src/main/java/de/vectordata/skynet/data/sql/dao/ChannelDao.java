@@ -1,13 +1,14 @@
 package de.vectordata.skynet.data.sql.dao;
 
-import java.util.List;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.TypeConverters;
 import androidx.room.Update;
+
+import java.util.List;
+
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.sql.converters.ChannelTypeConverter;
