@@ -69,16 +69,15 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
         ThemeUtil.resetTextViewColor(message);
         ThemeUtil.resetTextViewColor(date);
         switch (item.getType()) {
+            case DRAFT:
+                date.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                date.setText(R.string.draft);
             case NORMAL:
                 message.setTypeface(null, Typeface.NORMAL);
                 message.setAlpha(1.0f);
                 message.setText(item.getContent());
                 item.getMessageState().apply(messageState);
                 item.getMessageSide().apply(messageState);
-                break;
-            case DRAFT:
-                date.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-                date.setText(R.string.draft);
                 break;
             case DELETED:
                 message.setTypeface(null, Typeface.ITALIC);

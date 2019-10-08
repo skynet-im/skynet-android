@@ -160,7 +160,7 @@ public class ChatsFragment extends Fragment {
         String header = NameUtil.getFriendlyName(channel.getChannelId());
         DateTime lastActive = DateTime.now();
         String content = context.getString(R.string.tip_start_chatting);
-        MessageSide side = MessageSide.CENTER;
+        MessageSide side = MessageSide.LEFT;
         MessageState state = MessageState.NONE;
 
         if (hasContent) {
