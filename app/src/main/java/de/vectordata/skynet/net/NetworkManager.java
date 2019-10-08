@@ -74,6 +74,9 @@ public class NetworkManager implements VSLClientListener {
     }
 
     public ResponseAwaiter sendPacket(Packet packet) {
+        if (connectionState != ConnectionState.AUTHENTICATED && packet instanceof P0BChannelMessage)
+            return responseAwaiter;
+
         if (shouldCache(packet)) packetCache.add(packet);
         else {
             PacketBuffer buffer = new PacketBuffer();

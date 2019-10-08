@@ -40,8 +40,8 @@ public interface ChatMessageDao {
     @Query("SELECT * FROM chatMessages WHERE messageState=0")
     List<ChatMessage> queryPending();
 
-    @Query("SELECT * FROM chatMessages WHERE messageState=1")
-    List<ChatMessage> queryUnconfirmed();
+    @Query("SELECT chatMessages.* FROM chatMessages,channelMessages WHERE channelMessages.channelId=chatMessages.channelId AND channelMessages.messageId=chatMessages.messageId AND messageState=1 AND channelMessages.senderId!=:accountId")
+    List<ChatMessage> queryUnconfirmed(long accountId);
 
     @Query("SELECT * FROM chatMessages WHERE isUnread=1")
     List<ChatMessage> queryUnread();
