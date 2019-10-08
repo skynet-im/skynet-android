@@ -164,7 +164,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
 
         if (onlineState == null)
-            subtitleView.setVisibility(View.GONE);
+            runOnUiThread(() -> subtitleView.setVisibility(View.GONE));
         else if (channelAction != ChannelAction.NONE)
             applyChannelAction(channelAction);
         else if (onlineState.getOnlineState() == OnlineState.ACTIVE)
@@ -173,7 +173,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             setSubtitle(DateUtil.toLastSeen(this, onlineState.getLastSeen()));
 
         if (SkynetContext.getCurrent().getNetworkManager().getConnectionState() != ConnectionState.AUTHENTICATED)
-            subtitleView.setVisibility(View.GONE);
+            runOnUiThread(() -> subtitleView.setVisibility(View.GONE));
     }
 
     @Subscribe
