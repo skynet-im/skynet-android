@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="?attr/invWhite"
     tools:context=".ui.chat.ChatActivityDirect">
 
     <ImageView
@@ -19,7 +20,7 @@
         android:id="@+id/quote_indicator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#ffF"
+        android:background="?attr/invWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recycler_view"
         app:layout_constraintVertical_bias="0.0"
@@ -78,6 +79,7 @@
         android:layout_marginBottom="4dp"
         android:background="?android:attr/selectableItemBackground"
         android:padding="8dp"
+        android:tint="?attr/invBlack"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_send" />
@@ -96,7 +98,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="?attr/colorPrimaryAlt"
         app:layout_constraintStart_toEndOf="@+id/image_message_action"
         app:layout_constraintTop_toTopOf="@+id/image_message_action"
         tools:text="Account Name" />
@@ -108,7 +110,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="16dp"
         android:padding="8dp"
-        android:tint="?attr/colorPrimary"
+        android:tint="?attr/colorPrimaryAlt"
         app:layout_constraintBottom_toTopOf="@+id/input_message"
         app:layout_constraintStart_toStartOf="@+id/quote_indicator"
         app:srcCompat="@drawable/ic_quote" />

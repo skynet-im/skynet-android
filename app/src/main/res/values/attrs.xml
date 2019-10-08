@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Attributes that are inverted when the dark theme is activated -->
+    <attr name="colorPrimaryAlt" format="reference" />
+    <attr name="invWhite" format="reference" />
+    <attr name="invBlack" format="reference" />
+</resources>
