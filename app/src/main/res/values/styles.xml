@@ -27,7 +27,6 @@
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorAccent">#FFA726</item>
         <item name="actionModeStyle">@style/AppTheme.ActionMode</item>
-        <!-- TODO Dark theme does not really work yet. -->
         <item name="android:windowBackground">@color/black</item>
         <item name="android:actionModeBackground">@color/black</item>
         <item name="android:popupMenuStyle">@style/DarkMenu</item>
