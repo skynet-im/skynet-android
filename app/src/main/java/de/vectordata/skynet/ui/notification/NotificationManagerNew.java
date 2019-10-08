@@ -193,7 +193,7 @@ public class NotificationManagerNew implements INotificationManager {
                 new NotificationCompat.Builder(context, CHANNEL_ID)
                         .setContentTitle("")
                         .setContentText("")
-                        .setSmallIcon(R.drawable.skynet_icon)
+                        .setSmallIcon(R.drawable.notification_icon)
                         .setStyle(new NotificationCompat.InboxStyle().setSummaryText(subtitle))
                         .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0))
                         .setColor(color)
