@@ -2,6 +2,7 @@ package de.vectordata.skynet.ui.chat.action;
 
 import android.app.Activity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ public class MessageActionController {
     private ImageView imageView;
     private TextView headerTextView;
     private TextView contentTextView;
+    private EditText input;
 
     private long affectedMessage;
 
@@ -25,6 +27,7 @@ public class MessageActionController {
         headerTextView = parent.findViewById(R.id.label_message_action_header);
         contentTextView = parent.findViewById(R.id.label_message_action_content);
         imageView = parent.findViewById(R.id.image_message_action);
+        input = parent.findViewById(R.id.input_message);
     }
 
     public void begin(MessageAction action, long affectedMessage) {
@@ -33,6 +36,8 @@ public class MessageActionController {
     }
 
     public void exit() {
+        if (getAction().isClearOnExit())
+            input.setText("");
         setAction(MessageAction.NONE);
         this.affectedMessage = 0;
     }
