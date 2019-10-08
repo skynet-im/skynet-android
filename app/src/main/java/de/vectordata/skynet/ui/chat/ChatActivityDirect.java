@@ -73,6 +73,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
     private boolean isLoading;
     private boolean isFullyLoaded;
+    private boolean hasKeys;
 
     @Override
     public void initialize() {
@@ -90,6 +91,11 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             String text;
             if (messageInput.getText() == null || (text = messageInput.getText().toString()).trim().isEmpty())
                 return;
+
+            if (!hasKeys) {
+                Dialogs.showMessageBox(this, R.string.error_header_send, R.string.error_missing_keys);
+                return;
+            }
 
             backgroundHandler.post(() -> {
                 if (!messageActionController.isOpen()) {
@@ -162,6 +168,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
         OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
         ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
+
+        this.hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(accountDataChannel.getChannelId()) != 0;
 
         if (onlineState == null)
             runOnUiThread(() -> subtitleView.setVisibility(View.GONE));

@@ -38,6 +38,7 @@
     <string name="error_header_login">Login error</string>
     <string name="error_header_create_acc">Registration error</string>
     <string name="error_header_connect">Connection error</string>
+    <string name="error_header_send">Sending error</string>
     <string name="error_no_connection">Could not reach the Skynet servers. Please check your internet connection and try again.</string>
     <string name="error_firebase">Could not initialize messaging system. Please make sure you have Google Play Services installed.</string>
     <string name="error_firebase_token">Invalid firebase token.</string>
@@ -49,6 +50,7 @@
     <string name="error_account_name_invalid">This email address is invalid. Please try a different one.</string>
     <string name="error_passwords_not_matching">The passwords you entered do not match.</string>
     <string name="error_must_upgrade">Your Skynet version is too old. Please update to v%s.</string>
+    <string name="error_missing_keys">Sorry, we can\'t send the message. Your chat partner has to log in to Skynet at least once before messages can be sent.</string>
 
     <string name="warn_header_eol">End of life warning</string>
     <string name="warn_can_upgrade">Your Skynet version is reaching its end of life. We recommend updating to v%s.</string>

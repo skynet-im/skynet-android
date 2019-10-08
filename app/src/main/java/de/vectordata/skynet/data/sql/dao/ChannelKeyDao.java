@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.TypeConverters;
 import androidx.room.Update;
+
 import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.KeyType;
@@ -30,6 +31,10 @@ public interface ChannelKeyDao {
     @TypeConverters(ChannelTypeConverter.class)
     @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelType=:type")
     int hasKeys(ChannelType type);
+
+    @TypeConverters(ChannelTypeConverter.class)
+    @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelId=:channelId")
+    int hasKeys(long channelId);
 
     @TypeConverters(KeyTypeConverter.class)
     @Query("SELECT * FROM channelKeys WHERE channelId=:channelId AND keyType=:keyType ORDER BY messageId DESC LIMIT 1")

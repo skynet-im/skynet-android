@@ -11,7 +11,7 @@ import de.vectordata.skynet.net.packet.model.OnlineState;
 
 public class AppState {
 
-    private OnlineState onlineState = OnlineState.ACTIVE;
+    private OnlineState onlineState = OnlineState.INACTIVE;
 
     private LongSparseArray<ChannelAction> channelActions = new LongSparseArray<>();
 
