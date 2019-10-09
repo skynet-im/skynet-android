@@ -3,5 +3,7 @@
     <!-- Attributes that are inverted when the dark theme is activated -->
     <attr name="colorPrimaryAlt" format="reference" />
     <attr name="invWhite" format="reference" />
+    <attr name="invWhite_dark" format="reference" />
     <attr name="invBlack" format="reference" />
+    <attr name="toolbarTheme" format="reference" />
 </resources>

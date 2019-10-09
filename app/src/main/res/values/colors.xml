@@ -11,6 +11,8 @@
     <color name="lightGray">#afafaf</color>
     <color name="gray">#808080</color>
 
+    <color name="lime">#00FF00</color>
+
     <color name="transparent">#00000000</color>
 </resources>
 

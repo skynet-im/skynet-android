@@ -9,14 +9,18 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionModeStyle">@style/AppTheme.ActionMode</item>
         <item name="invWhite">@color/white</item>
+        <item name="invWhite_dark">@color/white</item>
         <item name="invBlack">@color/black</item>
+        <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
-    <style name="AppTheme.Light">
-        <item name="colorPrimary">#DFDFDF</item>
-        <item name="colorPrimaryDark">#B4B4B4</item>
+    <style name="AppTheme.Light" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">#D1D1D3</item>
+        <item name="colorPrimaryDark">#B1B1B3</item>
         <item name="colorAccent">#009688</item>
         <item name="actionModeStyle">@style/AppTheme.ActionMode</item>
+        <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
+        <item name="invWhite_dark">@color/black</item>
     </style>
 
     <!-- Dark theme has to be a PITA as always -->
@@ -53,6 +57,16 @@
 
     <style name="DarkMenu" parent="@android:style/Widget.PopupMenu">
         <item name="android:popupBackground">@color/black</item>
+    </style>
+
+    <style name="AppTheme.Hacker" parent="AppTheme.Dark">
+        <item name="colorAccent">@color/lime</item>
+        <item name="android:textColor">@color/lime</item>
+        <item name="android:textColorPrimary">@color/lime</item>
+        <item name="android:textColorSecondary">@color/lime</item>
+        <item name="invBlack">@color/lime</item>
+        <item name="invWhite_dark">@color/lime</item>
+        <item name="colorPrimaryAlt">@color/lime</item>
     </style>
 
     <style name="AppTheme.Blue">
@@ -107,6 +121,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.Hacker.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+
     <style name="AppTheme.Blue.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -137,8 +157,6 @@
     <style name="AppTheme.BorderlessButton" parent="Widget.AppCompat.Button.Borderless.Colored" />
 
     <style name="AppTheme.ColoredButton" parent="Widget.AppCompat.Button.Colored" />
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 

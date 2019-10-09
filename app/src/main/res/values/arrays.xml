@@ -4,6 +4,7 @@
         <item>Default</item>
         <item>Light</item>
         <item>Dark</item>
+        <item>Hacker</item>
         <item>Blue</item>
         <item>Red</item>
         <item>Green</item>
@@ -15,6 +16,7 @@
         <item>default</item>
         <item>light</item>
         <item>dark</item>
+        <item>hacker</item>
         <item>blue</item>
         <item>red</item>
         <item>green</item>

@@ -16,6 +16,7 @@ public class ThemeManager {
         registerTheme("default", R.style.AppTheme, R.style.AppTheme_NoActionBar);
         registerTheme("light", R.style.AppTheme_Light, R.style.AppTheme_Light_NoActionBar);
         registerTheme("dark", R.style.AppTheme_Dark, R.style.AppTheme_Dark_NoActionBar);
+        registerTheme("hacker", R.style.AppTheme_Hacker, R.style.AppTheme_Hacker_NoActionBar);
         registerTheme("blue", R.style.AppTheme_Blue, R.style.AppTheme_Blue_NoActionBar);
         registerTheme("red", R.style.AppTheme_Red, R.style.AppTheme_Red_NoActionBar);
         registerTheme("green", R.style.AppTheme_Green, R.style.AppTheme_Green_NoActionBar);

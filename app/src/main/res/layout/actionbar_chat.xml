@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-            android:textColor="@color/white"
+            android:textColor="?attr/invWhite_dark"
             tools:text="Contact's nickname" />
 
         <TextView
@@ -64,7 +64,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:textAlignment="gravity"
-            android:textColor="@color/white"
+            android:textColor="?attr/invWhite_dark"
             android:textSize="12sp"
             tools:text="online" />
 
