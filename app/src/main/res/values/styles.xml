@@ -38,6 +38,8 @@
         <item name="android:alertDialogTheme">@style/DarkDialog</item>
         <item name="android:dialogTheme">@style/DarkDialog</item>
         <item name="android:itemBackground">#0E0E0E</item>
+        <item name="textColorAlertDialogListItem">@color/white</item>
+        <item name="alertDialogTheme">@style/DarkDialog</item>
         <item name="invWhite">@color/black</item>
         <item name="invBlack">@color/white</item>
         <item name="android:textColor">@color/white</item>
@@ -51,7 +53,9 @@
     </style>
 
     <style name="DarkDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
         <item name="android:background">#212121</item>
     </style>
 
