@@ -69,6 +69,8 @@ public class SkynetContext implements KeyProvider {
     @Override
     public KeyStore getMessageKeys(P0BChannelMessage message) {
         Channel channel = Storage.getDatabase().channelDao().getById(message.channelId);
+        if (channel == null)
+            throw new IllegalArgumentException("Cannot request keys for null channel");
         if (channel.getChannelType() == ChannelType.LOOPBACK)
             return Storage.getSession().getSessionKeys().getLoopbackChannelKeys();
         if (channel.getChannelType() != ChannelType.DIRECT)

@@ -65,12 +65,17 @@ public class NotificationManagerNew implements INotificationManager {
                 long channelId = activeNotification.getNotification().extras.getLong(EXTRA_CHANNEL, 0);
                 if (channelId != 0)
                     notificationIdMap.put(channelId, activeNotification.getId());
+                else notificationManager.cancel(activeNotification.getId());
             }
     }
 
     @Override
     public void onMessageReceived(long channelId, long messageId, String text) {
         if (channelId == foregroundChannelId) return;
+        for (MessageInfo msg : messages)
+            if (msg.getChannelId() == channelId && msg.getMessageId() == messageId)
+                return;
+
         messages.add(new MessageInfo(channelId, messageId, text));
         resendNotification();
     }
@@ -111,7 +116,8 @@ public class NotificationManagerNew implements INotificationManager {
         for (MessageInfo info : messages)
             if (info.getChannelId() == channelId)
                 toBeDeleted.add(info);
-        messages.removeAll(toBeDeleted);
+        if (toBeDeleted.size() > 0)
+            messages.removeAll(toBeDeleted);
         if (notificationIdMap.indexOfKey(channelId) >= 0) {
             notificationManager.cancel(notificationIdMap.get(channelId));
             notificationIdMap.remove(channelId);
