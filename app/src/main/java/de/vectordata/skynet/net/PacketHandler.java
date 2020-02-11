@@ -206,9 +206,8 @@ public class PacketHandler {
                         )
                 );
             });
-
-
         }
+
         inSync = true;
         EventBus.getDefault().post(new SyncFinishedEvent());
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed(Storage.getSession().getAccountId())) {

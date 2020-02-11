@@ -87,42 +87,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
 
-        findViewById(R.id.button_send).setOnClickListener(v -> {
-            String text;
-            if (messageInput.getText() == null || (text = messageInput.getText().toString()).trim().isEmpty())
-                return;
-
-            if (!hasKeys) {
-                Dialogs.showMessageBox(this, R.string.error_header_send, R.string.error_missing_keys);
-                return;
-            }
-
-            backgroundHandler.post(() -> {
-                if (!messageActionController.isOpen()) {
-                    P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
-                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.create(), packet);
-                    insertMessage(packet, MessageState.SENDING);
-                } else if (messageActionController.getAction() == MessageAction.QUOTE) {
-                    P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
-                    ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
-                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
-                    insertMessage(packet, MessageState.SENDING);
-                } else if (messageActionController.getAction() == MessageAction.EDIT) {
-                    P21MessageOverride packet = new P21MessageOverride(messageActionController.getAffectedMessage(), OverrideAction.EDIT, text);
-                    ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
-                    getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
-                    modifyMessageItem(messageActionController.getAffectedMessage(), data -> {
-                        data.setContent(text);
-                        data.setEdited(true);
-                    });
-                }
-                runOnUiThread(() -> messageActionController.exit());
-                clearDraft();
-            });
-
-            messageInput.setText("");
-            onStopTyping();
-        });
+        findViewById(R.id.button_send).setOnClickListener(this::onSendMessage);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -174,7 +139,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         if (onlineState == null)
             runOnUiThread(() -> subtitleView.setVisibility(View.GONE));
         else if (channelAction != ChannelAction.NONE)
-            applyChannelAction(channelAction);
+            displayChannelAction(channelAction);
         else if (onlineState.getOnlineState() == OnlineState.ACTIVE)
             setSubtitle(R.string.state_online);
         else if (onlineState.getOnlineState() == OnlineState.INACTIVE)
@@ -248,7 +213,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         } else if (packetIn instanceof P2CChannelAction) {
             P2CChannelAction packet = (P2CChannelAction) packetIn;
             if (packet.channelId == messageChannelId)
-                applyChannelAction(packet.channelAction);
+                displayChannelAction(packet.channelAction);
         }
     }
 
@@ -348,7 +313,44 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         else super.onBackPressed();
     }
 
-    private void applyChannelAction(ChannelAction channelAction) {
+    private void onSendMessage(View v) {
+        String text;
+        if (messageInput.getText() == null || (text = messageInput.getText().toString()).trim().isEmpty())
+            return;
+
+        if (!hasKeys) {
+            Dialogs.showMessageBox(this, R.string.error_header_send, R.string.error_missing_keys);
+            return;
+        }
+
+        backgroundHandler.post(() -> {
+            if (!messageActionController.isOpen()) {
+                P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, 0);
+                getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), ChannelMessageConfig.create(), packet);
+                insertMessage(packet, MessageState.SENDING);
+            } else if (messageActionController.getAction() == MessageAction.QUOTE) {
+                P20ChatMessage packet = new P20ChatMessage(MessageType.PLAINTEXT, text, messageActionController.getAffectedMessage());
+                ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
+                getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
+                insertMessage(packet, MessageState.SENDING);
+            } else if (messageActionController.getAction() == MessageAction.EDIT) {
+                P21MessageOverride packet = new P21MessageOverride(messageActionController.getAffectedMessage(), OverrideAction.EDIT, text);
+                ChannelMessageConfig config = createConfigWithDependencyTo(messageActionController.getAffectedMessage());
+                getSkynetContext().getMessageInterface().schedule(messageChannel.getChannelId(), config, packet);
+                modifyMessageItem(messageActionController.getAffectedMessage(), data -> {
+                    data.setContent(text);
+                    data.setEdited(true);
+                });
+            }
+            runOnUiThread(() -> messageActionController.exit());
+            clearDraft();
+        });
+
+        messageInput.setText("");
+        onStopTyping();
+    }
+
+    private void displayChannelAction(ChannelAction channelAction) {
         switch (channelAction) {
             case NONE:
                 setSubtitle(R.string.state_online);
@@ -365,11 +367,12 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private void insertMessage(P20ChatMessage msg, MessageState messageState) {
         MessageItem oldLatest = messageItems.size() > 0 ? messageItems.get(messageItems.size() - 1) : null;
 
-        long myAccountId = Storage.getSession().getAccountId();
-        MessageSide messageSide = msg.getParent().senderId == myAccountId ? MessageSide.RIGHT : MessageSide.LEFT;
+        MessageSide messageSide = MessageSide.fromAccountId(msg.getParent().senderId);
+
         QuotedMessage quotedMessage = null;
         if (msg.quotedMessage != 0)
             quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
+
         MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide, quotedMessage, false);
         runOnUiThread(() -> {
             if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {

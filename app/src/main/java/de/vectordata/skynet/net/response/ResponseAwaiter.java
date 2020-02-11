@@ -3,6 +3,7 @@ package de.vectordata.skynet.net.response;
 
 import android.os.Handler;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -12,6 +13,7 @@ import de.vectordata.skynet.net.packet.base.Packet;
  * Created by Twometer on 11.12.2018.
  * (c) 2018 Twometer
  */
+@SuppressWarnings("unchecked")
 public class ResponseAwaiter {
 
     private List<AwaiterItem> awaiterItems = new CopyOnWriteArrayList<>();
@@ -23,11 +25,14 @@ public class ResponseAwaiter {
     }
 
     public void onPacket(Packet packet) {
-        for (AwaiterItem item : awaiterItems) {
+        Iterator<AwaiterItem> iterator = awaiterItems.iterator();
+
+        while (iterator.hasNext()) {
+            AwaiterItem item = iterator.next();
+
             if (item.getPacketClass() == packet.getClass()) {
+                iterator.remove();
                 item.getHandler().handle(packet);
-                awaiterItems.remove(item);
-                break;
             }
         }
     }
@@ -36,9 +41,10 @@ public class ResponseAwaiter {
         waitForPacket(packetClass, handler, null);
     }
 
-    public <T extends Packet> void waitForPacket(Class<T> packetClass, ResponseHandler<T> handler, Runnable timeout) {
+    public <T extends Packet> void waitForPacket(Class<T> packetClass, ResponseHandler<T> handler, final Runnable timeout) {
         if (timeout != null)
             this.handler.postDelayed(timeout, 5000);
+
         awaiterItems.add(new AwaiterItem(packetClass, packet -> {
             if (timeout != null)
                 this.handler.removeCallbacks(timeout);
