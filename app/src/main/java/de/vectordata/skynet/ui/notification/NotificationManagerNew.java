@@ -18,9 +18,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.main.MainActivity;
@@ -137,8 +137,9 @@ public class NotificationManagerNew implements INotificationManager {
 
         int color = ContextCompat.getColor(context, R.color.colorPrimary);
 
-        Set<Long> channelSet = new HashSet<>();
+        SortedSet<Long> channelSet = new TreeSet<>();
         for (MessageInfo messageInfo : messages) channelSet.add(messageInfo.getChannelId());
+
 
         int messageCount = messages.size();
         int channelCount = channelSet.size();
