@@ -21,7 +21,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
-import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.android.Activities;
 
 /**
  * Created by Twometer on 21.01.2019.

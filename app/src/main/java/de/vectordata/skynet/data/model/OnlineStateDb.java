@@ -4,11 +4,11 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.TypeConverters;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
 import de.vectordata.skynet.data.sql.converters.OnlineStateConverter;
 import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.model.OnlineState;
+import de.vectordata.skynet.util.date.DateTime;
 
 @Entity(tableName = "onlineStates", foreignKeys = @ForeignKey(
         entity = ChannelMessage.class,

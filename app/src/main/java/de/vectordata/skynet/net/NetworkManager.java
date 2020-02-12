@@ -10,7 +10,6 @@ import java.util.List;
 
 import de.vectordata.libjvsl.VSLClient;
 import de.vectordata.libjvsl.VSLClientListener;
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.auth.Authenticator;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.Storage;
@@ -18,6 +17,7 @@ import de.vectordata.skynet.event.AuthenticationFailedEvent;
 import de.vectordata.skynet.event.AuthenticationSuccessfulEvent;
 import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -27,8 +27,6 @@ import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
-import de.vectordata.skynet.util.Constants;
-import de.vectordata.skynet.util.Version;
 
 public class NetworkManager implements VSLClientListener {
 

@@ -23,7 +23,7 @@ import de.vectordata.skynet.net.packet.model.CreateSessionError;
 import de.vectordata.skynet.ui.base.SkynetActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.dialogs.ProgressDialog;
-import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.android.Activities;
 
 public class LoginActivity extends SkynetActivity {
 

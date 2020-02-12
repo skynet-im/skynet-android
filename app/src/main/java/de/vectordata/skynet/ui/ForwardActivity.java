@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -26,8 +25,9 @@ import de.vectordata.skynet.ui.main.recycler.ChatsItem;
 import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.ui.view.CheckableBehavior;
 import de.vectordata.skynet.ui.view.CheckableRecyclerView;
-import de.vectordata.skynet.util.Activities;
-import de.vectordata.skynet.util.Handlers;
+import de.vectordata.skynet.util.android.Activities;
+import de.vectordata.skynet.util.android.Handlers;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class ForwardActivity extends ThemedActivity {
 

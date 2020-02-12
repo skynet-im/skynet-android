@@ -6,9 +6,9 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.util.date.DateTime;
 
 @Entity(tableName = "channelMessages", foreignKeys = @ForeignKey(
         entity = Channel.class,

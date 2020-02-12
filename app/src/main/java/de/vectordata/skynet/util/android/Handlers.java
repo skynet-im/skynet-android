@@ -1,4 +1,4 @@
-package de.vectordata.skynet.util;
+package de.vectordata.skynet.util.android;
 
 import android.os.Handler;
 import android.os.HandlerThread;

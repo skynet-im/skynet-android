@@ -2,14 +2,14 @@ package de.vectordata.skynet.net.messages;
 
 import java.util.Random;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageInterface {
 

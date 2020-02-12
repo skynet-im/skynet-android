@@ -1,7 +1,6 @@
 package de.vectordata.skynet.net.packet;
 
-import de.vectordata.libjvsl.crypt.AesStatic;
-import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
@@ -12,6 +11,7 @@ import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.OverrideAction;
@@ -46,13 +46,13 @@ public class P21MessageOverride extends ChannelMessagePacket {
         encrypted.writeByte((byte) action.ordinal());
         if (action == OverrideAction.EDIT)
             encrypted.writeString(newText);
-        AesStatic.encryptWithHmac(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
+        Aes.encryptWithHmac(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
         messageId = decrypted.readInt64();
         action = OverrideAction.values()[decrypted.readByte()];
         if (action == OverrideAction.EDIT)

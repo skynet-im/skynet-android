@@ -15,7 +15,7 @@ import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P25Nickname;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
-import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.android.Activities;
 
 public class WelcomeActivity extends AppCompatActivity {
 

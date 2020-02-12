@@ -1,13 +1,13 @@
 package de.vectordata.skynet.net.packet;
 
-import de.vectordata.libjvsl.crypt.AesStatic;
-import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageType;
@@ -34,13 +34,13 @@ public class P20ChatMessage extends ChannelMessagePacket {
         encrypted.writeByte((byte) messageType.ordinal());
         encrypted.writeString(text);
         encrypted.writeInt64(quotedMessage);
-        AesStatic.encryptWithHmac(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
+        Aes.encryptWithHmac(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
         messageType = MessageType.values()[decrypted.readByte()];
         text = decrypted.readString();
         quotedMessage = decrypted.readInt64();

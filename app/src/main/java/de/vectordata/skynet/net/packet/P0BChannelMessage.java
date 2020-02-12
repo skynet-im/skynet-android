@@ -5,19 +5,19 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.libjvsl.crypt.AesStatic;
-import de.vectordata.libjvsl.util.PacketBuffer;
-import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.Selector;
+import de.vectordata.skynet.util.date.DateTime;
 
 
 public class P0BChannelMessage extends AbstractPacket {
@@ -56,7 +56,7 @@ public class P0BChannelMessage extends AbstractPacket {
             KeyStore channelKeys = keyProvider.getMessageKeys(this);
             PacketBuffer encryptedBuffer = new PacketBuffer();
             writeContents(encryptedBuffer);
-            AesStatic.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            Aes.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
         }
 
         buffer.writeUInt16(dependencies.size());
@@ -83,7 +83,7 @@ public class P0BChannelMessage extends AbstractPacket {
 
         if (!hasFlag(MessageFlags.UNENCRYPTED)) {
             KeyStore channelKeys = keyProvider.getMessageKeys(this);
-            byte[] decryptedData = AesStatic.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            byte[] decryptedData = Aes.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
             readContents(new PacketBuffer(decryptedData));
         } else readContents(buffer);
 

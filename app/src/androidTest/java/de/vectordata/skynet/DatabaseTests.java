@@ -2,12 +2,12 @@ package de.vectordata.skynet;
 
 import android.content.Context;
 
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
@@ -16,6 +16,7 @@ import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.data.sql.db.SkynetDatabase;
 import de.vectordata.skynet.net.packet.model.MessageType;
+import de.vectordata.skynet.util.date.DateTime;
 
 @RunWith(AndroidJUnit4.class)
 public class DatabaseTests {

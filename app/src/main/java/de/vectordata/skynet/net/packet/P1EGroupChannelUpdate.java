@@ -3,12 +3,12 @@ package de.vectordata.skynet.net.packet;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.libjvsl.crypt.AesStatic;
-import de.vectordata.libjvsl.util.PacketBuffer;
+import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.annotation.Flags;
@@ -36,7 +36,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, true);
         encrypted.writeByteArray(historyKey, true);
-        AesStatic.encryptWithHmac(encrypted.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+        Aes.encryptWithHmac(encrypted.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
         KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(AesStatic.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
 
     }
 

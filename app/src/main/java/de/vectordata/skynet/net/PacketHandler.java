@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
@@ -16,6 +15,7 @@ import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
 import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.event.SyncFinishedEvent;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.model.PacketDirection;

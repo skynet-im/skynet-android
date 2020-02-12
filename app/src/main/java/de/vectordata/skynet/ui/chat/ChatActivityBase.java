@@ -30,7 +30,7 @@ import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.model.ChannelAction;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.view.CheckableRecyclerView;
-import de.vectordata.skynet.util.Handlers;
+import de.vectordata.skynet.util.android.Handlers;
 
 /**
  * Created by Twometer on 21.01.2019.

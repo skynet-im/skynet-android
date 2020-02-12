@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -54,12 +53,13 @@ import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
 import de.vectordata.skynet.ui.chat.recycler.QuotedMessage;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
-import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
 import de.vectordata.skynet.ui.util.MessageSide;
 import de.vectordata.skynet.ui.util.NameUtil;
 import de.vectordata.skynet.util.Callback;
+import de.vectordata.skynet.util.date.DateTime;
+import de.vectordata.skynet.util.date.DateUtil;
 
 public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceListener {
 

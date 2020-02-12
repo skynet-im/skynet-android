@@ -22,6 +22,13 @@ public class SkynetApplication extends Application implements DefaultLifecycleOb
 
     public static final String TAG = "SkynetApplication";
 
+    public static final String APPLICATION_IDENTIFIER = "android/de.vectordata.skynet";
+    public static final int VERSION_CODE = BuildConfig.VERSION_CODE;
+
+    public static final String SERVER_IP = "skynet.lerchen.net";
+    public static final int SERVER_PORT = 32761;
+    public static final int PROTOCOL_VERSION = 2;
+
     @Override
     public void onCreate() {
         super.onCreate();

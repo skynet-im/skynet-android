@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.base.ThemedActivity;
-import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.android.Activities;
 
 public class NewGroupActivity extends ThemedActivity {
 
