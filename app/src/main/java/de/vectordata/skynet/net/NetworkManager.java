@@ -8,8 +8,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.libjvsl.VSLClient;
-import de.vectordata.libjvsl.VSLClientListener;
+import de.vectordata.skynet.SkynetApplication;
 import de.vectordata.skynet.auth.Authenticator;
 import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.data.Storage;
@@ -18,6 +17,8 @@ import de.vectordata.skynet.event.AuthenticationSuccessfulEvent;
 import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.client.PacketBuffer;
+import de.vectordata.skynet.net.client.SslClient;
+import de.vectordata.skynet.net.client.SslClientListener;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
@@ -28,13 +29,13 @@ import de.vectordata.skynet.net.packet.model.HandshakeState;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
-public class NetworkManager implements VSLClientListener {
+public class NetworkManager implements SslClientListener {
 
     private static final String TAG = "NetworkManager";
 
     private SkynetContext skynetContext;
 
-    private VSLClient vslClient;
+    private SslClient sslClient;
     private PacketHandler packetHandler;
     private ResponseAwaiter responseAwaiter = new ResponseAwaiter();
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
@@ -58,17 +59,13 @@ public class NetworkManager implements VSLClientListener {
 
         responseAwaiter.initialize();
         packetHandler = new PacketHandler(skynetContext, this, responseAwaiter);
-        new Thread(() -> {
-            vslClient = new VSLClient(Constants.PRODUCT_LATEST, Constants.PRODUCT_OLDEST);
-            vslClient.setListener(this);
-            boolean successfullyConnected = vslClient.connect(Constants.SERVER_IP, Constants.SERVER_PORT, Constants.SERVER_KEY);
-            if (!successfullyConnected)
-                onConnectionFailed();
-        }).start();
+
+        sslClient = new SslClient(/* TODO Certificate stream */);
+        sslClient.connect(SkynetApplication.SERVER_IP, SkynetApplication.SERVER_PORT);
     }
 
     public void disconnect() {
-        vslClient.disconnect();
+        sslClient.disconnect();
     }
 
     public ResponseAwaiter sendPacket(Packet packet) {
@@ -80,7 +77,7 @@ public class NetworkManager implements VSLClientListener {
             PacketBuffer buffer = new PacketBuffer();
             packet.writePacket(buffer, skynetContext);
             Log.d(TAG, "Sending packet 0x" + Integer.toHexString(packet.getId()));
-            vslClient.sendPacket(packet.getId(), buffer.toArray());
+            sslClient.sendPacket(packet.getId(), buffer.toArray());
         }
         return responseAwaiter;
     }
@@ -103,10 +100,10 @@ public class NetworkManager implements VSLClientListener {
     }
 
     @Override
-    public void onConnectionEstablished() {
+    public void onConnectionOpened() {
         connectionState = ConnectionState.HANDSHAKING;
         Log.v(TAG, "Sending handshake...");
-        sendPacket(new P00ConnectionHandshake(Version.PROTOCOL_VERSION, Version.APPLICATION_IDENTIFIER, Version.VERSION_CODE))
+        sendPacket(new P00ConnectionHandshake(SkynetApplication.PROTOCOL_VERSION, SkynetApplication.APPLICATION_IDENTIFIER, SkynetApplication.VERSION_CODE))
                 .waitForPacket(P01ConnectionResponse.class, p -> {
                     if (p.handshakeState == HandshakeState.MUST_UPGRADE) {
                         Log.e(TAG, "Server rejected connection: version too old, update to " + p.latestVersionCode);
@@ -127,15 +124,14 @@ public class NetworkManager implements VSLClientListener {
     }
 
     @Override
-    public void onPacketReceived(byte id, byte[] payload) {
-        Log.d(TAG, "Received packet " + id);
-        packetHandler.handlePacket(id, payload);
+    public void onConnectionClosed() {
+        onConnectionFailed();
     }
 
     @Override
-    public void onConnectionClosed(String s) {
-        Log.e(TAG, "Connection to server closed due to " + s);
-        onConnectionFailed();
+    public void onPacketReceived(byte id, byte[] payload) {
+        Log.d(TAG, "Received packet 0x" + Integer.toHexString(id));
+        packetHandler.handlePacket(id, payload);
     }
 
     private void onConnectionFailed() {
