@@ -3,9 +3,9 @@ package de.vectordata.skynet.net.response;
 
 import android.os.Handler;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.vectordata.skynet.net.packet.base.Packet;
 
@@ -16,7 +16,7 @@ import de.vectordata.skynet.net.packet.base.Packet;
 @SuppressWarnings("unchecked")
 public class ResponseAwaiter {
 
-    private List<AwaiterItem> awaiterItems = new CopyOnWriteArrayList<>();
+    private List<AwaiterItem> awaiterItems = new ArrayList<>();
     private Handler handler;
 
     public void initialize() {

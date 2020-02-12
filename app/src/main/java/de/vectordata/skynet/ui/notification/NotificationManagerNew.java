@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.main.MainActivity;
@@ -40,7 +41,7 @@ public class NotificationManagerNew implements INotificationManager {
     private Handler handler;
     private NotificationManager notificationManager;
 
-    private List<MessageInfo> messages = new ArrayList<>();
+    private List<MessageInfo> messages = new CopyOnWriteArrayList<>();
     private LongSparseArray<Integer> notificationIdMap = new LongSparseArray<>();
 
     private long foregroundChannelId;
@@ -82,14 +83,14 @@ public class NotificationManagerNew implements INotificationManager {
 
     @Override
     public void onMessageDeleted(long channelId, long messageId) {
-        MessageInfo toBeDeleted = null;
         for (MessageInfo info : messages)
-            if (info.getChannelId() == channelId && info.getMessageId() == messageId)
-                toBeDeleted = info;
-        if (toBeDeleted != null) {
-            messages.remove(toBeDeleted);
-            resendNotification();
-        }
+            if (info.getChannelId() == channelId && info.getMessageId() == messageId) {
+                messages.remove(info);
+                resendNotification();
+                break;
+            }
+
+        // Delete channel notifications if there are no more messages in this channel
         for (MessageInfo info : messages)
             if (info.getChannelId() == channelId)
                 return;
@@ -116,6 +117,7 @@ public class NotificationManagerNew implements INotificationManager {
         for (MessageInfo info : messages)
             if (info.getChannelId() == channelId)
                 toBeDeleted.add(info);
+
         if (toBeDeleted.size() > 0)
             messages.removeAll(toBeDeleted);
         if (notificationIdMap.indexOfKey(channelId) >= 0) {
