@@ -36,8 +36,8 @@ public interface ChannelKeyDao {
     @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelId=:channelId")
     int hasKeys(long channelId);
 
-    @TypeConverters(KeyTypeConverter.class)
-    @Query("SELECT * FROM channelKeys WHERE channelId=:channelId AND keyType=:keyType ORDER BY messageId DESC LIMIT 1")
-    ChannelKey getLast(long channelId, KeyType keyType);
+    @TypeConverters({KeyTypeConverter.class, ChannelTypeConverter.class})
+    @Query("SELECT * FROM channels,channelKeys WHERE channelType=:channelType AND ownerId=:ownerId AND keyType=:keyType ORDER BY messageId DESC LIMIT 1")
+    ChannelKey getFromChannel(long ownerId, ChannelType channelType, KeyType keyType);
 
 }

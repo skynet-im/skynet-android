@@ -72,6 +72,12 @@
         <item name="invBlack">@color/lime</item>
         <item name="invWhite_dark">@color/lime</item>
         <item name="colorPrimaryAlt">@color/lime</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textViewStyle">@style/HackerTextView</item>
+    </style>
+
+    <style name="HackerTextView" parent="android:Widget.TextView">
+        <item name="android:fontFamily">monospace</item>
     </style>
 
     <style name="AppTheme.Blue">
