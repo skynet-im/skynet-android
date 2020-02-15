@@ -99,7 +99,7 @@ public class PacketHandler {
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
 
-        if (payload == null || payload.length == 0) {
+        if (payload == null) {
             Log.w(TAG, "Received corrupted packet 0x" + Integer.toHexString(id));
             return;
         }
@@ -285,8 +285,9 @@ public class PacketHandler {
 
     public void handlePacket(P20ChatMessage packet) {
         if (!inSync) return; // Only send receive confirmations live if in sync
-        if (packet.getParent().senderId == Storage.getSession().getAccountId())
+        if (packet.getParent().isSentByMe())
             return; // Don't send receive confirmations for my own messages
+
         sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
         SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet.getParent().channelId, packet.getParent().messageId, packet.text);
     }

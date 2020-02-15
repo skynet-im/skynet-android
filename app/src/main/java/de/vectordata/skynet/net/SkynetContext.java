@@ -79,6 +79,11 @@ public class SkynetContext implements KeyProvider {
         ChannelKey privateKey = Storage.getDatabase().channelKeyDao().getFromChannel(Storage.getSession().getAccountId(), ChannelType.LOOPBACK, KeyType.PRIVATE);
         ChannelKey publicKey = Storage.getDatabase().channelKeyDao().getFromChannel(channel.getCounterpartId(), ChannelType.ACCOUNT_DATA, KeyType.PUBLIC);
 
+        if (privateKey == null)
+            throw new IllegalStateException("No private key in the loopback channel");
+        if (publicKey == null)
+            throw new IllegalStateException("No public key found in target account data channel");
+
         byte[] ecKey = EC.deriveKey(privateKey.getDerivationKey(), publicKey.getDerivationKey());
         byte[] sha512 = HashProvider.sha512(ecKey);
 
