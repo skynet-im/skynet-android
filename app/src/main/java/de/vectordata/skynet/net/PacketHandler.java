@@ -99,6 +99,11 @@ public class PacketHandler {
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
 
+        if (payload == null || payload.length == 0) {
+            Log.w(TAG, "Received corrupted packet 0x" + Integer.toHexString(id));
+            return;
+        }
+
         packet.readPacket(new PacketBuffer(payload), keyProvider);
 
         if (!packet.validatePacket())
