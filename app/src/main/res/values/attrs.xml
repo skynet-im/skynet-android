@@ -5,5 +5,6 @@
     <attr name="invWhite" format="reference" />
     <attr name="invWhite_dark" format="reference" />
     <attr name="invBlack" format="reference" />
+    <attr name="invGray" format="reference" />
     <attr name="toolbarTheme" format="reference" />
 </resources>
