@@ -107,7 +107,7 @@ public class Aes {
         byte[] iv = input.readByteArray(16);
         byte[] ciphertext = input.readByteArray(length - 48);
         if (!ByteUtils.sequenceEqual(hmac, Hmac.computeHmacSHA256(ByteUtils.concatBytes(iv, ciphertext), hmacKey)))
-            throw new RuntimeException("Data corrupted");
+            return null;
         return decrypt(ciphertext, aesKey, iv);
     }
 

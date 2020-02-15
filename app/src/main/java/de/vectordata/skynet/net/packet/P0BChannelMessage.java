@@ -35,6 +35,8 @@ public class P0BChannelMessage extends AbstractPacket {
     public byte[] contentPacket;
     public byte[] fileKey;
     public List<Dependency> dependencies = new ArrayList<>();
+    public boolean isCorrupted;
+
 
     boolean hasFlag(byte flag) {
         return (messageFlags & flag) != 0;
@@ -69,6 +71,8 @@ public class P0BChannelMessage extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        isCorrupted = false;
+
         dependencies.clear();
         packetVersion = buffer.readByte();
         channelId = buffer.readInt64();
@@ -84,6 +88,10 @@ public class P0BChannelMessage extends AbstractPacket {
         if (!hasFlag(MessageFlags.UNENCRYPTED)) {
             KeyStore channelKeys = keyProvider.getMessageKeys(this);
             byte[] decryptedData = Aes.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            if (decryptedData == null) {
+                isCorrupted = true;
+                return;
+            }
             readContents(new PacketBuffer(decryptedData));
         } else readContents(buffer);
 
