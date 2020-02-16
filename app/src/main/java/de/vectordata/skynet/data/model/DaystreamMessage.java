@@ -35,8 +35,8 @@ public class DaystreamMessage {
 
     public static DaystreamMessage fromPacket(P24DaystreamMessage packet) {
         DaystreamMessage message = new DaystreamMessage();
-        message.channelId = packet.getParent().channelId;
-        message.messageId = packet.getParent().messageId;
+        message.channelId = packet.channelId;
+        message.messageId = packet.messageId;
         message.messageType = packet.messageType;
         message.text = packet.text;
         return message;

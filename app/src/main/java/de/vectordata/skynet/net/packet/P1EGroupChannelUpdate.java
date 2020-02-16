@@ -27,14 +27,14 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
     public byte[] historyKey;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(groupRevision);
         buffer.writeUInt16(members.size());
         for (Member member : members) {
             buffer.writeInt64(member.accountId);
             buffer.writeByte(member.groupMemberFlags);
         }
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, LengthPrefix.NONE);
         encrypted.writeByteArray(historyKey, LengthPrefix.NONE);
@@ -42,14 +42,14 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         members.clear();
         groupRevision = buffer.readInt64();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++) {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             channelKey = decrypted.readBytes(64);
@@ -60,6 +60,11 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
     }
 
     @Override
+    public void persistContents(PacketDirection direction) {
+
+    }
+
+    @Override
     public void handlePacket(PacketHandler handler) {
         handler.handlePacket(this);
     }
@@ -67,10 +72,6 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
     @Override
     public byte getId() {
         return 0x1E;
-    }
-
-    @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
     }
 
     public class Member {

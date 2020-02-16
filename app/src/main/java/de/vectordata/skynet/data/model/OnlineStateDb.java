@@ -34,8 +34,8 @@ public class OnlineStateDb {
 
     public static OnlineStateDb fromPacket(P2BOnlineState packet) {
         OnlineStateDb onlineState = new OnlineStateDb();
-        onlineState.channelId = packet.getParent().channelId;
-        onlineState.messageId = packet.getParent().messageId;
+        onlineState.channelId = packet.channelId;
+        onlineState.messageId = packet.messageId;
         onlineState.onlineState = packet.onlineState;
         onlineState.lastSeen = packet.lastActive;
         return onlineState;

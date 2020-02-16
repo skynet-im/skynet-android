@@ -42,8 +42,8 @@ public class P21MessageOverride extends ChannelMessagePacket {
     }
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeInt64(messageId);
         encrypted.writeByte((byte) action.ordinal());
@@ -53,8 +53,8 @@ public class P21MessageOverride extends ChannelMessagePacket {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             messageId = decrypted.readInt64();
@@ -77,8 +77,8 @@ public class P21MessageOverride extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-        Channel channel = Storage.getDatabase().channelDao().getById(getParent().channelId);
+    public void persistContents(PacketDirection packetDirection) {
+        Channel channel = Storage.getDatabase().channelDao().getById(channelId);
         if (channel.getChannelType() == ChannelType.PROFILE_DATA) {
             DaystreamMessage message = Storage.getDatabase().daystreamMessageDao().get(channel.getChannelId(), messageId);
             if (action == OverrideAction.DELETE)
@@ -89,11 +89,11 @@ public class P21MessageOverride extends ChannelMessagePacket {
                 Storage.getDatabase().daystreamMessageDao().update(message);
             }
         } else {
-            ChatMessage message = Storage.getDatabase().chatMessageDao().query(getParent().channelId, messageId);
+            ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
             if (action == OverrideAction.DELETE) {
                 message.setText(ChatMessage.DELETED);
                 message.setEdited(false);
-                SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(getParent().channelId, messageId);
+                SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(channelId, messageId);
             } else {
                 message.setText(newText);
                 message.setEdited(true);
@@ -104,12 +104,12 @@ public class P21MessageOverride extends ChannelMessagePacket {
 
     @Override
     public boolean validatePacket() {
-        ChannelMessage targetMessage = Storage.getDatabase().channelMessageDao().getById(getParent().channelId, messageId);
+        ChannelMessage targetMessage = Storage.getDatabase().channelMessageDao().getById(channelId, messageId);
         long originalDate = targetMessage.getDispatchTime().toJavaDate().getTime();
-        long modifyDate = getParent().dispatchTime.toJavaDate().getTime();
+        long modifyDate = dispatchTime.toJavaDate().getTime();
         if (modifyDate - originalDate > OVERWITE_TIMEOUT)
             return false;
-        return getParent().senderId == targetMessage.getSenderId();
+        return senderId == targetMessage.getSenderId();
     }
 
 }

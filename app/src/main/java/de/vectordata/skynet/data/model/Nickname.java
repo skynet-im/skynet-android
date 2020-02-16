@@ -23,8 +23,8 @@ public class Nickname {
 
     public static Nickname fromPacket(P25Nickname packet) {
         Nickname nickname = new Nickname();
-        nickname.channelId = packet.getParent().channelId;
-        nickname.messageId = packet.getParent().messageId;
+        nickname.channelId = packet.channelId;
+        nickname.messageId = packet.messageId;
         nickname.nickname = packet.nickname;
         return nickname;
     }

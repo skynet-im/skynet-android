@@ -12,11 +12,11 @@ import de.vectordata.skynet.net.packet.model.MessageFlags;
 public class P22MessageReceived extends ChannelMessagePacket {
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
@@ -30,11 +30,11 @@ public class P22MessageReceived extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
     }
 
     @Override
     public boolean validatePacket() {
-        return getParent().dependencies.size() > 0;
+        return dependencies.size() > 0;
     }
 }

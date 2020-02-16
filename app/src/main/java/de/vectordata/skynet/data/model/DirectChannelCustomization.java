@@ -29,8 +29,8 @@ public class DirectChannelCustomization {
 
     public static DirectChannelCustomization fromPacket(P1CDirectChannelCustomization packet) {
         DirectChannelCustomization customization = new DirectChannelCustomization();
-        customization.channelId = packet.getParent().channelId;
-        customization.messageId = packet.getParent().messageId;
+        customization.channelId = packet.channelId;
+        customization.messageId = packet.messageId;
         customization.customNickname = packet.customNickname;
         customization.profileImageShape = packet.imageShape;
         return customization;

@@ -23,8 +23,8 @@ public class LoopbackKeyNotify {
 
     public static LoopbackKeyNotify fromPacket(P16LoopbackKeyNotify packet) {
         LoopbackKeyNotify notify = new LoopbackKeyNotify();
-        notify.channelId = packet.getParent().channelId;
-        notify.messageId = packet.getParent().messageId;
+        notify.channelId = packet.channelId;
+        notify.messageId = packet.messageId;
         notify.key = packet.key;
         return notify;
     }

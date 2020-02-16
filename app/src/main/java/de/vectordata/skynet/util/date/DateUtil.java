@@ -7,7 +7,7 @@ import java.util.Date;
 
 import de.vectordata.skynet.R;
 
-public class DateUtil {
+public final class DateUtil {
 
     public static String toLastSeen(Context context, DateTime dateTime) {
         if (dateTime.isToday())

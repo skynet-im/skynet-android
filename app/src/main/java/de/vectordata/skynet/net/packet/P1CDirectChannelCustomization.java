@@ -22,13 +22,13 @@ public class P1CDirectChannelCustomization extends ChannelMessagePacket {
     public ImageShape imageShape;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(customNickname, LengthPrefix.SHORT);
         buffer.writeByte((byte) imageShape.ordinal());
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         customNickname = buffer.readString(LengthPrefix.SHORT);
         imageShape = ImageShape.values()[buffer.readByte()];
     }
@@ -44,7 +44,7 @@ public class P1CDirectChannelCustomization extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().directChannelCustomizationDao().insert(DirectChannelCustomization.fromPacket(this));
     }
 }

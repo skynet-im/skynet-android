@@ -23,8 +23,8 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
     public String text;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByte((byte) messageType.ordinal());
         encrypted.writeString(text, LengthPrefix.MEDIUM);
@@ -32,8 +32,8 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             messageType = MessageType.values()[decrypted.readByte()];
@@ -54,7 +54,7 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().daystreamMessageDao().insert(DaystreamMessage.fromPacket(this));
     }
 }

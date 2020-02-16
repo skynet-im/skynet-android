@@ -23,8 +23,8 @@ import de.vectordata.skynet.net.client.SslClientListener;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.P00ConnectionHandshake;
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
@@ -72,7 +72,7 @@ public class NetworkManager implements SslClientListener {
     }
 
     public ResponseAwaiter sendPacket(Packet packet) {
-        if (connectionState != ConnectionState.AUTHENTICATED && packet instanceof P0BChannelMessage)
+        if (connectionState != ConnectionState.AUTHENTICATED && packet instanceof ChannelMessagePacket)
             return responseAwaiter;
 
         if (shouldCache(packet)) packetCache.add(packet);
@@ -88,7 +88,7 @@ public class NetworkManager implements SslClientListener {
     private boolean shouldCache(Packet packet) {
         // Never cache channel messages. They may be more complex than just sending a packet
         // and are therefore handled by the JobEngine
-        if (packet instanceof P0BChannelMessage)
+        if (packet instanceof ChannelMessagePacket)
             return false;
 
         // If no connection is present, and the packet in question does not have an AllowState

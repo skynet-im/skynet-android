@@ -99,7 +99,7 @@ public class ChatsFragment extends Fragment {
             reload();
 
         if (packet instanceof P20ChatMessage || packet instanceof P22MessageReceived || packet instanceof P23MessageRead || packet instanceof P21MessageOverride || packet instanceof P14MailAddress || packet instanceof P25Nickname)
-            reloadSingle(((ChannelMessagePacket) packet).getParent().channelId);
+            reloadSingle(((ChannelMessagePacket) packet).channelId);
 
         if (packet instanceof P2CChannelAction)
             reloadSingle(((P2CChannelAction) packet).channelId);

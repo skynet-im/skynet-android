@@ -7,16 +7,16 @@ import de.vectordata.skynet.jobengine.annotations.Retry;
 import de.vectordata.skynet.jobengine.api.Job;
 import de.vectordata.skynet.jobengine.api.JobState;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageSendError;
 
 @Retry(Retry.Mode.RECONNECT)
 public class ChannelMessageJob extends Job<Void> {
 
-    private P0BChannelMessage message;
+    private ChannelMessagePacket message;
 
-    public ChannelMessageJob(P0BChannelMessage message) {
+    public ChannelMessageJob(ChannelMessagePacket message) {
         this.message = message;
     }
 

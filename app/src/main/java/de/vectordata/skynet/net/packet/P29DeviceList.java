@@ -18,11 +18,11 @@ public class P29DeviceList extends ChannelMessagePacket {
     public List<PDevice> devices = new ArrayList<>();
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         devices.clear();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++)
@@ -40,7 +40,7 @@ public class P29DeviceList extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().deviceListDao().clear();
         Device[] devices = new Device[this.devices.size()];
         for (int i = 0; i < devices.length; i++)

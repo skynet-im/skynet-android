@@ -20,12 +20,12 @@ public class P16LoopbackKeyNotify extends ChannelMessagePacket {
     public byte[] key;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeByteArray(key, LengthPrefix.NONE);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         key = buffer.readBytes(64);
     }
 
@@ -40,7 +40,7 @@ public class P16LoopbackKeyNotify extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().loopbackKeyNotifyDao().insert(LoopbackKeyNotify.fromPacket(this));
     }
 }

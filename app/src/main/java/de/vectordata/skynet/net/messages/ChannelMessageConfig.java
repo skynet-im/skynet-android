@@ -3,7 +3,7 @@ package de.vectordata.skynet.net.messages;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 
 public class ChannelMessageConfig {
@@ -16,7 +16,7 @@ public class ChannelMessageConfig {
 
     private byte[] fileKey;
 
-    private List<P0BChannelMessage.Dependency> dependencies = new ArrayList<>();
+    private List<ChannelMessagePacket.NetDependency> dependencies = new ArrayList<>();
 
     public static ChannelMessageConfig create() {
         return new ChannelMessageConfig();
@@ -34,11 +34,11 @@ public class ChannelMessageConfig {
         return this;
     }
 
-    public ChannelMessageConfig addDependency(long accountId, long channelId, long messageId) {
-        return addDependency(new P0BChannelMessage.Dependency(accountId, channelId, messageId));
+    public ChannelMessageConfig addDependency(long accountId, long messageId) {
+        return addDependency(new ChannelMessagePacket.NetDependency(accountId, messageId));
     }
 
-    private ChannelMessageConfig addDependency(P0BChannelMessage.Dependency dependency) {
+    private ChannelMessageConfig addDependency(ChannelMessagePacket.NetDependency dependency) {
         dependencies.add(dependency);
         return this;
     }
@@ -55,7 +55,7 @@ public class ChannelMessageConfig {
         return fileKey;
     }
 
-    List<P0BChannelMessage.Dependency> getDependencies() {
+    List<ChannelMessagePacket.NetDependency> getDependencies() {
         return dependencies;
     }
 

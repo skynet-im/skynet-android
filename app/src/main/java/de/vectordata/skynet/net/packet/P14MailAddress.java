@@ -20,12 +20,12 @@ public class P14MailAddress extends ChannelMessagePacket {
     public String mailAddress;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(mailAddress, LengthPrefix.SHORT);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         mailAddress = buffer.readString(LengthPrefix.SHORT);
     }
 
@@ -40,7 +40,7 @@ public class P14MailAddress extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().mailAddressDao().insert(MailAddress.fromPacket(this));
     }
 }

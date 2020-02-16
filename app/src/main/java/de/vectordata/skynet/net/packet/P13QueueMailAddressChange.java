@@ -18,12 +18,12 @@ public class P13QueueMailAddressChange extends ChannelMessagePacket {
     public String newMailAddress;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(newMailAddress, LengthPrefix.SHORT);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         newMailAddress = buffer.readString(LengthPrefix.SHORT);
     }
 
@@ -38,6 +38,6 @@ public class P13QueueMailAddressChange extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
     }
 }

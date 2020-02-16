@@ -31,8 +31,8 @@ public class P20ChatMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByte((byte) messageType.ordinal());
         encrypted.writeString(text, LengthPrefix.MEDIUM);
@@ -41,8 +41,8 @@ public class P20ChatMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             messageType = MessageType.values()[decrypted.readByte()];
@@ -64,8 +64,8 @@ public class P20ChatMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-        if (getParent().isSentByMe()) {
+    public void persistContents(PacketDirection packetDirection) {
+        if (isSentByMe()) {
             Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, packetDirection == PacketDirection.RECEIVE ? MessageState.SENT : MessageState.SENDING, false));
         } else {
             Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, MessageState.NONE, true));

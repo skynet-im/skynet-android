@@ -9,11 +9,11 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 public class P19ArchiveChannel extends ChannelMessagePacket {
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
@@ -27,6 +27,6 @@ public class P19ArchiveChannel extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
     }
 }

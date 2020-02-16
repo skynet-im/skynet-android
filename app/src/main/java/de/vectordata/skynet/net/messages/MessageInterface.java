@@ -2,14 +2,10 @@ package de.vectordata.skynet.net.messages;
 
 import java.util.Random;
 
-import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.client.PacketBuffer;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
-import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageInterface {
 
@@ -77,7 +73,7 @@ public class MessageInterface {
     }
 
     private PreparedMessage prepare(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        P0BChannelMessage container = new P0BChannelMessage();
+        /*P0BCnelMessage container = new P0BCelMessage();
         container.channelId = channelId;
         container.messageId = messageId;
         container.senderId = Storage.getSession().getAccountId();
@@ -91,11 +87,11 @@ public class MessageInterface {
         container.dispatchTime = DateTime.now();
 
         PacketBuffer buffer = new PacketBuffer();
-        packet.setParent(container);
         packet.writePacket(buffer, skynetContext);
         container.contentPacket = buffer.toArray();
 
-        return new PreparedMessage(container, packet);
+        return new PreparedMessage(container, packet);*/
+
     }
 
 }

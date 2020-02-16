@@ -26,7 +26,6 @@ import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
@@ -97,9 +96,6 @@ public class PacketHandler {
         if (packet == null)
             return;
 
-        if (packet instanceof ChannelMessagePacket)
-            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
-
         if (payload == null) {
             Log.w(TAG, "Received corrupted packet 0x" + Integer.toHexString(id));
             return;
@@ -161,11 +157,6 @@ public class PacketHandler {
             channel.setChannelId(packet.channelId);
             Storage.getDatabase().channelDao().update(channel);
         } else Storage.getDatabase().channelDao().deleteById(packet.tempChannelId);
-    }
-
-    public void handlePacket(P0BChannelMessage packet) {
-        packet.writeToDatabase(PacketDirection.RECEIVE);
-        handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
@@ -267,12 +258,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1BDirectChannelUpdate packet) {
-        /*long me = Storage.getSession().getAccountId();
-        P0BChannelMessage parent = packet.getParent();
-        P0BChannelMessage.Dependency keypairReferenceDependency = parent.findDependency(d -> d.accountId == me);
-        List<Dependency> dependencies = Storage.getDatabase().dependencyDao().getDependencies(keypairReferenceDependency.channelId, keypairReferenceDependency.messageId);
-        ChannelKey privateKey;
-        ChannelKey publicKey;*/
+
     }
 
     public void handlePacket(P1CDirectChannelCustomization packet) {
@@ -289,11 +275,11 @@ public class PacketHandler {
 
     public void handlePacket(P20ChatMessage packet) {
         if (!inSync) return; // Only send receive confirmations live if in sync
-        if (packet.getParent().isSentByMe())
+        if (packet.isSentByMe())
             return; // Don't send receive confirmations for my own messages
 
-        sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
-        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet.getParent().channelId, packet.getParent().messageId, packet.text);
+        sendReceiveConfirmation(packet.channelId, packet.messageId);
+        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet.channelId, packet.messageId, packet.text);
     }
 
     public void handlePacket(P21MessageOverride packet) {
@@ -301,14 +287,14 @@ public class PacketHandler {
 
     // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received/read it.
     public void handlePacket(P22MessageReceived packet) {
-        P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
-        setMessageState(dependency.channelId, dependency.messageId, MessageState.DELIVERED);
+        ChannelMessagePacket.NetDependency dependency = packet.singleDependency();
+        setMessageState(packet.channelId, dependency.messageId, MessageState.DELIVERED);
     }
 
     public void handlePacket(P23MessageRead packet) {
-        P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
-        setMessageState(dependency.channelId, dependency.messageId, MessageState.SEEN);
-        SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(dependency.channelId, dependency.messageId);
+        ChannelMessagePacket.NetDependency dependency = packet.singleDependency();
+        setMessageState(packet.channelId, dependency.messageId, MessageState.SEEN);
+        SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(packet.channelId, dependency.messageId);
     }
 
     private void sendReceiveConfirmation(long channelId, long messageId) {

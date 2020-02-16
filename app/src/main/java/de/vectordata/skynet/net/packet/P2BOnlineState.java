@@ -17,14 +17,20 @@ public class P2BOnlineState extends ChannelMessagePacket {
     public DateTime lastActive;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         onlineState = OnlineState.values()[buffer.readByte()];
         if (onlineState == OnlineState.INACTIVE)
             lastActive = buffer.readDate();
+    }
+
+    @Override
+    public void persistContents(PacketDirection direction) {
+        Storage.getDatabase().onlineStateDao().insert(OnlineStateDb.fromPacket(this));
     }
 
     @Override
@@ -35,11 +41,6 @@ public class P2BOnlineState extends ChannelMessagePacket {
     @Override
     public byte getId() {
         return 0x2B;
-    }
-
-    @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-        Storage.getDatabase().onlineStateDao().insert(OnlineStateDb.fromPacket(this));
     }
 
 }

@@ -20,12 +20,12 @@ public class P27ProfileImage extends ChannelMessagePacket {
     public String caption;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(caption, LengthPrefix.MEDIUM);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         caption = buffer.readString(LengthPrefix.MEDIUM);
     }
 
@@ -40,7 +40,7 @@ public class P27ProfileImage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().profileImageDao().insert(ProfileImage.fromPacket(this));
     }
 }

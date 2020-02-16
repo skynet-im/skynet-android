@@ -17,14 +17,14 @@ public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
     public byte[] historyKey;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(channelId);
         buffer.writeByteArray(newKey, LengthPrefix.NONE);
         buffer.writeByteArray(historyKey, LengthPrefix.NONE);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         channelId = buffer.readInt64();
         newKey = buffer.readBytes(64);
         historyKey = buffer.readBytes(64);
@@ -41,8 +41,8 @@ public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-        if (packetDirection == PacketDirection.SEND && getParent().hasFlag(MessageFlags.NO_SENDER_SYNC))
+    public void persistContents(PacketDirection packetDirection) {
+        if (packetDirection == PacketDirection.SEND && hasFlag(MessageFlags.NO_SENDER_SYNC))
             return;
         Storage.getDatabase().groupChannelKeyNotifyDao().insert(GroupChannelKeyNotify.fromPacket(this));
     }

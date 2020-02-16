@@ -20,12 +20,12 @@ public class P26Bio extends ChannelMessagePacket {
     public String bio;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeString(bio, LengthPrefix.MEDIUM);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         bio = buffer.readString(LengthPrefix.MEDIUM);
     }
 
@@ -40,7 +40,7 @@ public class P26Bio extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().bioDao().insert(Bio.fromPacket(this));
     }
 }

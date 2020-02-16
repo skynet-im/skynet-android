@@ -28,13 +28,13 @@ public class P17PrivateKeys extends ChannelMessagePacket {
     }
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         writeKey(signatureKey, buffer);
         writeKey(derivationKey, buffer);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         signatureKey = readKey(buffer);
         derivationKey = readKey(buffer);
     }
@@ -59,7 +59,7 @@ public class P17PrivateKeys extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(this));
     }
 

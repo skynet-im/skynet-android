@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.util.date.DateTime;
 
 @Entity(tableName = "channelMessages", foreignKeys = @ForeignKey(
@@ -39,7 +39,7 @@ public class ChannelMessage {
 
     private int contentPacketId;
 
-    public static ChannelMessage fromPacket(P0BChannelMessage packet) {
+    public static ChannelMessage fromPacket(ChannelMessagePacket packet) {
         ChannelMessage message = new ChannelMessage();
         message.channelId = packet.channelId;
         message.messageId = packet.messageId;

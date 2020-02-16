@@ -21,13 +21,13 @@ public class P15PasswordUpdate extends ChannelMessagePacket {
     public byte[] keyHash;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeByteArray(loopbackKeyNotify, LengthPrefix.MEDIUM);
         buffer.writeByteArray(keyHash, LengthPrefix.NONE);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         keyHash = buffer.readBytes(32);
     }
 
@@ -42,7 +42,7 @@ public class P15PasswordUpdate extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().passwordUpdateDao().insert(PasswordUpdate.fromPacket(this));
     }
 }

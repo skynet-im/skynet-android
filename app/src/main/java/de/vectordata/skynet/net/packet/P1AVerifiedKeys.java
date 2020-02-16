@@ -18,13 +18,18 @@ public class P1AVerifiedKeys extends ChannelMessagePacket {
     public byte[] sha256;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeByteArray(sha256, LengthPrefix.NONE);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         sha256 = buffer.readBytes(32);
+    }
+
+    @Override
+    public void persistContents(PacketDirection direction) {
+
     }
 
     @Override
@@ -37,7 +42,4 @@ public class P1AVerifiedKeys extends ChannelMessagePacket {
         return 0x1A;
     }
 
-    @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-    }
 }

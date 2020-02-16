@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Handlers {
+public final class Handlers {
 
     private static Map<String, Handler> cache = new HashMap<>();
 
