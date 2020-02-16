@@ -5,6 +5,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Channel;
@@ -42,11 +43,11 @@ public class P18PublicKeys extends ChannelMessagePacket {
 
     private void writeKey(AsymmetricKey key, PacketBuffer buffer) {
         buffer.writeByte((byte) key.format.ordinal());
-        buffer.writeByteArray(key.key, true);
+        buffer.writeByteArray(key.key, LengthPrefix.MEDIUM);
     }
 
     private AsymmetricKey readKey(PacketBuffer buffer) {
-        return new AsymmetricKey(KeyFormat.values()[buffer.readByte()], buffer.readByteArray());
+        return new AsymmetricKey(KeyFormat.values()[buffer.readByte()], buffer.readByteArray(LengthPrefix.MEDIUM));
     }
 
     @Override

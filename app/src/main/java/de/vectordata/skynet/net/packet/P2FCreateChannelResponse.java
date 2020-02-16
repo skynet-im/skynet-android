@@ -5,12 +5,14 @@ import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.CreateChannelError;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class P2FCreateChannelResponse extends AbstractPacket {
 
     public long tempChannelId;
-    public CreateChannelError errorCode;
+    public CreateChannelError statusCode;
     public long channelId;
+    public DateTime creationTime;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -19,8 +21,9 @@ public class P2FCreateChannelResponse extends AbstractPacket {
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         tempChannelId = buffer.readInt64();
-        errorCode = CreateChannelError.values()[buffer.readByte()];
+        statusCode = CreateChannelError.values()[buffer.readByte()];
         channelId = buffer.readInt64();
+        creationTime = buffer.readDate();
     }
 
     @Override

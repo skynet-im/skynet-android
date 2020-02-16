@@ -6,7 +6,7 @@ import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
-public class P19KeypairReference extends ChannelMessagePacket {
+public class P19ArchiveChannel extends ChannelMessagePacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {

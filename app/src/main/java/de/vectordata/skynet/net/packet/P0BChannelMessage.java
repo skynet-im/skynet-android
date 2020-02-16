@@ -102,15 +102,15 @@ public class P0BChannelMessage extends AbstractPacket {
     }
 
     private void writeContents(PacketBuffer buffer) {
-        buffer.writeByteArray(contentPacket, true);
+        buffer.writeLongByteArray(contentPacket, true);
         if (hasFlag(MessageFlags.FILE_ATTACHED))
-            buffer.writeByteArray(fileKey, true);
+            buffer.writeLongByteArray(fileKey, true);
     }
 
     private void readContents(PacketBuffer packetBuffer) {
-        contentPacket = packetBuffer.readByteArray();
+        contentPacket = packetBuffer.readLongByteArray();
         if ((messageFlags & MessageFlags.FILE_ATTACHED) != 0)
-            fileKey = packetBuffer.readByteArray();
+            fileKey = packetBuffer.readLongByteArray();
     }
 
     @Override

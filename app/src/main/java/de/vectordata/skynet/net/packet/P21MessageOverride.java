@@ -13,6 +13,7 @@ import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.SkynetContext;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -47,7 +48,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
         encrypted.writeInt64(messageId);
         encrypted.writeByte((byte) action.ordinal());
         if (action == OverrideAction.EDIT)
-            encrypted.writeString(newText);
+            encrypted.writeString(newText, LengthPrefix.MEDIUM);
         Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
     }
 
@@ -59,7 +60,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
             messageId = decrypted.readInt64();
             action = OverrideAction.values()[decrypted.readByte()];
             if (action == OverrideAction.EDIT)
-                newText = decrypted.readString();
+                newText = decrypted.readString(LengthPrefix.MEDIUM);
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }

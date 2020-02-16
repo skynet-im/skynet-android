@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
@@ -22,11 +23,11 @@ public class P2ESearchAccountResponse extends AbstractPacket {
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++) {
             long accountId = buffer.readInt64();
-            String accountName = buffer.readString();
+            String accountName = buffer.readString(LengthPrefix.SHORT);
             int packetCount = buffer.readUInt16();
             List<ForwardedPacket> forwardedPackets = new ArrayList<>();
             for (int j = 0; j < packetCount; j++) {
-                forwardedPackets.add(new ForwardedPacket(buffer.readByte(), buffer.readByteArray()));
+                forwardedPackets.add(new ForwardedPacket(buffer.readByte(), buffer.readByteArray(LengthPrefix.MEDIUM)));
             }
             results.add(new Result(accountId, accountName, forwardedPackets));
         }

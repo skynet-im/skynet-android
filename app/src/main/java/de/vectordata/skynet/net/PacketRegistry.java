@@ -15,7 +15,7 @@ import de.vectordata.skynet.net.packet.P15PasswordUpdate;
 import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
-import de.vectordata.skynet.net.packet.P19KeypairReference;
+import de.vectordata.skynet.net.packet.P19ArchiveChannel;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
 import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
 import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
@@ -61,7 +61,7 @@ class PacketRegistry {
         register(new P16LoopbackKeyNotify());
         register(new P17PrivateKeys());
         register(new P18PublicKeys());
-        register(new P19KeypairReference());
+        register(new P19ArchiveChannel());
         register(new P1AVerifiedKeys());
         register(new P1BDirectChannelUpdate());
         register(new P1CDirectChannelCustomization());

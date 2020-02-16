@@ -2,15 +2,18 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
 
 public class P07CreateSessionResponse extends AbstractPacket {
 
+    public CreateSessionError statusCode;
     public long accountId;
     public long sessionId;
-    public CreateSessionError errorCode;
+    public byte[] sessionToken;
+    public String webToken;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -18,9 +21,11 @@ public class P07CreateSessionResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        statusCode = CreateSessionError.values()[buffer.readByte()];
         accountId = buffer.readInt64();
         sessionId = buffer.readInt64();
-        errorCode = CreateSessionError.values()[buffer.readByte()];
+        sessionToken = buffer.readBytes(32);
+        webToken = buffer.readString(LengthPrefix.MEDIUM);
     }
 
     @Override

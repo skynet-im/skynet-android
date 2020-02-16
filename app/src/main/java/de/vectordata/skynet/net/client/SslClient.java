@@ -48,7 +48,7 @@ public class SslClient {
     public void sendPacket(int id, byte[] payload) {
         PacketBuffer buffer = new PacketBuffer(payload.length + 4);
         buffer.writeInt32((payload.length << 8) | (byte) id);
-        buffer.writeByteArray(payload, false);
+        buffer.writeByteArray(payload, LengthPrefix.NONE);
 
         socket.send(buffer.toArray());
     }

@@ -2,6 +2,7 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
@@ -23,8 +24,8 @@ public class P02CreateAccount extends AbstractPacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeString(accountName);
-        buffer.writeByteArray(keyHash, false);
+        buffer.writeString(accountName, LengthPrefix.SHORT);
+        buffer.writeByteArray(keyHash, LengthPrefix.NONE);
     }
 
     @Override

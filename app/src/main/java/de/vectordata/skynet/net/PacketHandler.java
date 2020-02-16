@@ -34,7 +34,7 @@ import de.vectordata.skynet.net.packet.P15PasswordUpdate;
 import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
-import de.vectordata.skynet.net.packet.P19KeypairReference;
+import de.vectordata.skynet.net.packet.P19ArchiveChannel;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
 import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
 import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
@@ -132,7 +132,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P07CreateSessionResponse packet) {
-        if (packet.errorCode == CreateSessionError.SUCCESS) {
+        if (packet.statusCode == CreateSessionError.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
             networkManager.releaseCache();
         } else
@@ -152,7 +152,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P2FCreateChannelResponse packet) {
-        if (packet.errorCode == CreateChannelError.SUCCESS) {
+        if (packet.statusCode == CreateChannelError.SUCCESS) {
             Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
             channel.setChannelId(packet.channelId);
             Storage.getDatabase().channelDao().update(channel);
@@ -254,7 +254,7 @@ public class PacketHandler {
 
     }
 
-    public void handlePacket(P19KeypairReference packet) {
+    public void handlePacket(P19ArchiveChannel packet) {
 
     }
 

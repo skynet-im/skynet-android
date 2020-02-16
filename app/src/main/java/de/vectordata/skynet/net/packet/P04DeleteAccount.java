@@ -2,6 +2,7 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
@@ -11,7 +12,7 @@ public class P04DeleteAccount extends AbstractPacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByteArray(keyHash, false);
+        buffer.writeByteArray(keyHash, LengthPrefix.NONE);
     }
 
     @Override

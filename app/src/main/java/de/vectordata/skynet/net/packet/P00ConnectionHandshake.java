@@ -2,6 +2,7 @@ package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
@@ -23,7 +24,7 @@ public class P00ConnectionHandshake extends AbstractPacket {
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt32(protocolVersion);
-        buffer.writeString(applicationIdentifier);
+        buffer.writeString(applicationIdentifier, LengthPrefix.SHORT);
         buffer.writeInt32(versionCode);
     }
 

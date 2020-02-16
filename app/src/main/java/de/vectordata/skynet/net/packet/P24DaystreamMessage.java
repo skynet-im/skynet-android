@@ -9,6 +9,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Channel;
@@ -26,7 +27,7 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByte((byte) messageType.ordinal());
-        encrypted.writeString(text);
+        encrypted.writeString(text, LengthPrefix.MEDIUM);
         Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
     }
 
@@ -36,7 +37,7 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             messageType = MessageType.values()[decrypted.readByte()];
-            text = decrypted.readString();
+            text = decrypted.readString(LengthPrefix.MEDIUM);
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }

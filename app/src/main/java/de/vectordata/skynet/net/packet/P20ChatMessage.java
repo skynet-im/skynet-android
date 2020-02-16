@@ -9,6 +9,7 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -34,7 +35,7 @@ public class P20ChatMessage extends ChannelMessagePacket {
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByte((byte) messageType.ordinal());
-        encrypted.writeString(text);
+        encrypted.writeString(text, LengthPrefix.MEDIUM);
         encrypted.writeInt64(quotedMessage);
         Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
     }
@@ -45,7 +46,7 @@ public class P20ChatMessage extends ChannelMessagePacket {
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             messageType = MessageType.values()[decrypted.readByte()];
-            text = decrypted.readString();
+            text = decrypted.readString(LengthPrefix.MEDIUM);
             quotedMessage = decrypted.readInt64();
         } catch (StreamCorruptedException e) {
             e.printStackTrace();

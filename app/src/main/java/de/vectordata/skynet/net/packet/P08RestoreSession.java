@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
@@ -12,24 +13,22 @@ import de.vectordata.skynet.net.packet.base.AbstractPacket;
 @AllowState(ConnectionState.AUTHENTICATING)
 public class P08RestoreSession extends AbstractPacket {
 
-    public long accountId;
-    public byte[] keyHash;
     public long sessionId;
+    public byte[] sessionToken;
     public List<ChannelItem> channels;
 
-    public P08RestoreSession(long accountId, byte[] keyHash, long sessionId, List<ChannelItem> channels) {
-        this.accountId = accountId;
-        this.keyHash = keyHash;
+    public P08RestoreSession(long sessionId, byte[] sessionToken, List<ChannelItem> channels) {
         this.sessionId = sessionId;
+        this.sessionToken = sessionToken;
         this.channels = channels;
     }
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeInt64(accountId);
-        buffer.writeByteArray(keyHash, false);
         buffer.writeInt64(sessionId);
-        buffer.writeInt16((short) channels.size());
+        buffer.writeByteArray(sessionToken, LengthPrefix.NONE);
+
+        buffer.writeUInt16(channels.size());
         for (ChannelItem item : channels) {
             buffer.writeInt64(item.channelId);
             buffer.writeInt64(item.lastMessageId);

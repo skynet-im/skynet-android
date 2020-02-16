@@ -9,6 +9,7 @@ import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Channel;
@@ -35,8 +36,8 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         }
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
-        encrypted.writeByteArray(channelKey, true);
-        encrypted.writeByteArray(historyKey, true);
+        encrypted.writeByteArray(channelKey, LengthPrefix.NONE);
+        encrypted.writeByteArray(historyKey, LengthPrefix.NONE);
         Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
     }
 
@@ -51,6 +52,8 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
+            channelKey = decrypted.readBytes(64);
+            historyKey = decrypted.readBytes(64);
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }

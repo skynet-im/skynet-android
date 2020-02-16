@@ -7,6 +7,7 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Device;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -25,7 +26,7 @@ public class P29DeviceList extends ChannelMessagePacket {
         devices.clear();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++)
-            devices.add(new PDevice(buffer.readInt64(), buffer.readDate(), buffer.readString()));
+            devices.add(new PDevice(buffer.readInt64(), buffer.readDate(), buffer.readString(LengthPrefix.SHORT)));
     }
 
     @Override
