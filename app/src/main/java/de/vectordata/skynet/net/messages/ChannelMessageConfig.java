@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
+import de.vectordata.skynet.net.packet.model.FileInfo;
 
 public class ChannelMessageConfig {
 
@@ -14,7 +14,7 @@ public class ChannelMessageConfig {
 
     private long fileId;
 
-    private byte[] fileKey;
+    private FileInfo attachedFile;
 
     private List<ChannelMessagePacket.NetDependency> dependencies = new ArrayList<>();
 
@@ -27,11 +27,12 @@ public class ChannelMessageConfig {
         return this;
     }
 
-    public ChannelMessageConfig setAttachedFile(long fileId, byte[] fileKey) {
-        this.fileId = fileId;
-        this.fileKey = fileKey;
-        addFlag(MessageFlags.FILE_ATTACHED);
-        return this;
+    public FileInfo getAttachedFile() {
+        return attachedFile;
+    }
+
+    public void setAttachedFile(FileInfo attachedFile) {
+        this.attachedFile = attachedFile;
     }
 
     public ChannelMessageConfig addDependency(long accountId, long messageId) {
@@ -49,10 +50,6 @@ public class ChannelMessageConfig {
 
     long getFileId() {
         return fileId;
-    }
-
-    byte[] getFileKey() {
-        return fileKey;
     }
 
     List<ChannelMessagePacket.NetDependency> getDependencies() {
