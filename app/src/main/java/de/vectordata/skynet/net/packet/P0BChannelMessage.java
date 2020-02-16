@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.vectordata.skynet.crypto.Aes;
+import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
@@ -44,7 +44,6 @@ public class P0BChannelMessage extends AbstractPacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-
         buffer.writeByte(packetVersion);
         buffer.writeInt64(channelId);
         buffer.writeInt64(messageId);
@@ -55,10 +54,10 @@ public class P0BChannelMessage extends AbstractPacket {
         Log.d("P0BChannelMessage", String.format("Writing channel Message with content id %s: unencrypted=%s fileAttached=%s", contentPacketId, hasFlag(MessageFlags.UNENCRYPTED), hasFlag(MessageFlags.FILE_ATTACHED)));
         if (hasFlag(MessageFlags.UNENCRYPTED)) writeContents(buffer);
         else {
-            KeyStore channelKeys = keyProvider.getMessageKeys(this);
+            ChannelKeys channelKeys = keyProvider.getChannelKeys(this);
             PacketBuffer encryptedBuffer = new PacketBuffer();
             writeContents(encryptedBuffer);
-            Aes.encryptSigned(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            Aes.encryptSigned(encryptedBuffer.toArray(), buffer, true, channelKeys);
         }
 
         buffer.writeUInt16(dependencies.size());
@@ -86,8 +85,8 @@ public class P0BChannelMessage extends AbstractPacket {
         contentPacketVersion = buffer.readByte();
 
         if (!hasFlag(MessageFlags.UNENCRYPTED)) {
-            KeyStore channelKeys = keyProvider.getMessageKeys(this);
-            byte[] decryptedData = Aes.decryptSigned(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            ChannelKeys channelKeys = keyProvider.getChannelKeys(this);
+            byte[] decryptedData = Aes.decryptSigned(buffer, 0, channelKeys);
             if (decryptedData == null) {
                 isCorrupted = true;
                 return;

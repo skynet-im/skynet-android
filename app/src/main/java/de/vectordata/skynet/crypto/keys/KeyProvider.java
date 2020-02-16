@@ -4,6 +4,6 @@ import de.vectordata.skynet.net.packet.P0BChannelMessage;
 
 public interface KeyProvider {
 
-    KeyStore getMessageKeys(P0BChannelMessage message);
+    ChannelKeys getChannelKeys(P0BChannelMessage message);
 
 }

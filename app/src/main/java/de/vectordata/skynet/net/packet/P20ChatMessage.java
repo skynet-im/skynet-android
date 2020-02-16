@@ -1,8 +1,8 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.Aes;
+import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
@@ -29,18 +29,18 @@ public class P20ChatMessage extends ChannelMessagePacket {
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByte((byte) messageType.ordinal());
         encrypted.writeString(text);
         encrypted.writeInt64(quotedMessage);
-        Aes.encryptSigned(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
+        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
         messageType = MessageType.values()[decrypted.readByte()];
         text = decrypted.readString();
         quotedMessage = decrypted.readInt64();

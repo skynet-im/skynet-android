@@ -7,8 +7,8 @@ import java.io.InputStream;
 import de.vectordata.skynet.SkynetApplication;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.hash.HashProvider;
+import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelKey;
@@ -72,7 +72,7 @@ public class SkynetContext implements KeyProvider {
     }
 
     @Override
-    public KeyStore getMessageKeys(P0BChannelMessage message) {
+    public ChannelKeys getChannelKeys(P0BChannelMessage message) {
         Channel channel = Storage.getDatabase().channelDao().getById(message.channelId);
         if (channel == null)
             throw new IllegalArgumentException("Cannot request keys for null channel");
@@ -90,7 +90,7 @@ public class SkynetContext implements KeyProvider {
         byte[] ecKey = EC.deriveKey(privateKey.getDerivationKey(), publicKey.getDerivationKey());
         byte[] sha512 = HashProvider.sha512(ecKey);
 
-        return KeyStore.from64ByteArray(sha512);
+        return ChannelKeys.from64ByteArray(sha512);
     }
 
     public boolean isInSync() {

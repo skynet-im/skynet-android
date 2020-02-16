@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.vectordata.skynet.crypto.Aes;
+import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.PacketBuffer;
@@ -32,11 +32,11 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             buffer.writeInt64(member.accountId);
             buffer.writeByte(member.groupMemberFlags);
         }
-        KeyStore channelKeys = keyProvider.getMessageKeys(getParent());
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, true);
         encrypted.writeByteArray(historyKey, true);
-        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         for (int i = 0; i < count; i++) {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
-        KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
 
     }
 
