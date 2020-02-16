@@ -3,7 +3,6 @@ package de.vectordata.skynet.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 
 import androidx.annotation.Nullable;
 import androidx.preference.ListPreference;
@@ -70,7 +69,6 @@ public class PreferencesActivity extends ThemedActivity {
                 Dialogs.showYesNoBox(activity, R.string.question_header_logoff, R.string.question_logoff, (dialog, which) -> new Thread(() -> {
                     Storage.clear();
                     SkynetContext.getCurrent().getNetworkManager().disconnect();
-                    new Handler(activity.getApplicationContext().getMainLooper()).post(() -> SkynetContext.getCurrent().recreateNetworkManager());
                     startActivity(new Intent(activity, LoginActivity.class));
                     activity.finish();
                 }).start(), null);

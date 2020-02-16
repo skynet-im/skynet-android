@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,10 @@ public class NetworkManager implements SslClientListener {
         this.skynetContext = skynetContext;
     }
 
+    public void initialize(InputStream certStream) {
+        sslClient = new SslClient(certStream);
+    }
+
     public void connect() {
         if (connectionState != ConnectionState.DISCONNECTED) {
             Log.v(TAG, "connect() called but not disconnected from server");
@@ -59,8 +64,6 @@ public class NetworkManager implements SslClientListener {
 
         responseAwaiter.initialize();
         packetHandler = new PacketHandler(skynetContext, this, responseAwaiter);
-
-        sslClient = new SslClient(/* TODO Certificate stream */);
         sslClient.connect(SkynetApplication.SERVER_IP, SkynetApplication.SERVER_PORT);
     }
 

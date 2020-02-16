@@ -1,5 +1,10 @@
 package de.vectordata.skynet.net;
 
+import android.content.Context;
+
+import java.io.InputStream;
+
+import de.vectordata.skynet.SkynetApplication;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
@@ -32,7 +37,6 @@ public class SkynetContext implements KeyProvider {
         messageInterface = new MessageInterface(this);
         networkManager = new NetworkManager(this);
         appState = new AppState();
-        networkManager.connect();
     }
 
     public static SkynetContext getCurrent() {
@@ -41,9 +45,10 @@ public class SkynetContext implements KeyProvider {
         return currentContext;
     }
 
-    public void recreateNetworkManager() {
-        this.networkManager = new NetworkManager(this);
-        this.networkManager.connect();
+    public void initialize(Context context) {
+        InputStream certStream = context.getResources().openRawResource(SkynetApplication.CERTIFICATE_RES);
+        networkManager.initialize(certStream);
+        networkManager.connect();
     }
 
     public NetworkManager getNetworkManager() {

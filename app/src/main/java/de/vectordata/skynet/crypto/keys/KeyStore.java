@@ -2,7 +2,7 @@ package de.vectordata.skynet.crypto.keys;
 
 import java.io.Serializable;
 
-import de.vectordata.libjvsl.util.Util;
+import de.vectordata.skynet.net.client.ByteUtils;
 
 public class KeyStore implements Serializable {
 
@@ -15,8 +15,8 @@ public class KeyStore implements Serializable {
     }
 
     public static KeyStore from64ByteArray(byte[] data) {
-        byte[] aesKey = Util.takeBytes(data, 32, 0);
-        byte[] hmacKey = Util.takeBytes(data, 32, 31);
+        byte[] aesKey = ByteUtils.takeBytes(data, 32, 0);
+        byte[] hmacKey = ByteUtils.takeBytes(data, 32, 31);
         return new KeyStore(aesKey, hmacKey);
     }
 
