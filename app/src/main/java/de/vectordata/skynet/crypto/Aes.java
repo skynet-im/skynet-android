@@ -2,6 +2,7 @@ package de.vectordata.skynet.crypto;
 
 import android.util.Log;
 
+import java.io.StreamCorruptedException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -101,14 +102,14 @@ public class Aes {
         return bytes;
     }
 
-    public static byte[] decryptSigned(PacketBuffer input, int length, ChannelKeys channelKeys) {
+    public static byte[] decryptSigned(PacketBuffer input, int length, ChannelKeys channelKeys) throws StreamCorruptedException {
         if (length == 0)
             length = (int) input.readUInt32();
         byte[] hmac = input.readByteArray(32);
         byte[] iv = input.readByteArray(16);
         byte[] ciphertext = input.readByteArray(length - 48);
         if (!ByteUtils.sequenceEqual(hmac, Hmac.computeHmacSHA256(ByteUtils.concatBytes(iv, ciphertext), channelKeys.getHmacKey())))
-            return null;
+            throw new StreamCorruptedException("Data corrupted: HMAC invalid");
         return decrypt(ciphertext, channelKeys.getAesKey(), iv);
     }
 

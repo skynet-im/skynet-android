@@ -2,6 +2,7 @@ package de.vectordata.skynet.net.packet;
 
 import android.util.Log;
 
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,12 +87,13 @@ public class P0BChannelMessage extends AbstractPacket {
 
         if (!hasFlag(MessageFlags.UNENCRYPTED)) {
             ChannelKeys channelKeys = keyProvider.getChannelKeys(this);
-            byte[] decryptedData = Aes.decryptSigned(buffer, 0, channelKeys);
-            if (decryptedData == null) {
+            try {
+                byte[] decryptedData = Aes.decryptSigned(buffer, 0, channelKeys);
+                readContents(new PacketBuffer(decryptedData));
+            } catch (StreamCorruptedException e) {
                 isCorrupted = true;
                 return;
             }
-            readContents(new PacketBuffer(decryptedData));
         } else readContents(buffer);
 
         int dependencyCount = buffer.readUInt16();

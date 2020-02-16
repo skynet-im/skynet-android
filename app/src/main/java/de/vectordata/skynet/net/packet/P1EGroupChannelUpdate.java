@@ -1,5 +1,6 @@
 package de.vectordata.skynet.net.packet;
 
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +49,11 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-
+        try {
+            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

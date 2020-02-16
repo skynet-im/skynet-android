@@ -1,5 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
+import java.io.StreamCorruptedException;
+
 import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
@@ -31,9 +33,13 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-        messageType = MessageType.values()[decrypted.readByte()];
-        text = decrypted.readString();
+        try {
+            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
+            messageType = MessageType.values()[decrypted.readByte()];
+            text = decrypted.readString();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

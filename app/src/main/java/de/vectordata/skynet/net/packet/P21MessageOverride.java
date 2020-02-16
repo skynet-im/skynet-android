@@ -1,5 +1,7 @@
 package de.vectordata.skynet.net.packet;
 
+import java.io.StreamCorruptedException;
+
 import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
@@ -52,11 +54,15 @@ public class P21MessageOverride extends ChannelMessagePacket {
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-        messageId = decrypted.readInt64();
-        action = OverrideAction.values()[decrypted.readByte()];
-        if (action == OverrideAction.EDIT)
-            newText = decrypted.readString();
+        try {
+            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
+            messageId = decrypted.readInt64();
+            action = OverrideAction.values()[decrypted.readByte()];
+            if (action == OverrideAction.EDIT)
+                newText = decrypted.readString();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
