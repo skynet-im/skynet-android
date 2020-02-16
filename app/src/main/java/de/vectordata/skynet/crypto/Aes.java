@@ -1,5 +1,7 @@
 package de.vectordata.skynet.crypto;
 
+import android.util.Log;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -17,6 +19,10 @@ import de.vectordata.skynet.net.client.PacketBuffer;
 
 public class Aes {
 
+    private static final String TAG = "Aes";
+
+    private static SecureRandom random;
+
     /**
      * Executes an AES encryption.
      *
@@ -25,7 +31,7 @@ public class Aes {
      * @param iv     Initialization vector (128 bit).
      * @return
      */
-    public static byte[] encrypt(byte[] buffer, byte[] key, byte[] iv) {
+    private static byte[] encrypt(byte[] buffer, byte[] key, byte[] iv) {
         if (key == null)
             throw new IllegalArgumentException("key must not be null");
         if (key.length < 32)
@@ -38,7 +44,7 @@ public class Aes {
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             return cipher.doFinal(buffer);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to encrypt", e);
         }
         return null;
     }
@@ -51,7 +57,7 @@ public class Aes {
      * @param iv     Initialization vector (128 bit).
      * @return
      */
-    public static byte[] decrypt(byte[] buffer, byte[] key, byte[] iv) {
+    private static byte[] decrypt(byte[] buffer, byte[] key, byte[] iv) {
         if (key.length < 32)
             throw new IllegalArgumentException("Key has to be 256 bit (was " + key.length + ")");
 
@@ -62,7 +68,7 @@ public class Aes {
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
             return cipher.doFinal(buffer);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to decrypt", e);
         }
         return null;
     }
@@ -81,26 +87,20 @@ public class Aes {
      *
      * @return
      */
-    public static byte[] generateIV() {
+    private static byte[] generateIV() {
         return generateRandom(16);
     }
 
     private static byte[] generateRandom(int length) {
-        SecureRandom random = new SecureRandom();
+        if (random == null)
+            random = new SecureRandom();
+
         byte[] bytes = new byte[length];
         random.nextBytes(bytes);
         return bytes;
     }
 
-    public static byte[] incrementIv(byte[] iv) {
-        PacketBuffer bufferIn = new PacketBuffer(iv);
-        PacketBuffer bufferOut = new PacketBuffer();
-        bufferOut.writeInt64(bufferIn.readInt64() + 1);
-        bufferOut.writeInt64(bufferIn.readInt64());
-        return bufferOut.toArray();
-    }
-
-    public static byte[] decryptWithHmac(PacketBuffer input, int length, byte[] hmacKey, byte[] aesKey) {
+    public static byte[] decryptSigned(PacketBuffer input, int length, byte[] hmacKey, byte[] aesKey) {
         if (length == 0)
             length = (int) input.readUInt32();
         byte[] hmac = input.readByteArray(32);
@@ -111,7 +111,7 @@ public class Aes {
         return decrypt(ciphertext, aesKey, iv);
     }
 
-    public static void encryptWithHmac(byte[] input, PacketBuffer output, boolean writeLength, byte[] hmacKey, byte[] aesKey) {
+    public static void encryptSigned(byte[] input, PacketBuffer output, boolean writeLength, byte[] hmacKey, byte[] aesKey) {
         byte[] iv = generateIV();
         byte[] ciphertext = encrypt(input, aesKey, iv);
         if (writeLength)

@@ -12,9 +12,9 @@ import de.vectordata.skynet.util.date.DateTime;
 
 @SuppressWarnings("WeakerAccess")
 public class PacketBuffer {
-    public static int SIZE_SMALL = 8192;
-    public static int SIZE_MEDIUM = 32767;
-    public static int SIZE_BIG = 139264;
+    public static int SIZE_SMALL = 8192;    // 8K
+    public static int SIZE_MEDIUM = 32767;  // 32K
+    public static int SIZE_BIG = 131072;    // 128K
 
     private ByteBuffer buffer;
 
@@ -36,7 +36,7 @@ public class PacketBuffer {
         return buffer.capacity();
     }
 
-    public int getPending() {
+    public int getRemaining() {
         return buffer.remaining();
     }
 
@@ -49,18 +49,15 @@ public class PacketBuffer {
     }
 
     public DateTime readDate() {
-        long l = readInt64();
-        return DateTime.fromBinary(l);
+        return DateTime.fromBinary(readInt64());
     }
 
     public void writeDate(DateTime date) {
-        long l = date.toBinary();
-        writeInt64(l);
+        writeInt64(date.toBinary());
     }
 
     public void writeString(String str) {
-        byte[] arr = str.getBytes();
-        writeByteArray(arr, true);
+        writeByteArray(str.getBytes(), true);
     }
 
     public String readString() {
@@ -80,7 +77,13 @@ public class PacketBuffer {
     }
 
     public byte readByte() {
-        return readBytes(1)[0];
+        return buffer.get();
+    }
+
+    public void writeByteArray(byte[] arr, boolean writeLength) {
+        if (writeLength)
+            writeUInt32(arr.length);
+        writeBytes(arr);
     }
 
     public byte[] readByteArray() {
@@ -89,12 +92,6 @@ public class PacketBuffer {
 
     public byte[] readByteArray(int len) {
         return readBytes(len);
-    }
-
-    public void writeByteArray(byte[] arr, boolean sendArrLen) {
-        if (sendArrLen)
-            writeUInt32(arr.length);
-        writeBytes(arr);
     }
 
     public void writeInt16(short i) {
@@ -123,26 +120,31 @@ public class PacketBuffer {
         return ByteBuffer.wrap(new byte[]{b[3], b[2], b[1], b[0]}).getInt();
     }
 
+    public void writeUInt32(long i) {
+        writeBytes(new byte[]{(byte) (i), (byte) (i >> 8), (byte) (i >> 16), (byte) (i >> 24)});
+    }
+
     public long readUInt32() {
         byte[] b = readBytes(4);
         return ByteBuffer.wrap(new byte[]{0, 0, 0, 0, b[3], b[2], b[1], b[0]}).getLong();
     }
 
-    public void writeUInt32(long i) {
-        writeBytes(new byte[]{(byte) (i), (byte) (i >> 8), (byte) (i >> 16), (byte) (i >> 24)});
-    }
-
     public void writeUInt64(long i) {
         writeBytes(new byte[]{
                 (byte) (i),
-                (byte) (i >> 8),
-                (byte) (i >> 16),
-                (byte) (i >> 24),
-                (byte) (i >> 32),
-                (byte) (i >> 40),
-                (byte) (i >> 48),
-                (byte) (i >> 56)
+                (byte) (i >>> 8),
+                (byte) (i >>> 16),
+                (byte) (i >>> 24),
+                (byte) (i >>> 32),
+                (byte) (i >>> 40),
+                (byte) (i >>> 48),
+                (byte) (i >>> 56)
         });
+    }
+
+    public void writeInt64(long l) {
+        byte[] b = new byte[]{(byte) (l), (byte) (l >> 8), (byte) (l >> 16), (byte) (l >> 24), (byte) (l >> 32), (byte) (l >> 40), (byte) (l >> 48), (byte) (l >> 56)};
+        writeBytes(b);
     }
 
     public long readInt64() {
@@ -157,12 +159,15 @@ public class PacketBuffer {
                 | ((((long) b[7]) << 56) & 0xFF00000000000000L);
     }
 
-    public void writeInt64(long l) {
-        byte[] b = new byte[]{(byte) (l), (byte) (l >> 8), (byte) (l >> 16), (byte) (l >> 24), (byte) (l >> 32), (byte) (l >> 40), (byte) (l >> 48), (byte) (l >> 56)};
-        writeBytes(b);
+    private void writeBytes(byte[] array) {
+        allocated += array.length;
+        buffer.put(array);
     }
 
     private byte[] readBytes(int amount) {
+        if (buffer.remaining() == 0)
+            throw new IllegalStateException("Buffer underflow: Requested to read " + amount + " bytes from PacketBuffer, but buffer is empty.");
+
         if (buffer.remaining() < amount)
             amount = buffer.remaining();
         byte[] buf = new byte[amount];
@@ -170,19 +175,8 @@ public class PacketBuffer {
         return buf;
     }
 
-    private void writeBytes(byte[] array) {
-        allocated += array.length;
-        buffer.put(array);
-    }
-
     public byte[] toArray() {
         return ByteUtils.takeBytes(buffer.array(), allocated, 0);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        buffer = null;
     }
 
     public byte[] readToEnd() {

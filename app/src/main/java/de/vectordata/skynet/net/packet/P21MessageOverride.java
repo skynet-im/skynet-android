@@ -46,13 +46,13 @@ public class P21MessageOverride extends ChannelMessagePacket {
         encrypted.writeByte((byte) action.ordinal());
         if (action == OverrideAction.EDIT)
             encrypted.writeString(newText);
-        Aes.encryptWithHmac(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
+        Aes.encryptSigned(encrypted.toArray(), buffer, true, keyStore.getHmacKey(), keyStore.getAesKey());
     }
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
         messageId = decrypted.readInt64();
         action = OverrideAction.values()[decrypted.readByte()];
         if (action == OverrideAction.EDIT)

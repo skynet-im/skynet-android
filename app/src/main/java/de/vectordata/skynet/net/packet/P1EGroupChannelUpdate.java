@@ -36,7 +36,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, true);
         encrypted.writeByteArray(historyKey, true);
-        Aes.encryptWithHmac(encrypted.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
         KeyStore keyStore = keyProvider.getMessageKeys(getParent());
-        PacketBuffer decrypted = new PacketBuffer(Aes.decryptWithHmac(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
+        PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, keyStore.getHmacKey(), keyStore.getAesKey()));
 
     }
 

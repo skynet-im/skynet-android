@@ -58,7 +58,7 @@ public class P0BChannelMessage extends AbstractPacket {
             KeyStore channelKeys = keyProvider.getMessageKeys(this);
             PacketBuffer encryptedBuffer = new PacketBuffer();
             writeContents(encryptedBuffer);
-            Aes.encryptWithHmac(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            Aes.encryptSigned(encryptedBuffer.toArray(), buffer, true, channelKeys.getHmacKey(), channelKeys.getAesKey());
         }
 
         buffer.writeUInt16(dependencies.size());
@@ -87,7 +87,7 @@ public class P0BChannelMessage extends AbstractPacket {
 
         if (!hasFlag(MessageFlags.UNENCRYPTED)) {
             KeyStore channelKeys = keyProvider.getMessageKeys(this);
-            byte[] decryptedData = Aes.decryptWithHmac(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
+            byte[] decryptedData = Aes.decryptSigned(buffer, 0, channelKeys.getHmacKey(), channelKeys.getAesKey());
             if (decryptedData == null) {
                 isCorrupted = true;
                 return;
