@@ -11,6 +11,7 @@
         <item name="invWhite">@color/white</item>
         <item name="invWhite_dark">@color/white</item>
         <item name="invBlack">@color/black</item>
+        <item name="invGray">@color/blueGray</item>
         <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
@@ -42,6 +43,7 @@
         <item name="alertDialogTheme">@style/DarkDialog</item>
         <item name="invWhite">@color/black</item>
         <item name="invBlack">@color/white</item>
+        <item name="invGray">@color/darkBlueGray</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorPrimary">?android:attr/textColorPrimaryInverse</item>
         <item name="android:textColorSecondary">?android:attr/textColorSecondaryInverse</item>
@@ -72,6 +74,12 @@
         <item name="invBlack">@color/lime</item>
         <item name="invWhite_dark">@color/lime</item>
         <item name="colorPrimaryAlt">@color/lime</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textViewStyle">@style/HackerTextView</item>
+    </style>
+
+    <style name="HackerTextView" parent="android:Widget.TextView">
+        <item name="android:fontFamily">monospace</item>
     </style>
 
     <style name="AppTheme.Blue">
@@ -130,7 +138,6 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
 
     <style name="AppTheme.Blue.NoActionBar">
         <item name="windowActionBar">false</item>

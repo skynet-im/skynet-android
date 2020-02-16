@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5b28692a9caf350543a476c6ad7bb5f2",
+    "identityHash": "71f8ef9f11c2346c594682d74653ce23",
     "entities": [
       {
         "tableName": "channels",
@@ -58,7 +58,7 @@
             "columnNames": [
               "channelId"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_channels_channelId` ON `${TABLE_NAME}` (`channelId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_channels_channelId` ON `${TABLE_NAME}` (`channelId`)"
           }
         ],
         "foreignKeys": []
@@ -136,7 +136,7 @@
               "channelId",
               "messageId"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_channelMessages_channelId_messageId` ON `${TABLE_NAME}` (`channelId`, `messageId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_channelMessages_channelId_messageId` ON `${TABLE_NAME}` (`channelId`, `messageId`)"
           }
         ],
         "foreignKeys": [
@@ -208,7 +208,7 @@
               "srcChannelId",
               "srcMessageId"
             ],
-            "createSql": "CREATE  INDEX `index_dependencies_srcChannelId_srcMessageId` ON `${TABLE_NAME}` (`srcChannelId`, `srcMessageId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dependencies_srcChannelId_srcMessageId` ON `${TABLE_NAME}` (`srcChannelId`, `srcMessageId`)"
           }
         ],
         "foreignKeys": [
@@ -862,7 +862,7 @@
       },
       {
         "tableName": "onlineStates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `onlineState` INTEGER, `lastSeen` INTEGER, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `onlineState` INTEGER, `lastSeen` INTEGER, PRIMARY KEY(`channelId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "channelId",
@@ -891,8 +891,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "channelId",
-            "messageId"
+            "channelId"
           ],
           "autoGenerate": false
         },
@@ -943,7 +942,7 @@
             "columnNames": [
               "channelId"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_messageDrafts_channelId` ON `${TABLE_NAME}` (`channelId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_messageDrafts_channelId` ON `${TABLE_NAME}` (`channelId`)"
           }
         ],
         "foreignKeys": [
@@ -964,7 +963,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b28692a9caf350543a476c6ad7bb5f2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '71f8ef9f11c2346c594682d74653ce23')"
     ]
   }
 }

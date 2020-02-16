@@ -39,7 +39,6 @@ public class P2BOnlineState extends ChannelMessagePacket {
 
     @Override
     public void writeToDatabase(PacketDirection packetDirection) {
-        Storage.getDatabase().onlineStateDao().clear(getParent().channelId);
         Storage.getDatabase().onlineStateDao().insert(OnlineStateDb.fromPacket(this));
     }
 

@@ -16,7 +16,7 @@ import de.vectordata.skynet.util.date.DateTime;
         childColumns = {"channelId", "messageId"},
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.CASCADE),
-        primaryKeys = {"channelId", "messageId"}
+        primaryKeys = {"channelId"}
 )
 public class OnlineStateDb {
 

@@ -77,7 +77,7 @@ public class ChatsFragment extends Fragment {
 
         context = Objects.requireNonNull(getActivity());
         if (handler == null)
-            handler = Handlers.createOnThread("DatabaseThread");
+            handler = Handlers.createOnThread("BackgroundThread");
 
         adapter = new ChatsAdapter(dataset);
         adapter.setItemClickListener(idx -> {

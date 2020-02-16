@@ -148,6 +148,10 @@ public class P0BChannelMessage extends AbstractPacket {
         return null;
     }
 
+    public boolean isSentByMe() {
+        return Storage.getSession().getAccountId() == senderId;
+    }
+
     public static class Dependency {
         public long accountId;
         public long channelId;
