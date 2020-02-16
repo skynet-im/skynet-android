@@ -42,9 +42,7 @@ public abstract class SkynetActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAuthenticationFailed(AuthenticationFailedEvent event) {
-        if (event.getError() == RestoreSessionError.INVALID_CREDENTIALS)
-            Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
-        else if (event.getError() == RestoreSessionError.INVALID_SESSION)
+        if (event.getError() == RestoreSessionError.INVALID_SESSION)
             Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
     }
 

@@ -2,6 +2,7 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.TypeConverters;
 
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
@@ -16,7 +17,8 @@ import de.vectordata.skynet.util.date.DateTime;
         childColumns = {"channelId", "messageId"},
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.CASCADE),
-        primaryKeys = {"channelId"}
+        primaryKeys = {"channelId"},
+        indices = {@Index(value = {"channelId", "messageId"}, unique = true)}
 )
 public class OnlineStateDb {
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "71f8ef9f11c2346c594682d74653ce23",
+    "identityHash": "b04559c5186d3f8324691fd477265a3b",
     "entities": [
       {
         "tableName": "channels",
@@ -895,7 +895,17 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_onlineStates_channelId_messageId",
+            "unique": true,
+            "columnNames": [
+              "channelId",
+              "messageId"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_onlineStates_channelId_messageId` ON `${TABLE_NAME}` (`channelId`, `messageId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "channelMessages",
@@ -963,7 +973,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '71f8ef9f11c2346c594682d74653ce23')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b04559c5186d3f8324691fd477265a3b')"
     ]
   }
 }

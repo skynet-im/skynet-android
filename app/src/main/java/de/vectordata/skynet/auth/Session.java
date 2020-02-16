@@ -12,6 +12,8 @@ public class Session implements Serializable {
 
     private KeyCollection sessionKeys;
 
+    private byte[] sessionToken;
+
     public Session(KeyCollection sessionKeys) {
         this.sessionKeys = sessionKeys;
     }
@@ -30,6 +32,14 @@ public class Session implements Serializable {
 
     public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public byte[] getSessionToken() {
+        return sessionToken;
+    }
+
+    public void setSessionToken(byte[] sessionToken) {
+        this.sessionToken = sessionToken;
     }
 
     public KeyCollection getSessionKeys() {
