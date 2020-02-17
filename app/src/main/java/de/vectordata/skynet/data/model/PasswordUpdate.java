@@ -23,8 +23,8 @@ public class PasswordUpdate {
 
     public static PasswordUpdate fromPacket(P15PasswordUpdate packet) {
         PasswordUpdate update = new PasswordUpdate();
-        update.channelId = packet.getParent().channelId;
-        update.messageId = packet.getParent().messageId;
+        update.channelId = packet.channelId;
+        update.messageId = packet.messageId;
         update.keyHash = packet.keyHash;
         return update;
     }

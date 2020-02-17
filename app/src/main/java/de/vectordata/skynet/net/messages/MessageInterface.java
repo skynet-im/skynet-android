@@ -2,14 +2,12 @@ package de.vectordata.skynet.net.messages;
 
 import java.util.Random;
 
-import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
-import de.vectordata.skynet.net.client.PacketBuffer;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
-import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageInterface {
 
@@ -44,9 +42,9 @@ public class MessageInterface {
      * @return An awaitable for the response
      */
     public ResponseAwaiter send(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        PreparedMessage message = prepare(channelId, newId(), config, packet);
-        message.persist(PersistenceMode.DATABASE);
-        return skynetContext.getNetworkManager().sendPacket(message.getChannelMessage());
+        configure(packet, channelId, newId(), config);
+        packet.persist(PacketDirection.SEND);
+        return skynetContext.getNetworkManager().sendPacket(packet);
     }
 
     /**
@@ -71,31 +69,24 @@ public class MessageInterface {
      * @param persistenceMode Whether to save to the database
      */
     public void schedule(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet, PersistenceMode persistenceMode) {
-        PreparedMessage message = prepare(channelId, messageId, config, packet);
-        message.persist(persistenceMode);
-        skynetContext.getJobEngine().schedule(new ChannelMessageJob(message.getChannelMessage()));
+        configure(packet, channelId, newId(), config);
+        if (persistenceMode == PersistenceMode.DATABASE)
+            packet.persist(PacketDirection.SEND);
+        skynetContext.getJobEngine().schedule(new ChannelMessageJob(packet));
     }
 
-    private PreparedMessage prepare(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet) {
-        P0BChannelMessage container = new P0BChannelMessage();
-        container.channelId = channelId;
-        container.messageId = messageId;
-        container.senderId = Storage.getSession().getAccountId();
-        container.packetVersion = PACKET_VERSION;
-        container.messageFlags = config.getMessageFlags();
-        container.fileId = config.getFileId();
-        container.contentPacketId = packet.getId();
-        container.contentPacketVersion = PACKET_VERSION;
-        container.fileKey = config.getFileKey();
-        container.dependencies = config.getDependencies();
-        container.dispatchTime = DateTime.now();
+    private void configure(ChannelMessagePacket packet, long channelId, long messageId, ChannelMessageConfig config) {
+        packet.packetVersion = PACKET_VERSION;
+        packet.channelId = channelId;
+        packet.messageId = messageId;
+        packet.messageFlags = config.getMessageFlags();
+        packet.dependencies = config.getDependencies();
+        packet.attachedFile = config.getAttachedFile();
+        packet.fileId = config.getFileId();
 
-        PacketBuffer buffer = new PacketBuffer();
-        packet.setParent(container);
-        packet.writePacket(buffer, skynetContext);
-        container.contentPacket = buffer.toArray();
-
-        return new PreparedMessage(container, packet);
+        Flags flags = packet.getClass().getAnnotation(Flags.class);
+        if (flags != null)
+            packet.messageFlags |= flags.value();
     }
 
 }

@@ -1,6 +1,7 @@
 package de.vectordata.skynet.net.client;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import de.vectordata.skynet.util.date.DateTime;
@@ -56,12 +57,12 @@ public class PacketBuffer {
         writeInt64(date.toBinary());
     }
 
-    public void writeString(String str) {
-        writeByteArray(str.getBytes(), true);
+    public void writeString(String string, LengthPrefix prefix) {
+        writeByteArray(string.getBytes(Charset.forName("UTF-8")), prefix);
     }
 
-    public String readString() {
-        return new String(readByteArray());
+    public String readString(LengthPrefix prefix) {
+        return new String(readByteArray(prefix));
     }
 
     public void writeBool(boolean bool) {
@@ -80,17 +81,48 @@ public class PacketBuffer {
         return buffer.get();
     }
 
-    public void writeByteArray(byte[] arr, boolean writeLength) {
-        if (writeLength)
-            writeUInt32(arr.length);
+    public void writeUInt8(int b) {
+        writeByte((byte) b);
+    }
+
+    public int readUInt8() {
+        return buffer.get() & 0xFF;
+    }
+
+    public void writeByteArray(byte[] arr, LengthPrefix prefix) {
+        switch (prefix) {
+            case SHORT:
+                writeUInt8(arr.length);
+                break;
+            case MEDIUM:
+                writeUInt16(arr.length);
+                break;
+            case LONG:
+                writeInt32(arr.length);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown LengthPrefix " + prefix);
+        }
         writeBytes(arr);
     }
 
-    public byte[] readByteArray() {
-        return readBytes((int) readUInt32());
-    }
-
-    public byte[] readByteArray(int len) {
+    public byte[] readByteArray(LengthPrefix prefix) {
+        int len;
+        switch (prefix) {
+            case SHORT:
+                len = readUInt8();
+                break;
+            case MEDIUM:
+                len = readUInt16();
+                break;
+            case LONG:
+                len = readInt32();
+                break;
+            case NONE:
+                throw new IllegalArgumentException("Can't read an array with LengthPrefix none if no fixed length is specified. Use readBytes(int) instead.");
+            default:
+                throw new IllegalArgumentException("Unknown LengthPrefix " + prefix);
+        }
         return readBytes(len);
     }
 
@@ -164,7 +196,7 @@ public class PacketBuffer {
         buffer.put(array);
     }
 
-    private byte[] readBytes(int amount) {
+    public byte[] readBytes(int amount) {
         if (buffer.remaining() == 0)
             throw new IllegalStateException("Buffer underflow: Requested to read " + amount + " bytes from PacketBuffer, but buffer is empty.");
 

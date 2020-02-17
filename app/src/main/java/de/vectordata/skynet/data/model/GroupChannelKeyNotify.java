@@ -27,8 +27,8 @@ public class GroupChannelKeyNotify {
 
     public static GroupChannelKeyNotify fromPacket(P1DGroupChannelKeyNotify packet) {
         GroupChannelKeyNotify notify = new GroupChannelKeyNotify();
-        notify.channelId = packet.getParent().channelId;
-        notify.messageId = packet.getParent().messageId;
+        notify.channelId = packet.channelId;
+        notify.messageId = packet.messageId;
         notify.groupChannelId = packet.channelId;
         notify.newKey = packet.newKey;
         notify.historyKey = packet.historyKey;

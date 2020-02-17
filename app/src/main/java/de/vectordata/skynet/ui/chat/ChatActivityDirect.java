@@ -31,7 +31,6 @@ import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
 import de.vectordata.skynet.net.model.ConnectionState;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P20ChatMessage;
 import de.vectordata.skynet.net.packet.P21MessageOverride;
@@ -163,7 +162,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     public void onPacketEvent(PacketEvent event) {
         Packet packetIn = event.getPacket();
         if (packetIn instanceof ChannelMessagePacket) {
-            long channelId = ((ChannelMessagePacket) packetIn).getParent().channelId;
+            long channelId = ((ChannelMessagePacket) packetIn).channelId;
             if (channelId != messageChannel.getChannelId() && channelId != accountDataChannel.getChannelId() && channelId != profileDataChannel.getChannelId())
                 return;
         }
@@ -171,8 +170,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         if (packetIn instanceof P20ChatMessage) {
             P20ChatMessage chatMessage = (P20ChatMessage) packetIn;
             insertMessage(chatMessage, MessageState.SENT);
-            if (chatMessage.getParent().senderId != Storage.getSession().getAccountId())
-                readMessage(chatMessage.getParent().messageId);
+            if (chatMessage.senderId != Storage.getSession().getAccountId())
+                readMessage(chatMessage.messageId);
         } else if (packetIn instanceof P0CChannelMessageResponse) {
             P0CChannelMessageResponse response = ((P0CChannelMessageResponse) packetIn);
             if (response.channelId != messageChannel.getChannelId()) return;
@@ -181,13 +180,13 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 i.setMessageState(MessageState.SENT);
             });
         } else if (packetIn instanceof P22MessageReceived) {
-            P0BChannelMessage.Dependency dependency = ((P22MessageReceived) packetIn).getParent().singleDependency();
+            ChannelMessagePacket.NetDependency dependency = ((P22MessageReceived) packetIn).singleDependency();
             modifyMessageItem(dependency.messageId, i -> {
                 if (i.getMessageState() != MessageState.SEEN)
                     i.setMessageState(MessageState.DELIVERED);
             });
         } else if (packetIn instanceof P23MessageRead) {
-            P0BChannelMessage.Dependency dependency = ((P23MessageRead) packetIn).getParent().singleDependency();
+            ChannelMessagePacket.NetDependency dependency = ((P23MessageRead) packetIn).singleDependency();
             modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));
         } else if (packetIn instanceof P21MessageOverride) {
             P21MessageOverride override = (P21MessageOverride) packetIn;
@@ -199,7 +198,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             });
         } else if (packetIn instanceof P2BOnlineState) {
             P2BOnlineState packet = (P2BOnlineState) packetIn;
-            if (packet.getParent().channelId != this.accountDataChannel.getChannelId()) return;
+            if (packet.channelId != this.accountDataChannel.getChannelId()) return;
 
             switch (packet.onlineState) {
                 case ACTIVE:
@@ -367,13 +366,13 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private void insertMessage(P20ChatMessage msg, MessageState messageState) {
         MessageItem oldLatest = messageItems.size() > 0 ? messageItems.get(messageItems.size() - 1) : null;
 
-        MessageSide messageSide = MessageSide.fromAccountId(msg.getParent().senderId);
+        MessageSide messageSide = MessageSide.fromAccountId(msg.senderId);
 
         QuotedMessage quotedMessage = null;
         if (msg.quotedMessage != 0)
             quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
 
-        MessageItem newLatest = new MessageItem(msg.getParent().messageId, msg.text, msg.getParent().dispatchTime, messageState, messageSide, quotedMessage, false);
+        MessageItem newLatest = new MessageItem(msg.messageId, msg.text, msg.dispatchTime, messageState, messageSide, quotedMessage, false);
         runOnUiThread(() -> {
             if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
                 messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));

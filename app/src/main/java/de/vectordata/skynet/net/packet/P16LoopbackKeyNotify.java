@@ -3,29 +3,27 @@ package de.vectordata.skynet.net.packet;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.LoopbackKeyNotify;
-import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
-import de.vectordata.skynet.net.packet.annotation.Channel;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 
-@Flags(MessageFlags.UNENCRYPTED)
-@Channel(ChannelType.LOOPBACK)
+@Flags(MessageFlags.LOOPBACK)
 public class P16LoopbackKeyNotify extends ChannelMessagePacket {
 
     public byte[] key;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByteArray(key, false);
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        buffer.writeByteArray(key, LengthPrefix.NONE);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        key = buffer.readByteArray(32);
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        key = buffer.readBytes(64);
     }
 
     @Override
@@ -39,7 +37,7 @@ public class P16LoopbackKeyNotify extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().loopbackKeyNotifyDao().insert(LoopbackKeyNotify.fromPacket(this));
     }
 }

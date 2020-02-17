@@ -4,11 +4,11 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 
 public class P09RestoreSessionResponse extends AbstractPacket {
 
-    public RestoreSessionError errorCode;
+    public RestoreSessionStatus statusCode;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -16,7 +16,7 @@ public class P09RestoreSessionResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        errorCode = RestoreSessionError.values()[buffer.readByte()];
+        statusCode = RestoreSessionStatus.values()[buffer.readByte()];
     }
 
     @Override

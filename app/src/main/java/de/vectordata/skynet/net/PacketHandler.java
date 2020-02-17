@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
+import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
@@ -25,7 +26,6 @@ import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
@@ -34,7 +34,7 @@ import de.vectordata.skynet.net.packet.P15PasswordUpdate;
 import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
-import de.vectordata.skynet.net.packet.P19KeypairReference;
+import de.vectordata.skynet.net.packet.P19ArchiveChannel;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
 import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
 import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
@@ -55,17 +55,16 @@ import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
-import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.P34SetClientState;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.AsymmetricKey;
-import de.vectordata.skynet.net.packet.model.CreateChannelError;
-import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
+import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
 import de.vectordata.skynet.net.packet.model.KeyFormat;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
@@ -96,12 +95,17 @@ public class PacketHandler {
         if (packet == null)
             return;
 
-        if (packet instanceof ChannelMessagePacket)
-            ((ChannelMessagePacket) packet).setParent((P0BChannelMessage) parent);
-
         if (payload == null) {
             Log.w(TAG, "Received corrupted packet 0x" + Integer.toHexString(id));
             return;
+        }
+
+        if (packet instanceof ChannelMessagePacket) {
+            ChannelMessagePacket message = (ChannelMessagePacket) packet;
+            Flags flags = message.getClass().getAnnotation(Flags.class);
+            if (flags != null)
+                if ((message.messageFlags | flags.value()) != message.messageFlags)
+                    throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
         }
 
         packet.readPacket(new PacketBuffer(payload), keyProvider);
@@ -110,7 +114,7 @@ public class PacketHandler {
             return;
 
         if (packet instanceof ChannelMessagePacket)
-            ((ChannelMessagePacket) packet).writeToDatabase(PacketDirection.RECEIVE);
+            ((ChannelMessagePacket) packet).persist(PacketDirection.RECEIVE);
 
         Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
 
@@ -132,15 +136,19 @@ public class PacketHandler {
     }
 
     public void handlePacket(P07CreateSessionResponse packet) {
-        if (packet.errorCode == CreateSessionError.SUCCESS) {
+        if (packet.statusCode == CreateSessionStatus.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
             networkManager.releaseCache();
         } else
             networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
+        Session session = Storage.getSession();
+        session.setSessionToken(packet.sessionToken);
+        session.setWebToken(packet.webToken);
+        Storage.setSession(session);
     }
 
     public void handlePacket(P09RestoreSessionResponse packet) {
-        if (packet.errorCode == RestoreSessionError.SUCCESS) {
+        if (packet.statusCode == RestoreSessionStatus.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
             networkManager.releaseCache();
         } else
@@ -152,16 +160,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P2FCreateChannelResponse packet) {
-        if (packet.errorCode == CreateChannelError.SUCCESS) {
+        if (packet.statusCode == CreateChannelStatus.SUCCESS) {
             Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
             channel.setChannelId(packet.channelId);
             Storage.getDatabase().channelDao().update(channel);
         } else Storage.getDatabase().channelDao().deleteById(packet.tempChannelId);
-    }
-
-    public void handlePacket(P0BChannelMessage packet) {
-        packet.writeToDatabase(PacketDirection.RECEIVE);
-        handlePacket(packet.contentPacketId, packet.contentPacket, packet);
     }
 
     public void handlePacket(P0CChannelMessageResponse packet) {
@@ -203,8 +206,7 @@ public class PacketHandler {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
                         new ChannelMessageConfig()
-                                .addFlag(MessageFlags.UNENCRYPTED)
-                                .addDependency(Storage.getSession().getAccountId(), loopbackChannel.getChannelId(), response.messageId),
+                                .addDependency(Storage.getSession().getAccountId(), response.messageId),
                         new P18PublicKeys(
                                 new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
                                 new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
@@ -254,7 +256,7 @@ public class PacketHandler {
 
     }
 
-    public void handlePacket(P19KeypairReference packet) {
+    public void handlePacket(P19ArchiveChannel packet) {
 
     }
 
@@ -263,12 +265,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1BDirectChannelUpdate packet) {
-        /*long me = Storage.getSession().getAccountId();
-        P0BChannelMessage parent = packet.getParent();
-        P0BChannelMessage.Dependency keypairReferenceDependency = parent.findDependency(d -> d.accountId == me);
-        List<Dependency> dependencies = Storage.getDatabase().dependencyDao().getDependencies(keypairReferenceDependency.channelId, keypairReferenceDependency.messageId);
-        ChannelKey privateKey;
-        ChannelKey publicKey;*/
+
     }
 
     public void handlePacket(P1CDirectChannelCustomization packet) {
@@ -285,11 +282,11 @@ public class PacketHandler {
 
     public void handlePacket(P20ChatMessage packet) {
         if (!inSync) return; // Only send receive confirmations live if in sync
-        if (packet.getParent().isSentByMe())
+        if (packet.isSentByMe())
             return; // Don't send receive confirmations for my own messages
 
-        sendReceiveConfirmation(packet.getParent().channelId, packet.getParent().messageId);
-        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet.getParent().channelId, packet.getParent().messageId, packet.text);
+        sendReceiveConfirmation(packet.channelId, packet.messageId);
+        SkynetContext.getCurrent().getNotificationManager().onMessageReceived(packet.channelId, packet.messageId, packet.text);
     }
 
     public void handlePacket(P21MessageOverride packet) {
@@ -297,20 +294,20 @@ public class PacketHandler {
 
     // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received/read it.
     public void handlePacket(P22MessageReceived packet) {
-        P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
-        setMessageState(dependency.channelId, dependency.messageId, MessageState.DELIVERED);
+        ChannelMessagePacket.NetDependency dependency = packet.singleDependency();
+        setMessageState(packet.channelId, dependency.messageId, MessageState.DELIVERED);
     }
 
     public void handlePacket(P23MessageRead packet) {
-        P0BChannelMessage.Dependency dependency = packet.getParent().singleDependency();
-        setMessageState(dependency.channelId, dependency.messageId, MessageState.SEEN);
-        SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(dependency.channelId, dependency.messageId);
+        ChannelMessagePacket.NetDependency dependency = packet.singleDependency();
+        setMessageState(packet.channelId, dependency.messageId, MessageState.SEEN);
+        SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(packet.channelId, dependency.messageId);
     }
 
     private void sendReceiveConfirmation(long channelId, long messageId) {
         SkynetContext.getCurrent().getMessageInterface()
                 .send(channelId,
-                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, channelId, messageId),
+                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
                         new P22MessageReceived()
                 );
         setMessageState(channelId, messageId, MessageState.DELIVERED);
@@ -364,10 +361,6 @@ public class PacketHandler {
 
     ////////////////////// On demand packets //////////////////////
     public void handlePacket(P2ESearchAccountResponse packet) {
-
-    }
-
-    public void handlePacket(P31FileUploadResponse packet) {
 
     }
 

@@ -23,8 +23,8 @@ public class MailAddress {
 
     public static MailAddress fromPacket(P14MailAddress packet) {
         MailAddress address = new MailAddress();
-        address.channelId = packet.getParent().channelId;
-        address.messageId = packet.getParent().messageId;
+        address.channelId = packet.channelId;
+        address.messageId = packet.messageId;
         address.setMailAddress(packet.mailAddress);
         return address;
     }

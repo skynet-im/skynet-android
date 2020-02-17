@@ -7,25 +7,29 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Device;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.date.DateTime;
 
+@Flags(MessageFlags.LOOPBACK | MessageFlags.UNENCRYPTED)
 public class P29DeviceList extends ChannelMessagePacket {
 
     public List<PDevice> devices = new ArrayList<>();
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         devices.clear();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++)
-            devices.add(new PDevice(buffer.readInt64(), buffer.readDate(), buffer.readString()));
+            devices.add(new PDevice(buffer.readInt64(), buffer.readDate(), buffer.readString(LengthPrefix.SHORT)));
     }
 
     @Override
@@ -39,7 +43,7 @@ public class P29DeviceList extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+    public void persistContents(PacketDirection packetDirection) {
         Storage.getDatabase().deviceListDao().clear();
         Device[] devices = new Device[this.devices.size()];
         for (int i = 0; i < devices.length; i++)

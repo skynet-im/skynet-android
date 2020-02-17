@@ -6,7 +6,6 @@ import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
@@ -15,7 +14,7 @@ import de.vectordata.skynet.net.packet.P15PasswordUpdate;
 import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
-import de.vectordata.skynet.net.packet.P19KeypairReference;
+import de.vectordata.skynet.net.packet.P19ArchiveChannel;
 import de.vectordata.skynet.net.packet.P1AVerifiedKeys;
 import de.vectordata.skynet.net.packet.P1BDirectChannelUpdate;
 import de.vectordata.skynet.net.packet.P1CDirectChannelCustomization;
@@ -36,7 +35,6 @@ import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
-import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.base.Packet;
 
@@ -52,7 +50,6 @@ class PacketRegistry {
         register(new P09RestoreSessionResponse());
         register(new P0ACreateChannel());
         register(new P2FCreateChannelResponse());
-        register(new P0BChannelMessage());
         register(new P0CChannelMessageResponse());
         register(new P0FSyncFinished());
         register(new P13QueueMailAddressChange());
@@ -61,7 +58,7 @@ class PacketRegistry {
         register(new P16LoopbackKeyNotify());
         register(new P17PrivateKeys());
         register(new P18PublicKeys());
-        register(new P19KeypairReference());
+        register(new P19ArchiveChannel());
         register(new P1AVerifiedKeys());
         register(new P1BDirectChannelUpdate());
         register(new P1CDirectChannelCustomization());
@@ -82,7 +79,6 @@ class PacketRegistry {
         register(new P2CChannelAction());
         register(new P2ESearchAccountResponse());
         register(new P2FCreateChannelResponse());
-        register(new P31FileUploadResponse());
         register(new P33DeviceListResponse());
     }
 

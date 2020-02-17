@@ -1,14 +1,11 @@
 package de.vectordata.skynet.net.packet;
 
-import java.io.StreamCorruptedException;
-
-import de.vectordata.skynet.crypto.Aes;
-import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -30,26 +27,17 @@ public class P20ChatMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
-        PacketBuffer encrypted = new PacketBuffer();
-        encrypted.writeByte((byte) messageType.ordinal());
-        encrypted.writeString(text);
-        encrypted.writeInt64(quotedMessage);
-        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        buffer.writeByte((byte) messageType.ordinal());
+        buffer.writeString(text, LengthPrefix.MEDIUM);
+        buffer.writeInt64(quotedMessage);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(getParent());
-        try {
-            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-            messageType = MessageType.values()[decrypted.readByte()];
-            text = decrypted.readString();
-            quotedMessage = decrypted.readInt64();
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        }
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        messageType = MessageType.values()[buffer.readByte()];
+        text = buffer.readString(LengthPrefix.MEDIUM);
+        quotedMessage = buffer.readInt64();
     }
 
     @Override
@@ -63,8 +51,8 @@ public class P20ChatMessage extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-        if (getParent().isSentByMe()) {
+    public void persistContents(PacketDirection packetDirection) {
+        if (isSentByMe()) {
             Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, packetDirection == PacketDirection.RECEIVE ? MessageState.SENT : MessageState.SENDING, false));
         } else {
             Storage.getDatabase().chatMessageDao().insert(ChatMessage.fromPacket(this, MessageState.NONE, true));

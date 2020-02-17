@@ -16,7 +16,6 @@ import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.jobengine.JobEngine;
 import de.vectordata.skynet.net.messages.MessageInterface;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.state.AppState;
 import de.vectordata.skynet.ui.notification.INotificationManager;
 import de.vectordata.skynet.ui.notification.NotificationManagerFactory;
@@ -72,8 +71,8 @@ public class SkynetContext implements KeyProvider {
     }
 
     @Override
-    public ChannelKeys getChannelKeys(P0BChannelMessage message) {
-        Channel channel = Storage.getDatabase().channelDao().getById(message.channelId);
+    public ChannelKeys getChannelKeys(long channelId) {
+        Channel channel = Storage.getDatabase().channelDao().getById(channelId);
         if (channel == null)
             throw new IllegalArgumentException("Cannot request keys for null channel");
         if (channel.getChannelType() == ChannelType.LOOPBACK)

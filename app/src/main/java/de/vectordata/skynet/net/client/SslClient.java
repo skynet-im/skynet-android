@@ -1,5 +1,6 @@
 package de.vectordata.skynet.net.client;
 
+import android.os.Build;
 import android.util.Log;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class SslClient {
     public void sendPacket(int id, byte[] payload) {
         PacketBuffer buffer = new PacketBuffer(payload.length + 4);
         buffer.writeInt32((payload.length << 8) | (byte) id);
-        buffer.writeByteArray(payload, false);
+        buffer.writeByteArray(payload, LengthPrefix.NONE);
 
         socket.send(buffer.toArray());
     }
@@ -90,7 +91,8 @@ public class SslClient {
             TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             factory.init(store);
 
-            SSLContext context = SSLContext.getInstance("TLSv1.2");
+            String tlsVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? "TLSv1.3" : "TLSv1.2";
+            SSLContext context = SSLContext.getInstance(tlsVersion);
             context.init(null, factory.getTrustManagers(), new SecureRandom());
             return context.getSocketFactory();
         } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException | IOException e) {

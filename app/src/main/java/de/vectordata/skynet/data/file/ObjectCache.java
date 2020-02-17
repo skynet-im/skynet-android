@@ -16,6 +16,7 @@ import java.io.IOException;
  *
  * @param <T> The object type
  */
+@SuppressWarnings("unchecked")
 public class ObjectCache<T> {
 
     public static final String TAG = "ObjectCache";

@@ -1,26 +1,27 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.data.Storage;
-import de.vectordata.skynet.data.model.Bio;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.model.ArchiveMode;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 
-public class P26Bio extends ChannelMessagePacket {
+@Flags(MessageFlags.UNENCRYPTED)
+public class P19ArchiveChannel extends ChannelMessagePacket {
 
-    public String bio;
+    public ArchiveMode archiveMode;
 
     @Override
     public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeString(bio, LengthPrefix.MEDIUM);
+        buffer.writeByte((byte) archiveMode.ordinal());
     }
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        bio = buffer.readString(LengthPrefix.MEDIUM);
+        archiveMode = ArchiveMode.values()[buffer.readByte()];
     }
 
     @Override
@@ -30,11 +31,10 @@ public class P26Bio extends ChannelMessagePacket {
 
     @Override
     public byte getId() {
-        return 0x26;
+        return 0x19;
     }
 
     @Override
     public void persistContents(PacketDirection packetDirection) {
-        Storage.getDatabase().bioDao().insert(Bio.fromPacket(this));
     }
 }

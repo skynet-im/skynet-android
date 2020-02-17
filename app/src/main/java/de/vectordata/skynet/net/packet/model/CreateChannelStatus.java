@@ -1,6 +1,6 @@
 package de.vectordata.skynet.net.packet.model;
 
-public enum CreateChannelError {
+public enum CreateChannelStatus {
     SUCCESS,
     ALREADY_EXISTS,
     INVALID_COUNTERPART,

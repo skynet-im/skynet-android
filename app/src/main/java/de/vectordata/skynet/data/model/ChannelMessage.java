@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.util.date.DateTime;
 
 @Entity(tableName = "channelMessages", foreignKeys = @ForeignKey(
@@ -35,11 +35,7 @@ public class ChannelMessage {
 
     private long fileId;
 
-    private byte[] fileKey;
-
-    private int contentPacketId;
-
-    public static ChannelMessage fromPacket(P0BChannelMessage packet) {
+    public static ChannelMessage fromPacket(ChannelMessagePacket packet) {
         ChannelMessage message = new ChannelMessage();
         message.channelId = packet.channelId;
         message.messageId = packet.messageId;
@@ -47,8 +43,6 @@ public class ChannelMessage {
         message.dispatchTime = packet.dispatchTime;
         message.messageFlags = packet.messageFlags;
         message.fileId = packet.fileId;
-        message.fileKey = packet.fileKey;
-        message.contentPacketId = packet.contentPacketId;
         return message;
     }
 
@@ -106,22 +100,6 @@ public class ChannelMessage {
 
     public void setFileId(long fileId) {
         this.fileId = fileId;
-    }
-
-    public byte[] getFileKey() {
-        return fileKey;
-    }
-
-    public void setFileKey(byte[] fileKey) {
-        this.fileKey = fileKey;
-    }
-
-    public int getContentPacketId() {
-        return contentPacketId;
-    }
-
-    public void setContentPacketId(int contentPacketId) {
-        this.contentPacketId = contentPacketId;
     }
 
 }

@@ -60,7 +60,7 @@ public class AddContactActivity extends ThemedActivity {
                 channel.setChannelType(ChannelType.DIRECT);
                 channel.setChannelId(tempChannelId);
                 Storage.getDatabase().channelDao().insert(channel);
-                Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
+                Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, accountId);
                 SkynetContext.getCurrent().getNetworkManager().sendPacket(packet)
                         .waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(() -> {
                             dialog.dismiss();
