@@ -143,6 +143,7 @@ public class PacketHandler {
             networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
         Session session = Storage.getSession();
         session.setSessionToken(packet.sessionToken);
+        session.setWebToken(packet.webToken);
         Storage.setSession(session);
     }
 
