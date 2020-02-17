@@ -5,6 +5,7 @@ import java.util.Random;
 import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
@@ -82,6 +83,10 @@ public class MessageInterface {
         packet.dependencies = config.getDependencies();
         packet.attachedFile = config.getAttachedFile();
         packet.fileId = config.getFileId();
+
+        Flags flags = packet.getClass().getAnnotation(Flags.class);
+        if (flags != null)
+            packet.messageFlags |= flags.value();
     }
 
 }

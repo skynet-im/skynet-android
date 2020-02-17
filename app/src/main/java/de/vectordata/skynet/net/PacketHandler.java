@@ -55,7 +55,6 @@ import de.vectordata.skynet.net.packet.P2BOnlineState;
 import de.vectordata.skynet.net.packet.P2CChannelAction;
 import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
-import de.vectordata.skynet.net.packet.P31FileUploadResponse;
 import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
@@ -64,7 +63,6 @@ import de.vectordata.skynet.net.packet.model.AsymmetricKey;
 import de.vectordata.skynet.net.packet.model.CreateChannelError;
 import de.vectordata.skynet.net.packet.model.CreateSessionError;
 import de.vectordata.skynet.net.packet.model.KeyFormat;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.RestoreSessionError;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
@@ -198,7 +196,6 @@ public class PacketHandler {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
                         new ChannelMessageConfig()
-                                .addFlag(MessageFlags.UNENCRYPTED)
                                 .addDependency(Storage.getSession().getAccountId(), response.messageId),
                         new P18PublicKeys(
                                 new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
@@ -354,10 +351,6 @@ public class PacketHandler {
 
     ////////////////////// On demand packets //////////////////////
     public void handlePacket(P2ESearchAccountResponse packet) {
-
-    }
-
-    public void handlePacket(P31FileUploadResponse packet) {
 
     }
 

@@ -10,9 +10,12 @@ import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.date.DateTime;
 
+@Flags(MessageFlags.LOOPBACK | MessageFlags.UNENCRYPTED)
 public class P29DeviceList extends ChannelMessagePacket {
 
     public List<PDevice> devices = new ArrayList<>();
