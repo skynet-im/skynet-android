@@ -104,7 +104,8 @@ public class PacketHandler {
             ChannelMessagePacket message = (ChannelMessagePacket) packet;
             Flags flags = message.getClass().getAnnotation(Flags.class);
             if (flags != null)
-                message.messageFlags |= flags.value();
+                if ((message.messageFlags | flags.value()) != message.messageFlags)
+                    throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
         }
 
         packet.readPacket(new PacketBuffer(payload), keyProvider);
