@@ -10,9 +10,9 @@ import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.Dependency;
+import de.vectordata.skynet.data.model.FileInfo;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
-import de.vectordata.skynet.net.packet.model.FileInfo;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.Selector;
 import de.vectordata.skynet.util.date.DateTime;
@@ -100,6 +100,8 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
         }
         Storage.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
         Storage.getDatabase().dependencyDao().insert(Dependency.arrayFromPacket(this, dependencies));
+        if (attachedFile != null)
+            Storage.getDatabase().fileInfoDao().insert(attachedFile);
         persistContents(packetDirection);
     }
 

@@ -1,8 +1,23 @@
-package de.vectordata.skynet.net.packet.model;
+package de.vectordata.skynet.data.model;
+
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
 
 import de.vectordata.skynet.util.date.DateTime;
 
+@Entity(tableName = "fileInfos", foreignKeys = @ForeignKey(
+        entity = ChannelMessage.class,
+        parentColumns = {"channelId", "messageId"},
+        childColumns = {"channelId", "messageId"},
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE),
+        primaryKeys = {"channelId", "messageId"}
+)
 public class FileInfo {
+
+    private long channelId;
+
+    private long messageId;
 
     private String name;
 
@@ -20,7 +35,9 @@ public class FileInfo {
 
     private byte[] key;
 
-    public FileInfo(String name, DateTime creationTime, DateTime lastWriteTime, String thumbnailContentType, byte[] thumbnail, String contentType, long length, byte[] key) {
+    public FileInfo(long channelId, long messageId, String name, DateTime creationTime, DateTime lastWriteTime, String thumbnailContentType, byte[] thumbnail, String contentType, long length, byte[] key) {
+        this.channelId = channelId;
+        this.messageId = messageId;
         this.name = name;
         this.creationTime = creationTime;
         this.lastWriteTime = lastWriteTime;
@@ -29,6 +46,22 @@ public class FileInfo {
         this.contentType = contentType;
         this.length = length;
         this.key = key;
+    }
+
+    public long getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(long channelId) {
+        this.channelId = channelId;
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 
     public String getName() {

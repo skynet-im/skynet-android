@@ -3,8 +3,8 @@ package de.vectordata.skynet.net.messages;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.vectordata.skynet.data.model.FileInfo;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.model.FileInfo;
 
 public class ChannelMessageConfig {
 
