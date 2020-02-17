@@ -1,6 +1,6 @@
 package de.vectordata.skynet.net.packet.model;
 
-public enum RestoreSessionError {
+public enum DeleteAccountStatus {
     SUCCESS,
-    INVALID_SESSION
+    INVALID_CREDENTIALS
 }

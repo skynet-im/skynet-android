@@ -27,7 +27,7 @@ import de.vectordata.skynet.net.packet.annotation.AllowState;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class NetworkManager implements SslClientListener {
@@ -152,7 +152,7 @@ public class NetworkManager implements SslClientListener {
             return;
         }
         Authenticator.authenticate(session, err -> {
-            if (err != RestoreSessionError.SUCCESS)
+            if (err != RestoreSessionStatus.SUCCESS)
                 EventBus.getDefault().post(new AuthenticationFailedEvent(err));
             else
                 EventBus.getDefault().post(new AuthenticationSuccessfulEvent());

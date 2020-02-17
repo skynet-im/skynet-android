@@ -4,11 +4,11 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
-import de.vectordata.skynet.net.packet.model.DeleteAccountError;
+import de.vectordata.skynet.net.packet.model.DeleteAccountStatus;
 
 public class P05DeleteAccountResponse extends AbstractPacket {
 
-    public DeleteAccountError errorCode;
+    public DeleteAccountStatus statusCode;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -16,7 +16,7 @@ public class P05DeleteAccountResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        errorCode = DeleteAccountError.values()[buffer.readByte()];
+        statusCode = DeleteAccountStatus.values()[buffer.readByte()];
     }
 
     @Override

@@ -5,11 +5,11 @@ import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
-import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
 
 public class P07CreateSessionResponse extends AbstractPacket {
 
-    public CreateSessionError statusCode;
+    public CreateSessionStatus statusCode;
     public long accountId;
     public long sessionId;
     public byte[] sessionToken;
@@ -21,7 +21,7 @@ public class P07CreateSessionResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        statusCode = CreateSessionError.values()[buffer.readByte()];
+        statusCode = CreateSessionStatus.values()[buffer.readByte()];
         accountId = buffer.readInt64();
         sessionId = buffer.readInt64();
         sessionToken = buffer.readBytes(32);

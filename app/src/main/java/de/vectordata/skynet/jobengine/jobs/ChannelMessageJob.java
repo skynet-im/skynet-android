@@ -9,7 +9,7 @@ import de.vectordata.skynet.jobengine.api.JobState;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.packet.model.MessageSendError;
+import de.vectordata.skynet.net.packet.model.MessageSendStatus;
 
 @Retry(Retry.Mode.RECONNECT)
 public class ChannelMessageJob extends Job<Void> {
@@ -25,7 +25,7 @@ public class ChannelMessageJob extends Job<Void> {
         SkynetContext context = SkynetContext.getCurrent();
 
         context.getNetworkManager().sendPacket(message).waitForPacket(P0CChannelMessageResponse.class,
-                response -> reportState(response.errorCode == MessageSendError.SUCCESS ? JobState.SUCCESSFUL : JobState.FAILED),
+                response -> reportState(response.statusCode == MessageSendStatus.SUCCESS ? JobState.SUCCESSFUL : JobState.FAILED),
                 () -> {
                     // No response from the server after 5 seconds, assume timeout
                     reportState(JobState.FAILED);

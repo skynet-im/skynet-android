@@ -8,12 +8,12 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P08RestoreSession;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.util.Callback;
 
 public class Authenticator {
 
-    public static void authenticate(Session session, Callback<RestoreSessionError> callback) {
+    public static void authenticate(Session session, Callback<RestoreSessionStatus> callback) {
         List<P08RestoreSession.ChannelItem> channelItems = new ArrayList<>();
         List<Channel> channels = Storage.getDatabase().channelDao().getAll();
         for (Channel channel : channels)
@@ -21,7 +21,7 @@ public class Authenticator {
         SkynetContext.getCurrent()
                 .getNetworkManager()
                 .sendPacket(new P08RestoreSession(session.getAccountId(), session.getSessionToken(), channelItems))
-                .waitForPacket(P09RestoreSessionResponse.class, p -> callback.onCallback(p.errorCode));
+                .waitForPacket(P09RestoreSessionResponse.class, p -> callback.onCallback(p.statusCode));
     }
 
 }

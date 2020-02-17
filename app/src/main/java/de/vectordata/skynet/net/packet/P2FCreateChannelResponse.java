@@ -4,13 +4,13 @@ import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
-import de.vectordata.skynet.net.packet.model.CreateChannelError;
+import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
 import de.vectordata.skynet.util.date.DateTime;
 
 public class P2FCreateChannelResponse extends AbstractPacket {
 
     public long tempChannelId;
-    public CreateChannelError statusCode;
+    public CreateChannelStatus statusCode;
     public long channelId;
     public DateTime creationTime;
 
@@ -21,7 +21,7 @@ public class P2FCreateChannelResponse extends AbstractPacket {
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
         tempChannelId = buffer.readInt64();
-        statusCode = CreateChannelError.values()[buffer.readByte()];
+        statusCode = CreateChannelStatus.values()[buffer.readByte()];
         channelId = buffer.readInt64();
         creationTime = buffer.readDate();
     }

@@ -1,6 +1,6 @@
 package de.vectordata.skynet.net.packet.model;
 
-public enum CreateSessionError {
+public enum CreateSessionStatus {
     SUCCESS,
     INVALID_CREDENTIALS,
     INVALID_FCM_TOKEN,

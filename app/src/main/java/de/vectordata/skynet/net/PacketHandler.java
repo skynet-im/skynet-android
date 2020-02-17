@@ -61,10 +61,10 @@ import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.AsymmetricKey;
-import de.vectordata.skynet.net.packet.model.CreateChannelError;
-import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
+import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
 import de.vectordata.skynet.net.packet.model.KeyFormat;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
@@ -135,7 +135,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P07CreateSessionResponse packet) {
-        if (packet.statusCode == CreateSessionError.SUCCESS) {
+        if (packet.statusCode == CreateSessionStatus.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
             networkManager.releaseCache();
         } else
@@ -146,7 +146,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P09RestoreSessionResponse packet) {
-        if (packet.errorCode == RestoreSessionError.SUCCESS) {
+        if (packet.statusCode == RestoreSessionStatus.SUCCESS) {
             networkManager.setConnectionState(ConnectionState.AUTHENTICATED);
             networkManager.releaseCache();
         } else
@@ -158,7 +158,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P2FCreateChannelResponse packet) {
-        if (packet.statusCode == CreateChannelError.SUCCESS) {
+        if (packet.statusCode == CreateChannelStatus.SUCCESS) {
             Channel channel = Storage.getDatabase().channelDao().getById(packet.tempChannelId);
             channel.setChannelId(packet.channelId);
             Storage.getDatabase().channelDao().update(channel);
