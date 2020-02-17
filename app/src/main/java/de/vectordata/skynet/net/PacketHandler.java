@@ -198,8 +198,8 @@ public class PacketHandler {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
                         new ChannelMessageConfig()
-                                .addFlag(MessageFlags.UNENCRYPTED),
-                        // .addDependency(Storage.getSession().getAccountId(), response.messageId),
+                                .addFlag(MessageFlags.UNENCRYPTED)
+                                .addDependency(Storage.getSession().getAccountId(), response.messageId),
                         new P18PublicKeys(
                                 new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
                                 new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
