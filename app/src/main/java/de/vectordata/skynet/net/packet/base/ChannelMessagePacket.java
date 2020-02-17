@@ -11,6 +11,7 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.data.model.FileInfo;
+import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
@@ -30,33 +31,49 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
     public List<NetDependency> dependencies = new ArrayList<>();
     public boolean isCorrupted;
 
-    public abstract void writeContents(PacketBuffer buffer, KeyProvider keyProvider);
-
     public abstract void readContents(PacketBuffer buffer, KeyProvider keyProvider);
+
+    public abstract void writeContents(PacketBuffer buffer, KeyProvider keyProvider);
 
     public abstract void persistContents(PacketDirection direction);
 
-    @Override
-    public final void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByte(packetVersion);
-        buffer.writeInt64(channelId);
-        buffer.writeInt64(messageId);
-        buffer.writeByte(messageFlags);
-        if (hasFlag(MessageFlags.EXTERNAL_FILE))
-            buffer.writeInt64(fileId);
-
-        if (hasFlag(MessageFlags.UNENCRYPTED)) {
-            writeContents(buffer, keyProvider);
-        } else {
-            PacketBuffer contentBuf = new PacketBuffer(PacketBuffer.SIZE_MEDIUM);
-            writeContents(contentBuf, keyProvider);
-            Aes.encryptSigned(contentBuf.toArray(), buffer, true, keyProvider.getChannelKeys(channelId));
+    private void readFile(PacketBuffer buf) {
+        if (!hasFlag(MessageFlags.MEDIA_MESSAGE)) {
+            attachedFile = null;
+            return;
         }
 
-        buffer.writeUInt16(dependencies.size());
-        for (NetDependency dependency : dependencies) {
-            buffer.writeInt64(dependency.accountId);
-            buffer.writeInt64(dependency.messageId);
+        attachedFile = new FileInfo(
+                channelId,
+                messageId,
+                buf.readString(LengthPrefix.SHORT),     // Name
+                buf.readDate(),                         // Creation Time
+                buf.readDate(),                         // Last Write TIme
+                buf.readString(LengthPrefix.SHORT),     // Thumbnail Content Type
+                buf.readByteArray(LengthPrefix.MEDIUM)  // Thumbnail Data
+        );
+
+        if (hasFlag(MessageFlags.EXTERNAL_FILE)) {
+            attachedFile.setContentType(buf.readString(LengthPrefix.SHORT));
+            attachedFile.setLength(buf.readInt64());
+            attachedFile.setKey(buf.readBytes(32));
+        }
+    }
+
+    private void writeFile(PacketBuffer buf) {
+        if (!hasFlag(MessageFlags.MEDIA_MESSAGE) || attachedFile == null)
+            return;
+
+        buf.writeString(attachedFile.getName(), LengthPrefix.SHORT);
+        buf.writeDate(attachedFile.getCreationTime());
+        buf.writeDate(attachedFile.getLastWriteTime());
+        buf.writeString(attachedFile.getThumbnailContentType(), LengthPrefix.SHORT);
+        buf.writeByteArray(attachedFile.getThumbnail(), LengthPrefix.MEDIUM);
+
+        if (hasFlag(MessageFlags.EXTERNAL_FILE)) {
+            buf.writeString(attachedFile.getContentType(), LengthPrefix.SHORT);
+            buf.writeInt64(attachedFile.getLength());
+            buf.writeByteArray(attachedFile.getKey(), LengthPrefix.NONE);
         }
     }
 
@@ -74,12 +91,14 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
         if (hasFlag(MessageFlags.EXTERNAL_FILE))
             fileId = buffer.readInt64();
 
-        if (hasFlag(MessageFlags.UNENCRYPTED))
+        if (hasFlag(MessageFlags.UNENCRYPTED)) {
             readContents(buffer, keyProvider);
-        else {
+            readFile(buffer);
+        } else {
             try {
                 PacketBuffer contentBuf = new PacketBuffer(Aes.decryptSigned(buffer, 0, keyProvider.getChannelKeys(channelId)));
                 readContents(contentBuf, keyProvider);
+                readFile(contentBuf);
             } catch (StreamCorruptedException e) {
                 isCorrupted = true;
             }
@@ -88,6 +107,32 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
         int dependencyCount = buffer.readUInt16();
         for (int i = 0; i < dependencyCount; i++)
             dependencies.add(new NetDependency(buffer.readInt64(), buffer.readInt64()));
+    }
+
+    @Override
+    public final void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        buffer.writeByte(packetVersion);
+        buffer.writeInt64(channelId);
+        buffer.writeInt64(messageId);
+        buffer.writeByte(messageFlags);
+        if (hasFlag(MessageFlags.EXTERNAL_FILE))
+            buffer.writeInt64(fileId);
+
+        if (hasFlag(MessageFlags.UNENCRYPTED)) {
+            writeContents(buffer, keyProvider);
+            writeFile(buffer);
+        } else {
+            PacketBuffer contentBuf = new PacketBuffer(PacketBuffer.SIZE_MEDIUM);
+            writeContents(contentBuf, keyProvider);
+            writeFile(contentBuf);
+            Aes.encryptSigned(contentBuf.toArray(), buffer, true, keyProvider.getChannelKeys(channelId));
+        }
+
+        buffer.writeUInt16(dependencies.size());
+        for (NetDependency dependency : dependencies) {
+            buffer.writeInt64(dependency.accountId);
+            buffer.writeInt64(dependency.messageId);
+        }
     }
 
     public void persist(PacketDirection packetDirection) {
@@ -100,10 +145,11 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
         }
         Storage.getDatabase().channelMessageDao().insert(ChannelMessage.fromPacket(this));
         Storage.getDatabase().dependencyDao().insert(Dependency.arrayFromPacket(this, dependencies));
-        if (attachedFile != null)
+        if (hasFlag(MessageFlags.MEDIA_MESSAGE) && attachedFile != null)
             Storage.getDatabase().fileInfoDao().insert(attachedFile);
         persistContents(packetDirection);
     }
+
 
     public NetDependency singleDependency() {
         if (dependencies.size() != 1)

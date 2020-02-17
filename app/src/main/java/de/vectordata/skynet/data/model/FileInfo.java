@@ -35,7 +35,7 @@ public class FileInfo {
 
     private byte[] key;
 
-    public FileInfo(long channelId, long messageId, String name, DateTime creationTime, DateTime lastWriteTime, String thumbnailContentType, byte[] thumbnail, String contentType, long length, byte[] key) {
+    public FileInfo(long channelId, long messageId, String name, DateTime creationTime, DateTime lastWriteTime, String thumbnailContentType, byte[] thumbnail) {
         this.channelId = channelId;
         this.messageId = messageId;
         this.name = name;
@@ -43,9 +43,6 @@ public class FileInfo {
         this.lastWriteTime = lastWriteTime;
         this.thumbnailContentType = thumbnailContentType;
         this.thumbnail = thumbnail;
-        this.contentType = contentType;
-        this.length = length;
-        this.key = key;
     }
 
     public long getChannelId() {
