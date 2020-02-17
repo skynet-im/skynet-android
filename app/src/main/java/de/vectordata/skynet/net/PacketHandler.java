@@ -57,6 +57,7 @@ import de.vectordata.skynet.net.packet.P2ESearchAccountResponse;
 import de.vectordata.skynet.net.packet.P2FCreateChannelResponse;
 import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.P34SetClientState;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.AsymmetricKey;
@@ -97,6 +98,13 @@ public class PacketHandler {
         if (payload == null) {
             Log.w(TAG, "Received corrupted packet 0x" + Integer.toHexString(id));
             return;
+        }
+
+        if (packet instanceof ChannelMessagePacket) {
+            ChannelMessagePacket message = (ChannelMessagePacket) packet;
+            Flags flags = message.getClass().getAnnotation(Flags.class);
+            if (flags != null)
+                message.messageFlags |= flags.value();
         }
 
         packet.readPacket(new PacketBuffer(payload), keyProvider);
