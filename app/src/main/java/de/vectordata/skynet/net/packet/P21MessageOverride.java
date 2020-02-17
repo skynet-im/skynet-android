@@ -1,9 +1,5 @@
 package de.vectordata.skynet.net.packet;
 
-import java.io.StreamCorruptedException;
-
-import de.vectordata.skynet.crypto.Aes;
-import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -43,27 +39,18 @@ public class P21MessageOverride extends ChannelMessagePacket {
 
     @Override
     public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
-        PacketBuffer encrypted = new PacketBuffer();
-        encrypted.writeInt64(messageId);
-        encrypted.writeByte((byte) action.ordinal());
+        buffer.writeInt64(messageId);
+        buffer.writeByte((byte) action.ordinal());
         if (action == OverrideAction.EDIT)
-            encrypted.writeString(newText, LengthPrefix.MEDIUM);
-        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
+            buffer.writeString(newText, LengthPrefix.MEDIUM);
     }
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
-        try {
-            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-            messageId = decrypted.readInt64();
-            action = OverrideAction.values()[decrypted.readByte()];
-            if (action == OverrideAction.EDIT)
-                newText = decrypted.readString(LengthPrefix.MEDIUM);
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        }
+        messageId = buffer.readInt64();
+        action = OverrideAction.values()[buffer.readByte()];
+        if (action == OverrideAction.EDIT)
+            newText = buffer.readString(LengthPrefix.MEDIUM);
     }
 
     @Override

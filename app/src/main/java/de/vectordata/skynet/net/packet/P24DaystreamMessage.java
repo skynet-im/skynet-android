@@ -1,9 +1,5 @@
 package de.vectordata.skynet.net.packet;
 
-import java.io.StreamCorruptedException;
-
-import de.vectordata.skynet.crypto.Aes;
-import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.DaystreamMessage;
@@ -24,23 +20,14 @@ public class P24DaystreamMessage extends ChannelMessagePacket {
 
     @Override
     public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
-        PacketBuffer encrypted = new PacketBuffer();
-        encrypted.writeByte((byte) messageType.ordinal());
-        encrypted.writeString(text, LengthPrefix.MEDIUM);
-        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
+        buffer.writeByte((byte) messageType.ordinal());
+        buffer.writeString(text, LengthPrefix.MEDIUM);
     }
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
-        try {
-            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-            messageType = MessageType.values()[decrypted.readByte()];
-            text = decrypted.readString(LengthPrefix.MEDIUM);
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        }
+        messageType = MessageType.values()[buffer.readByte()];
+        text = buffer.readString(LengthPrefix.MEDIUM);
     }
 
     @Override

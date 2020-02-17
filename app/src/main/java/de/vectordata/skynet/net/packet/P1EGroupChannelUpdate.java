@@ -34,6 +34,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             buffer.writeInt64(member.accountId);
             buffer.writeByte(member.groupMemberFlags);
         }
+
         ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, LengthPrefix.NONE);
@@ -49,19 +50,19 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         for (int i = 0; i < count; i++) {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
+
         ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
         try {
             PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
             channelKey = decrypted.readBytes(64);
             historyKey = decrypted.readBytes(64);
         } catch (StreamCorruptedException e) {
-            e.printStackTrace();
+            isCorrupted = true;
         }
     }
 
     @Override
     public void persistContents(PacketDirection direction) {
-
     }
 
     @Override
