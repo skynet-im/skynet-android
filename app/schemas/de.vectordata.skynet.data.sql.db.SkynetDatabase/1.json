@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7b08358fcb3712189e06e44eb28f6fae",
+    "identityHash": "2ff2466dc021f95fc141145331c8110c",
     "entities": [
       {
         "tableName": "channels",
@@ -956,12 +956,101 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "fileInfos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `name` TEXT, `creationTime` INTEGER, `lastWriteTime` INTEGER, `thumbnailContentType` TEXT, `thumbnail` BLOB, `contentType` TEXT, `length` INTEGER NOT NULL, `key` BLOB, PRIMARY KEY(`channelId`, `messageId`), FOREIGN KEY(`channelId`, `messageId`) REFERENCES `channelMessages`(`channelId`, `messageId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelId",
+            "columnName": "channelId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "creationTime",
+            "columnName": "creationTime",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastWriteTime",
+            "columnName": "lastWriteTime",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnailContentType",
+            "columnName": "thumbnailContentType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnail",
+            "columnName": "thumbnail",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "contentType",
+            "columnName": "contentType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "length",
+            "columnName": "length",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channelId",
+            "messageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "channelMessages",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "channelId",
+              "messageId"
+            ],
+            "referencedColumns": [
+              "channelId",
+              "messageId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b08358fcb3712189e06e44eb28f6fae')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2ff2466dc021f95fc141145331c8110c')"
     ]
   }
 }

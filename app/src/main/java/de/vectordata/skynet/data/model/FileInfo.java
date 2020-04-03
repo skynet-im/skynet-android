@@ -2,7 +2,9 @@ package de.vectordata.skynet.data.model;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.TypeConverters;
 
+import de.vectordata.skynet.data.sql.converters.DateTimeConverter;
 import de.vectordata.skynet.util.date.DateTime;
 
 @Entity(tableName = "fileInfos", foreignKeys = @ForeignKey(
@@ -21,8 +23,10 @@ public class FileInfo {
 
     private String name;
 
+    @TypeConverters(DateTimeConverter.class)
     private DateTime creationTime;
 
+    @TypeConverters(DateTimeConverter.class)
     private DateTime lastWriteTime;
 
     private String thumbnailContentType;

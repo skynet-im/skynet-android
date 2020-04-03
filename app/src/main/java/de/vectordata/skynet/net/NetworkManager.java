@@ -64,6 +64,7 @@ public class NetworkManager implements SslClientListener {
 
         responseAwaiter.initialize();
         packetHandler = new PacketHandler(skynetContext, this, responseAwaiter);
+        sslClient.setListener(this);
         sslClient.connect(SkynetApplication.SERVER_IP, SkynetApplication.SERVER_PORT);
     }
 
@@ -119,7 +120,7 @@ public class NetworkManager implements SslClientListener {
                         Log.w(TAG, "Server recommends upgrading to a later version");
                         raiseHandshakeEvent(HandshakeState.CAN_UPGRADE, p.latestVersion);
                     } else
-                        Log.i(TAG, "Successfully connected the server");
+                        Log.i(TAG, "Successfully connected to the server");
 
                     connectionState = ConnectionState.AUTHENTICATING;
                     authenticate();

@@ -100,6 +100,9 @@ public class PacketBuffer {
             case LONG:
                 writeInt32(arr.length);
                 break;
+            case NONE:
+                // Well, write none.
+                break;
             default:
                 throw new IllegalArgumentException("Unknown LengthPrefix " + prefix);
         }
