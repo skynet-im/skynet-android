@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
-import de.vectordata.skynet.auth.Session;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
@@ -84,10 +83,6 @@ public class PacketHandler {
     }
 
     void handlePacket(byte id, byte[] payload) {
-        handlePacket(id, payload, null);
-    }
-
-    private void handlePacket(byte id, byte[] payload, Packet parent) {
         if (!PacketRegistry.isValidId(id))
             return;
 
@@ -141,10 +136,6 @@ public class PacketHandler {
             networkManager.releaseCache();
         } else
             networkManager.setConnectionState(ConnectionState.UNAUTHENTICATED);
-        Session session = Storage.getSession();
-        session.setSessionToken(packet.sessionToken);
-        session.setWebToken(packet.webToken);
-        Storage.setSession(session);
     }
 
     public void handlePacket(P09RestoreSessionResponse packet) {

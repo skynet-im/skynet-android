@@ -200,6 +200,9 @@ public class PacketBuffer {
     }
 
     public byte[] readBytes(int amount) {
+        if (amount == 0)
+            return new byte[]{};
+
         if (buffer.remaining() == 0)
             throw new IllegalStateException("Buffer underflow: Requested to read " + amount + " bytes from PacketBuffer, but buffer is empty.");
 

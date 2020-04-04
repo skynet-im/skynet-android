@@ -87,6 +87,8 @@ public class LoginActivity extends SkynetActivity {
                     else if (p.statusCode == CreateSessionStatus.SUCCESS) {
                         session.setSessionId(p.sessionId);
                         session.setAccountId(p.accountId);
+                        session.setSessionToken(p.sessionToken);
+                        session.setWebToken(p.webToken);
                         Storage.setSession(session);
                         finish();
                     }
