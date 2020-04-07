@@ -28,7 +28,7 @@ public class SkynetApplication extends Application implements DefaultLifecycleOb
 
     public static final String SERVER_IP = "skynet.lerchen.net";
     public static final int SERVER_PORT = 32762;
-    public static final int PROTOCOL_VERSION = 2;
+    public static final int PROTOCOL_VERSION = 3;
 
     @RawRes
     public static final int CERTIFICATE_RES = R.raw.devcert;

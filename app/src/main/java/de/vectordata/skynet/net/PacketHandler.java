@@ -95,6 +95,8 @@ public class PacketHandler {
             return;
         }
 
+        packet.readPacket(new PacketBuffer(payload), keyProvider);
+
         if (packet instanceof ChannelMessagePacket) {
             ChannelMessagePacket message = (ChannelMessagePacket) packet;
             Flags flags = message.getClass().getAnnotation(Flags.class);
@@ -102,8 +104,6 @@ public class PacketHandler {
                 if ((message.messageFlags | flags.value()) != message.messageFlags)
                     throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
         }
-
-        packet.readPacket(new PacketBuffer(payload), keyProvider);
 
         if (!packet.validatePacket())
             return;
