@@ -51,7 +51,7 @@ public class P29DeviceList extends ChannelMessagePacket {
         Storage.getDatabase().deviceListDao().insert(devices);
     }
 
-    public class PDevice {
+    public static class PDevice {
         public long sessionId;
         public DateTime creationTime;
         public String applicationIdentifier;

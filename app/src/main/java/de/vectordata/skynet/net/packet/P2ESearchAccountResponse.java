@@ -24,12 +24,7 @@ public class P2ESearchAccountResponse extends AbstractPacket {
         for (int i = 0; i < count; i++) {
             long accountId = buffer.readInt64();
             String accountName = buffer.readString(LengthPrefix.SHORT);
-            int packetCount = buffer.readUInt16();
-            List<ForwardedPacket> forwardedPackets = new ArrayList<>();
-            for (int j = 0; j < packetCount; j++) {
-                forwardedPackets.add(new ForwardedPacket(buffer.readByte(), buffer.readByteArray(LengthPrefix.MEDIUM)));
-            }
-            results.add(new Result(accountId, accountName, forwardedPackets));
+            results.add(new Result(accountId, accountName));
         }
     }
 
@@ -43,25 +38,13 @@ public class P2ESearchAccountResponse extends AbstractPacket {
         return 0x2E;
     }
 
-    public class Result {
+    public static class Result {
         public long accountId;
         public String accountName;
-        public List<ForwardedPacket> forwardedPackets;
 
-        public Result(long accountId, String accountName, List<ForwardedPacket> forwardedPackets) {
+        public Result(long accountId, String accountName) {
             this.accountId = accountId;
             this.accountName = accountName;
-            this.forwardedPackets = forwardedPackets;
-        }
-    }
-
-    public class ForwardedPacket {
-        public byte packetId;
-        public byte[] packetContent;
-
-        public ForwardedPacket(byte packetId, byte[] packetContent) {
-            this.packetId = packetId;
-            this.packetContent = packetContent;
         }
     }
 }

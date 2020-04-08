@@ -16,7 +16,7 @@ public class ChannelKeys implements Serializable {
 
     public static ChannelKeys from64ByteArray(byte[] data) {
         byte[] aesKey = ByteUtils.takeBytes(data, 32, 0);
-        byte[] hmacKey = ByteUtils.takeBytes(data, 32, 31);
+        byte[] hmacKey = ByteUtils.takeBytes(data, 32, 32);
         return new ChannelKeys(aesKey, hmacKey);
     }
 

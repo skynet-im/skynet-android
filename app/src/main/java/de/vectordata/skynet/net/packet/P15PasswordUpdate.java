@@ -1,5 +1,8 @@
 package de.vectordata.skynet.net.packet;
 
+import java.io.StreamCorruptedException;
+
+import de.vectordata.skynet.crypto.Aes;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.PasswordUpdate;
@@ -14,18 +17,29 @@ import de.vectordata.skynet.net.packet.model.MessageFlags;
 @Flags(MessageFlags.LOOPBACK | MessageFlags.UNENCRYPTED)
 public class P15PasswordUpdate extends ChannelMessagePacket {
 
-    public byte[] loopbackKeyNotify;
+    public byte[] previousKeyHash;
     public byte[] keyHash;
+    public byte[] previousKey;
 
     @Override
     public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeByteArray(loopbackKeyNotify, LengthPrefix.MEDIUM);
+        buffer.writeByteArray(previousKeyHash, LengthPrefix.NONE);
         buffer.writeByteArray(keyHash, LengthPrefix.NONE);
+        buffer.writeByteArray(Aes.encryptSigned(previousKey, keyProvider.getChannelKeys(channelId)), LengthPrefix.MEDIUM);
     }
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        previousKeyHash = buffer.readBytes(32);
         keyHash = buffer.readBytes(32);
+        byte[] keyHistory = buffer.readByteArray(LengthPrefix.MEDIUM);
+        if (keyHistory.length > 0) {
+            try {
+                previousKey = Aes.decryptSigned(buffer.readByteArray(LengthPrefix.MEDIUM), keyProvider.getChannelKeys(channelId));
+            } catch (StreamCorruptedException e) {
+                isCorrupted = true;
+            }
+        }
     }
 
     @Override

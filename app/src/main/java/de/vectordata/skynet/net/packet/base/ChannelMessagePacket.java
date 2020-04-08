@@ -91,14 +91,16 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
         if (hasFlag(MessageFlags.EXTERNAL_FILE))
             fileId = buffer.readInt64();
 
+        byte[] packetContent = buffer.readByteArray(LengthPrefix.MEDIUM);
         if (hasFlag(MessageFlags.UNENCRYPTED)) {
-            readContents(buffer, keyProvider);
-            readFile(buffer);
+            PacketBuffer contentBuffer = new PacketBuffer(packetContent);
+            readContents(contentBuffer, keyProvider);
+            readFile(contentBuffer);
         } else {
             try {
-                PacketBuffer contentBuf = new PacketBuffer(Aes.decryptSigned(buffer, 0, keyProvider.getChannelKeys(channelId)));
-                readContents(contentBuf, keyProvider);
-                readFile(contentBuf);
+                PacketBuffer contentBuffer = new PacketBuffer(Aes.decryptSigned(packetContent, keyProvider.getChannelKeys(channelId)));
+                readContents(contentBuffer, keyProvider);
+                readFile(contentBuffer);
             } catch (StreamCorruptedException e) {
                 isCorrupted = true;
             }
@@ -118,15 +120,17 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
         if (hasFlag(MessageFlags.EXTERNAL_FILE))
             buffer.writeInt64(fileId);
 
+        PacketBuffer contentBuffer = new PacketBuffer(PacketBuffer.SIZE_MEDIUM);
+        writeContents(contentBuffer, keyProvider);
+        writeFile(contentBuffer);
+
+        byte[] packetContent;
         if (hasFlag(MessageFlags.UNENCRYPTED)) {
-            writeContents(buffer, keyProvider);
-            writeFile(buffer);
+            packetContent = contentBuffer.toArray();
         } else {
-            PacketBuffer contentBuf = new PacketBuffer(PacketBuffer.SIZE_MEDIUM);
-            writeContents(contentBuf, keyProvider);
-            writeFile(contentBuf);
-            Aes.encryptSigned(contentBuf.toArray(), buffer, true, keyProvider.getChannelKeys(channelId));
+            packetContent = Aes.encryptSigned(contentBuffer.toArray(), keyProvider.getChannelKeys(channelId));
         }
+        buffer.writeByteArray(packetContent, LengthPrefix.MEDIUM);
 
         buffer.writeUInt16(dependencies.size());
         for (NetDependency dependency : dependencies) {

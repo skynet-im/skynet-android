@@ -25,12 +25,13 @@ import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
 import de.vectordata.skynet.net.packet.P0ACreateChannel;
+import de.vectordata.skynet.net.packet.P0BSyncStarted;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
+import de.vectordata.skynet.net.packet.P0DDeleteChannel;
 import de.vectordata.skynet.net.packet.P0FSyncFinished;
 import de.vectordata.skynet.net.packet.P13QueueMailAddressChange;
 import de.vectordata.skynet.net.packet.P14MailAddress;
 import de.vectordata.skynet.net.packet.P15PasswordUpdate;
-import de.vectordata.skynet.net.packet.P16LoopbackKeyNotify;
 import de.vectordata.skynet.net.packet.P17PrivateKeys;
 import de.vectordata.skynet.net.packet.P18PublicKeys;
 import de.vectordata.skynet.net.packet.P19ArchiveChannel;
@@ -158,6 +159,10 @@ public class PacketHandler {
         } else Storage.getDatabase().channelDao().deleteById(packet.tempChannelId);
     }
 
+    public void handlePacket(P0DDeleteChannel packet) {
+
+    }
+
     public void handlePacket(P0CChannelMessageResponse packet) {
         ChannelMessage message = Storage.getDatabase().channelMessageDao().getById(packet.channelId, packet.tempMessageId);
         message.setMessageId(packet.messageId);
@@ -178,6 +183,10 @@ public class PacketHandler {
         }
     }
 
+    public void handlePacket(P0BSyncStarted packet) {
+
+    }
+
     public void handlePacket(P0FSyncFinished packet) {
         boolean hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(ChannelType.LOOPBACK) != 0;
         if (!hasKeys) {
@@ -190,8 +199,8 @@ public class PacketHandler {
             SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(),
                     new ChannelMessageConfig(),
                     new P17PrivateKeys(
-                            new AsymmetricKey(KeyFormat.JAVA, signature.getPrivateKey()),
-                            new AsymmetricKey(KeyFormat.JAVA, derivation.getPrivateKey())
+                            new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPrivateKey()),
+                            new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPrivateKey())
                     )
             ).waitForPacket(P0CChannelMessageResponse.class, response -> {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
@@ -199,8 +208,8 @@ public class PacketHandler {
                         new ChannelMessageConfig()
                                 .addDependency(Storage.getSession().getAccountId(), response.messageId),
                         new P18PublicKeys(
-                                new AsymmetricKey(KeyFormat.JAVA, signature.getPublicKey()),
-                                new AsymmetricKey(KeyFormat.JAVA, derivation.getPublicKey())
+                                new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPublicKey()),
+                                new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPublicKey())
                         )
                 );
             });
@@ -232,10 +241,6 @@ public class PacketHandler {
     }
 
     public void handlePacket(P15PasswordUpdate packet) {
-
-    }
-
-    public void handlePacket(P16LoopbackKeyNotify packet) {
 
     }
 
