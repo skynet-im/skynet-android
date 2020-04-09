@@ -103,7 +103,7 @@ public class Aes {
 
     public static byte[] decryptSigned(byte[] input, ChannelKeys channelKeys) throws StreamCorruptedException {
         byte[] hmac = ByteUtils.takeBytes(input, 32, 0);
-        byte[] iv = ByteUtils.takeBytes(input, 16,32);
+        byte[] iv = ByteUtils.takeBytes(input, 16, 32);
         byte[] ciphertext = ByteUtils.takeBytes(input, input.length - 48, 48);
         if (!ByteUtils.sequenceEqual(hmac, Hmac.computeHmacSHA256(ByteUtils.concatBytes(iv, ciphertext), channelKeys.getHmacKey())))
             throw new StreamCorruptedException("Data corrupted: HMAC invalid");
