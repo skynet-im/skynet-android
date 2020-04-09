@@ -184,7 +184,8 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0BSyncStarted packet) {
-
+        Log.d(TAG, "Resyncing...");
+        inSync = false;
     }
 
     public void handlePacket(P0FSyncFinished packet) {

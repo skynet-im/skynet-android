@@ -16,13 +16,13 @@ public class Authenticator {
 
     public static void authenticate(Session session, Callback<RestoreSessionStatus> callback) {
         ChannelMessage lastMessage = Storage.getDatabase().channelMessageDao().queryLast();
-        List<Long> channelItems = new ArrayList<>();
+        List<Long> channelIds = new ArrayList<>();
         List<Channel> channels = Storage.getDatabase().channelDao().getAll();
         for (Channel channel : channels)
-            channelItems.add(channel.getChannelId());
+            channelIds.add(channel.getChannelId());
         SkynetContext.getCurrent()
                 .getNetworkManager()
-                .sendPacket(new P08RestoreSession(session.getAccountId(), session.getSessionToken(), lastMessage.getMessageId(), channelItems))
+                .sendPacket(new P08RestoreSession(session.getAccountId(), session.getSessionToken(), lastMessage.getMessageId(), channelIds))
                 .waitForPacket(P09RestoreSessionResponse.class, p -> callback.onCallback(p.statusCode));
     }
 
