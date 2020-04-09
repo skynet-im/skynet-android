@@ -24,7 +24,9 @@ public interface ChannelMessageDao {
     @Query("SELECT * FROM channelMessages WHERE channelId=:channelId")
     List<ChannelMessage> query(long channelId);
 
-    @Query("SELECT * FROM channelMessages WHERE channelId=:channelId ORDER BY dispatchTime DESC LIMIT 1")
-    ChannelMessage queryLast(long channelId);
+    @Query("SELECT * FROM channelMessages ORDER BY messageId DESC LIMIT 1")
+    ChannelMessage queryLast();
 
+    @Query("SELECT * FROM channelMessages WHERE channelId=:channelId ORDER BY messageId DESC LIMIT 1")
+    ChannelMessage queryLast(long channelId);
 }

@@ -17,8 +17,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.net.client.ByteUtils;
-import de.vectordata.skynet.net.client.LengthPrefix;
-import de.vectordata.skynet.net.client.PacketBuffer;
 
 public class Aes {
 
@@ -103,25 +101,21 @@ public class Aes {
         return bytes;
     }
 
-    public static byte[] decryptSigned(PacketBuffer input, int length, ChannelKeys channelKeys) throws StreamCorruptedException {
-        if (length == 0)
-            length = (int) input.readUInt32();
-        byte[] hmac = input.readBytes(32);
-        byte[] iv = input.readBytes(16);
-        byte[] ciphertext = input.readBytes(length - 48);
+    public static byte[] decryptSigned(byte[] input, ChannelKeys channelKeys) throws StreamCorruptedException {
+        byte[] hmac = ByteUtils.takeBytes(input, 32, 0);
+        byte[] iv = ByteUtils.takeBytes(input, 16, 32);
+        byte[] ciphertext = ByteUtils.takeBytes(input, input.length - 48, 48);
         if (!ByteUtils.sequenceEqual(hmac, Hmac.computeHmacSHA256(ByteUtils.concatBytes(iv, ciphertext), channelKeys.getHmacKey())))
             throw new StreamCorruptedException("Data corrupted: HMAC invalid");
         return decrypt(ciphertext, channelKeys.getAesKey(), iv);
     }
 
-    public static void encryptSigned(byte[] input, PacketBuffer output, boolean writeLength, ChannelKeys channelKeys) {
+    public static byte[] encryptSigned(byte[] input, ChannelKeys channelKeys) {
         byte[] iv = generateIV();
         byte[] ciphertext = encrypt(input, channelKeys.getAesKey(), iv);
-        if (writeLength)
-            output.writeUInt32(32 + 16 + ByteUtils.getTotalSize(input.length + 1, 16));
-        output.writeByteArray(Hmac.computeHmacSHA256(ByteUtils.concatBytes(iv, ciphertext), channelKeys.getHmacKey()), LengthPrefix.NONE);
-        output.writeByteArray(iv, LengthPrefix.NONE);
-        output.writeByteArray(ciphertext, LengthPrefix.NONE);
+        byte[] hmac = Hmac.computeHmacSHA256(ByteUtils.concatBytes(iv, ciphertext), channelKeys.getHmacKey());
+        // Some allocations could be avoided but would make the code harder to maintain
+        return ByteUtils.concatBytes(hmac, iv, ciphertext);
     }
 
 }

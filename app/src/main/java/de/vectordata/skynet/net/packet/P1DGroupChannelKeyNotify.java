@@ -14,20 +14,20 @@ import de.vectordata.skynet.net.packet.model.MessageFlags;
 @Flags(MessageFlags.NO_SENDER_SYNC)
 public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
 
-    public long channelId;
+    public long groupChannelId;
     public byte[] newKey;
     public byte[] historyKey;
 
     @Override
     public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeInt64(channelId);
+        buffer.writeInt64(groupChannelId);
         buffer.writeByteArray(newKey, LengthPrefix.NONE);
         buffer.writeByteArray(historyKey, LengthPrefix.NONE);
     }
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        channelId = buffer.readInt64();
+        groupChannelId = buffer.readInt64();
         newKey = buffer.readBytes(64);
         historyKey = buffer.readBytes(64);
     }

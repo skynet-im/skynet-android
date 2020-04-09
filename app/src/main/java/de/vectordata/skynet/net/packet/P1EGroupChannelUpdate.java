@@ -36,7 +36,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         PacketBuffer encrypted = new PacketBuffer();
         encrypted.writeByteArray(channelKey, LengthPrefix.NONE);
         encrypted.writeByteArray(historyKey, LengthPrefix.NONE);
-        Aes.encryptSigned(encrypted.toArray(), buffer, true, channelKeys);
+        buffer.writeByteArray(Aes.encryptSigned(encrypted.toArray(), channelKeys), LengthPrefix.MEDIUM);
     }
 
     @Override
@@ -48,13 +48,15 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
             members.add(new Member(buffer.readInt64(), buffer.readByte()));
         }
 
-        ChannelKeys channelKeys = keyProvider.getChannelKeys(channelId);
-        try {
-            PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(buffer, 0, channelKeys));
-            channelKey = decrypted.readBytes(64);
-            historyKey = decrypted.readBytes(64);
-        } catch (StreamCorruptedException e) {
-            isCorrupted = true;
+        byte[] keyHistory = buffer.readByteArray(LengthPrefix.MEDIUM);
+        if (keyHistory.length > 0) {
+            try {
+                PacketBuffer decrypted = new PacketBuffer(Aes.decryptSigned(keyHistory, keyProvider.getChannelKeys(channelId)));
+                channelKey = decrypted.readBytes(64);
+                historyKey = decrypted.readBytes(64);
+            } catch (StreamCorruptedException e) {
+                isCorrupted = true;
+            }
         }
     }
 
@@ -72,7 +74,7 @@ public class P1EGroupChannelUpdate extends ChannelMessagePacket {
         return 0x1E;
     }
 
-    public class Member {
+    public static class Member {
         long accountId;
         byte groupMemberFlags;
 

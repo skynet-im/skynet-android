@@ -15,11 +15,13 @@ public class P08RestoreSession extends AbstractPacket {
 
     public long sessionId;
     public byte[] sessionToken;
-    public List<ChannelItem> channels;
+    public long lastMessageId;
+    public List<Long> channels;
 
-    public P08RestoreSession(long sessionId, byte[] sessionToken, List<ChannelItem> channels) {
+    public P08RestoreSession(long sessionId, byte[] sessionToken, long lastMessageId, List<Long> channels) {
         this.sessionId = sessionId;
         this.sessionToken = sessionToken;
+        this.lastMessageId = lastMessageId;
         this.channels = channels;
     }
 
@@ -27,11 +29,11 @@ public class P08RestoreSession extends AbstractPacket {
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
         buffer.writeInt64(sessionId);
         buffer.writeByteArray(sessionToken, LengthPrefix.NONE);
+        buffer.writeInt64(lastMessageId);
 
         buffer.writeUInt16(channels.size());
-        for (ChannelItem item : channels) {
-            buffer.writeInt64(item.channelId);
-            buffer.writeInt64(item.lastMessageId);
+        for (long channelId : channels) {
+            buffer.writeInt64(channelId);
         }
     }
 
@@ -46,15 +48,5 @@ public class P08RestoreSession extends AbstractPacket {
     @Override
     public byte getId() {
         return 0x08;
-    }
-
-    public static class ChannelItem {
-        public long channelId;
-        public long lastMessageId;
-
-        public ChannelItem(long channelId, long lastMessageId) {
-            this.channelId = channelId;
-            this.lastMessageId = lastMessageId;
-        }
     }
 }
