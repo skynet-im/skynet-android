@@ -67,7 +67,8 @@ public class CreateAccountActivity extends SkynetActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConnectionFailed(ConnectionFailedEvent event) {
-        progressDialog.dismiss();
+        if (progressDialog != null)
+            progressDialog.dismiss();
         Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_no_connection);
     }
 
