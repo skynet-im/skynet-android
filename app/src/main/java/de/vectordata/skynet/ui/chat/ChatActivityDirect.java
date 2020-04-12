@@ -115,7 +115,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         SkynetContext.getCurrent().getNotificationManager().onForeground(messageChannel.getChannelId());
 
         String friendlyName = NameUtil.getFriendlyName(messageChannel.getCounterpartId(), accountDataChannel);
-        DefaultProfileImage profileImage = DefaultProfileImage.create(friendlyName.substring(0, 1), accountDataChannel.getOwnerId(), 128, 128);
+        DefaultProfileImage profileImage = DefaultProfileImage.create(friendlyName, accountDataChannel.getOwnerId(), 128, 128);
         runOnUiThread(() -> {
             titleView.setText(friendlyName);
             profileImage.loadInto(avatarView);

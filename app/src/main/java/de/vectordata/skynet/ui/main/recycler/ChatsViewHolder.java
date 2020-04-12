@@ -44,7 +44,7 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
 
     void configure(ChatsItem item, boolean singleLine) {
         header.setText(item.getHeader());
-        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getCounterpartId(), 128, 128)
+        DefaultProfileImage.create(item.getHeader(), item.getCounterpartId(), 128, 128)
                 .loadInto(avatar);
 
         if (singleLine) {

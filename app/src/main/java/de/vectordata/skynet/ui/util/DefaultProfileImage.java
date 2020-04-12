@@ -35,7 +35,9 @@ public class DefaultProfileImage {
         this.bitmap = bitmap;
     }
 
-    public static DefaultProfileImage create(String initials, long accountId, int width, int height) {
+    public static DefaultProfileImage create(String nickname, long accountId, int width, int height) {
+        String initials = nickname.length() < 2 ? nickname : nickname.substring(0, 1);
+
         int color = COLORS[(int) Math.abs(accountId % COLORS.length)];
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
