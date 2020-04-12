@@ -22,7 +22,7 @@ public class Authenticator {
             channelIds.add(channel.getChannelId());
         SkynetContext.getCurrent()
                 .getNetworkManager()
-                .sendPacket(new P08RestoreSession(session.getAccountId(), session.getSessionToken(), lastMessage.getMessageId(), channelIds))
+                .sendPacket(new P08RestoreSession(session.getSessionId(), session.getSessionToken(), lastMessage.getMessageId(), channelIds))
                 .waitForPacket(P09RestoreSessionResponse.class, p -> callback.onCallback(p.statusCode));
     }
 
