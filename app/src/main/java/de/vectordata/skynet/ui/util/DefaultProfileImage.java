@@ -49,11 +49,13 @@ public class DefaultProfileImage {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(68);
 
-        Rect textBounds = new Rect();
-        paint.getTextBounds(initials, 0, 1, textBounds);
-        int textHeight = Math.abs(textBounds.height());
+        if (!initials.isEmpty()) {
+            Rect textBounds = new Rect();
+            paint.getTextBounds(initials, 0, 1, textBounds);
+            int textHeight = Math.abs(textBounds.height());
 
-        canvas.drawText(initials, bitmap.getWidth() / 2f, bitmap.getHeight() / 2f + textHeight / 2f, paint);
+            canvas.drawText(initials, bitmap.getWidth() / 2f, bitmap.getHeight() / 2f + textHeight / 2f, paint);
+        }
         return new DefaultProfileImage(bitmap);
     }
 
