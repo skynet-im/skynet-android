@@ -33,6 +33,10 @@ public class ProgressDialog implements DialogInterface.OnClickListener {
         return cancelled;
     }
 
+    public boolean isOpen() {
+        return alertDialog.isShowing();
+    }
+
     void show() {
         alertDialog.show();
     }
