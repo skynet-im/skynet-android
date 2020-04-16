@@ -2,7 +2,7 @@ package de.vectordata.skynet.data.sql.converters;
 
 import androidx.room.TypeConverter;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class DateTimeConverter {
 

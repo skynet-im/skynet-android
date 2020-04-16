@@ -1,8 +1,8 @@
 package de.vectordata.skynet.ui.chat.recycler;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.ui.util.MessageSide;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageItem {
 

@@ -30,7 +30,7 @@ import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.model.ChannelAction;
 import de.vectordata.skynet.ui.base.ThemedActivity;
 import de.vectordata.skynet.ui.view.CheckableRecyclerView;
-import de.vectordata.skynet.util.Handlers;
+import de.vectordata.skynet.util.android.Handlers;
 
 /**
  * Created by Twometer on 21.01.2019.
@@ -178,7 +178,7 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
     void readMessage(long messageId) {
         SkynetContext.getCurrent().getMessageInterface()
                 .send(messageChannel.getChannelId(),
-                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageChannel.getChannelId(), messageId),
+                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
                         new P23MessageRead()
                 );
         backgroundHandler.post(() -> {
@@ -205,7 +205,7 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
     }
 
     ChannelMessageConfig createConfigWithDependencyTo(long messageId) {
-        return ChannelMessageConfig.create().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageChannel.getChannelId(), messageId);
+        return ChannelMessageConfig.create().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package de.vectordata.skynet.util;
+package de.vectordata.skynet.util.android;
 
 import android.app.Activity;
 import android.os.Build;

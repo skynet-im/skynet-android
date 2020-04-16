@@ -1,9 +1,14 @@
 package de.vectordata.skynet.net;
 
+import android.content.Context;
+
+import java.io.InputStream;
+
+import de.vectordata.skynet.SkynetApplication;
 import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.hash.HashProvider;
+import de.vectordata.skynet.crypto.keys.ChannelKeys;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.crypto.keys.KeyStore;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelKey;
@@ -11,7 +16,6 @@ import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.KeyType;
 import de.vectordata.skynet.jobengine.JobEngine;
 import de.vectordata.skynet.net.messages.MessageInterface;
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
 import de.vectordata.skynet.net.state.AppState;
 import de.vectordata.skynet.ui.notification.INotificationManager;
 import de.vectordata.skynet.ui.notification.NotificationManagerFactory;
@@ -32,7 +36,6 @@ public class SkynetContext implements KeyProvider {
         messageInterface = new MessageInterface(this);
         networkManager = new NetworkManager(this);
         appState = new AppState();
-        networkManager.connect();
     }
 
     public static SkynetContext getCurrent() {
@@ -41,9 +44,10 @@ public class SkynetContext implements KeyProvider {
         return currentContext;
     }
 
-    public void recreateNetworkManager() {
-        this.networkManager = new NetworkManager(this);
-        this.networkManager.connect();
+    public void initialize(Context context) {
+        InputStream certStream = context.getResources().openRawResource(SkynetApplication.CERTIFICATE_RES);
+        networkManager.initialize(certStream);
+        networkManager.connect();
     }
 
     public NetworkManager getNetworkManager() {
@@ -67,8 +71,8 @@ public class SkynetContext implements KeyProvider {
     }
 
     @Override
-    public KeyStore getMessageKeys(P0BChannelMessage message) {
-        Channel channel = Storage.getDatabase().channelDao().getById(message.channelId);
+    public ChannelKeys getChannelKeys(long channelId) {
+        Channel channel = Storage.getDatabase().channelDao().getById(channelId);
         if (channel == null)
             throw new IllegalArgumentException("Cannot request keys for null channel");
         if (channel.getChannelType() == ChannelType.LOOPBACK)
@@ -87,7 +91,7 @@ public class SkynetContext implements KeyProvider {
         byte[] ecKey = EC.deriveKey(privateKey.getDerivationKey(), publicKey.getDerivationKey());
         byte[] sha512 = HashProvider.sha512(ecKey);
 
-        return KeyStore.from64ByteArray(sha512);
+        return ChannelKeys.from64ByteArray(sha512);
     }
 
     public boolean isInSync() {

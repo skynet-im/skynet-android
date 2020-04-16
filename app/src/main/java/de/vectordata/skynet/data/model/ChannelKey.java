@@ -40,8 +40,8 @@ public class ChannelKey {
 
     public static ChannelKey fromPacket(P17PrivateKeys packet) {
         ChannelKey channelKey = new ChannelKey();
-        channelKey.channelId = packet.getParent().channelId;
-        channelKey.messageId = packet.getParent().messageId;
+        channelKey.channelId = packet.channelId;
+        channelKey.messageId = packet.messageId;
         channelKey.keyType = KeyType.PRIVATE;
         channelKey.signatureKeyFormat = packet.signatureKey.format;
         channelKey.signatureKey = packet.signatureKey.key;
@@ -52,8 +52,8 @@ public class ChannelKey {
 
     public static ChannelKey fromPacket(P18PublicKeys packet) {
         ChannelKey channelKey = new ChannelKey();
-        channelKey.channelId = packet.getParent().channelId;
-        channelKey.messageId = packet.getParent().messageId;
+        channelKey.channelId = packet.channelId;
+        channelKey.messageId = packet.messageId;
         channelKey.keyType = KeyType.PUBLIC;
         channelKey.signatureKeyFormat = packet.signatureKey.format;
         channelKey.signatureKey = packet.signatureKey.key;

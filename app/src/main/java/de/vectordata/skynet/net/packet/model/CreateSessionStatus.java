@@ -1,7 +1,8 @@
 package de.vectordata.skynet.net.packet.model;
 
-public enum RestoreSessionError {
+public enum CreateSessionStatus {
     SUCCESS,
     INVALID_CREDENTIALS,
-    INVALID_SESSION
+    INVALID_FCM_TOKEN,
+    UNCONFIRMED_ACCOUNT
 }

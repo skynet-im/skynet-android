@@ -3,9 +3,10 @@ package de.vectordata.skynet.net.packet;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
 public class P2ESearchAccountResponse extends AbstractPacket {
@@ -22,13 +23,8 @@ public class P2ESearchAccountResponse extends AbstractPacket {
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++) {
             long accountId = buffer.readInt64();
-            String accountName = buffer.readString();
-            int packetCount = buffer.readUInt16();
-            List<ForwardedPacket> forwardedPackets = new ArrayList<>();
-            for (int j = 0; j < packetCount; j++) {
-                forwardedPackets.add(new ForwardedPacket(buffer.readByte(), buffer.readByteArray()));
-            }
-            results.add(new Result(accountId, accountName, forwardedPackets));
+            String accountName = buffer.readString(LengthPrefix.SHORT);
+            results.add(new Result(accountId, accountName));
         }
     }
 
@@ -42,25 +38,13 @@ public class P2ESearchAccountResponse extends AbstractPacket {
         return 0x2E;
     }
 
-    public class Result {
+    public static class Result {
         public long accountId;
         public String accountName;
-        public List<ForwardedPacket> forwardedPackets;
 
-        public Result(long accountId, String accountName, List<ForwardedPacket> forwardedPackets) {
+        public Result(long accountId, String accountName) {
             this.accountId = accountId;
             this.accountName = accountName;
-            this.forwardedPackets = forwardedPackets;
-        }
-    }
-
-    public class ForwardedPacket {
-        public byte packetId;
-        public byte[] packetContent;
-
-        public ForwardedPacket(byte packetId, byte[] packetContent) {
-            this.packetId = packetId;
-            this.packetContent = packetContent;
         }
     }
 }

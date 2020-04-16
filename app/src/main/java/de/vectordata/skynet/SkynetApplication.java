@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RawRes;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ProcessLifecycleOwner;
@@ -22,6 +23,16 @@ public class SkynetApplication extends Application implements DefaultLifecycleOb
 
     public static final String TAG = "SkynetApplication";
 
+    public static final String APPLICATION_IDENTIFIER = "android/de.vectordata.skynet";
+    public static final int VERSION_CODE = BuildConfig.VERSION_CODE;
+
+    public static final String SERVER_IP = "skynet.lerchen.net";
+    public static final int SERVER_PORT = 32762;
+    public static final int PROTOCOL_VERSION = 3;
+
+    @RawRes
+    public static final int CERTIFICATE_RES = R.raw.devcert;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -29,6 +40,7 @@ public class SkynetApplication extends Application implements DefaultLifecycleOb
         Storage.initialize(getApplicationContext());
         FirebaseApp.initializeApp(this);
         EmojiManager.install(new IosEmojiProvider());
+        SkynetContext.getCurrent().initialize(this);
         SkynetContext.getCurrent().getNetworkManager().connect();
         SkynetContext.getCurrent().getNotificationManager().onInitialize(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);

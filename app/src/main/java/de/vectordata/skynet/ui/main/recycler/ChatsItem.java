@@ -1,10 +1,10 @@
 package de.vectordata.skynet.ui.main.recycler;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.ui.util.MessageSide;
+import de.vectordata.skynet.util.date.DateTime;
 
 /**
  * Created by Twometer on 14.12.2018.

@@ -1,16 +1,16 @@
 package de.vectordata.skynet.event;
 
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 
 public class AuthenticationFailedEvent {
 
-    private RestoreSessionError error;
+    private RestoreSessionStatus error;
 
-    public AuthenticationFailedEvent(RestoreSessionError error) {
+    public AuthenticationFailedEvent(RestoreSessionStatus error) {
         this.error = error;
     }
 
-    public RestoreSessionError getError() {
+    public RestoreSessionStatus getError() {
         return error;
     }
 

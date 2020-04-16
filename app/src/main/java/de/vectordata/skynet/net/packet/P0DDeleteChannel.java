@@ -1,12 +1,13 @@
 package de.vectordata.skynet.net.packet;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
-import de.vectordata.skynet.net.model.PacketDirection;
-import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
+import de.vectordata.skynet.net.client.PacketBuffer;
+import de.vectordata.skynet.net.packet.base.AbstractPacket;
 
-public class P19KeypairReference extends ChannelMessagePacket {
+public class P0DDeleteChannel extends AbstractPacket {
+
+    public long channelId;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -14,6 +15,7 @@ public class P19KeypairReference extends ChannelMessagePacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
+        channelId = buffer.readInt64();
     }
 
     @Override
@@ -23,10 +25,6 @@ public class P19KeypairReference extends ChannelMessagePacket {
 
     @Override
     public byte getId() {
-        return 0x19;
-    }
-
-    @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
+        return 0x0D;
     }
 }

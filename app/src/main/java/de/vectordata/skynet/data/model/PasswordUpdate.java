@@ -19,13 +19,19 @@ public class PasswordUpdate {
 
     private long messageId;
 
+    private byte[] previousKeyHash;
+
     private byte[] keyHash;
+
+    private byte[] previousKey;
 
     public static PasswordUpdate fromPacket(P15PasswordUpdate packet) {
         PasswordUpdate update = new PasswordUpdate();
-        update.channelId = packet.getParent().channelId;
-        update.messageId = packet.getParent().messageId;
+        update.channelId = packet.channelId;
+        update.messageId = packet.messageId;
+        update.previousKeyHash = packet.previousKeyHash;
         update.keyHash = packet.keyHash;
+        update.previousKey = packet.previousKey;
         return update;
     }
 
@@ -45,11 +51,27 @@ public class PasswordUpdate {
         this.messageId = messageId;
     }
 
+    public byte[] getPreviousKeyHash() {
+        return previousKeyHash;
+    }
+
+    public void setPreviousKeyHash(byte[] previousKeyHash) {
+        this.previousKeyHash = previousKeyHash;
+    }
+
     public byte[] getKeyHash() {
         return keyHash;
     }
 
     public void setKeyHash(byte[] keyHash) {
         this.keyHash = keyHash;
+    }
+
+    public byte[] getPreviousKey() {
+        return previousKey;
+    }
+
+    public void setPreviousKey(byte[] previousKey) {
+        this.previousKey = previousKey;
     }
 }

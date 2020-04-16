@@ -2,9 +2,10 @@ package de.vectordata.skynet.net.packet;
 
 import java.util.List;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.ConnectionState;
 import de.vectordata.skynet.net.packet.annotation.AllowState;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
@@ -12,27 +13,27 @@ import de.vectordata.skynet.net.packet.base.AbstractPacket;
 @AllowState(ConnectionState.AUTHENTICATING)
 public class P08RestoreSession extends AbstractPacket {
 
-    public long accountId;
-    public byte[] keyHash;
     public long sessionId;
-    public List<ChannelItem> channels;
+    public byte[] sessionToken;
+    public long lastMessageId;
+    public List<Long> channels;
 
-    public P08RestoreSession(long accountId, byte[] keyHash, long sessionId, List<ChannelItem> channels) {
-        this.accountId = accountId;
-        this.keyHash = keyHash;
+    public P08RestoreSession(long sessionId, byte[] sessionToken, long lastMessageId, List<Long> channels) {
         this.sessionId = sessionId;
+        this.sessionToken = sessionToken;
+        this.lastMessageId = lastMessageId;
         this.channels = channels;
     }
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeInt64(accountId);
-        buffer.writeByteArray(keyHash, false);
         buffer.writeInt64(sessionId);
-        buffer.writeInt16((short) channels.size());
-        for (ChannelItem item : channels) {
-            buffer.writeInt64(item.channelId);
-            buffer.writeInt64(item.lastMessageId);
+        buffer.writeByteArray(sessionToken, LengthPrefix.NONE);
+        buffer.writeInt64(lastMessageId);
+
+        buffer.writeUInt16(channels.size());
+        for (long channelId : channels) {
+            buffer.writeInt64(channelId);
         }
     }
 
@@ -47,15 +48,5 @@ public class P08RestoreSession extends AbstractPacket {
     @Override
     public byte getId() {
         return 0x08;
-    }
-
-    public static class ChannelItem {
-        public long channelId;
-        public long lastMessageId;
-
-        public ChannelItem(long channelId, long lastMessageId) {
-            this.channelId = channelId;
-            this.lastMessageId = lastMessageId;
-        }
     }
 }

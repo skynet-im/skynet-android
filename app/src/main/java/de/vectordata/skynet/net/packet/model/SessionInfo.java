@@ -1,6 +1,6 @@
 package de.vectordata.skynet.net.packet.model;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class SessionInfo {
 

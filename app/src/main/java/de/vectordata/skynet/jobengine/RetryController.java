@@ -36,7 +36,7 @@ class RetryController {
         ChannelMessageConfig config = new ChannelMessageConfig();
         List<Dependency> dependencies = Storage.getDatabase().dependencyDao().getDependencies(chatMessage.getChannelId(), chatMessage.getMessageId());
         for (Dependency dependency : dependencies)
-            config.addDependency(dependency.getDstAccountId(), dependency.getDstChannelId(), dependency.getDstMessageId());
+            config.addDependency(dependency.getDstAccountId(), dependency.getDstMessageId());
 
         getSkynetContext().getMessageInterface().schedule(chatMessage.getChannelId(), chatMessage.getMessageId(), config, packet, PersistenceMode.NONE);
     }

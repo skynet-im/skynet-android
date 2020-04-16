@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
@@ -27,8 +26,9 @@ import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.dialogs.ProgressDialog;
 import de.vectordata.skynet.ui.main.recycler.ChatsAdapter;
 import de.vectordata.skynet.ui.main.recycler.ChatsItem;
-import de.vectordata.skynet.util.Activities;
-import de.vectordata.skynet.util.Handlers;
+import de.vectordata.skynet.util.android.Activities;
+import de.vectordata.skynet.util.android.Handlers;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class AddContactActivity extends ThemedActivity {
 
@@ -60,7 +60,7 @@ public class AddContactActivity extends ThemedActivity {
                 channel.setChannelType(ChannelType.DIRECT);
                 channel.setChannelId(tempChannelId);
                 Storage.getDatabase().channelDao().insert(channel);
-                Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, Storage.getSession().getAccountId(), accountId);
+                Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, accountId);
                 SkynetContext.getCurrent().getNetworkManager().sendPacket(packet)
                         .waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(() -> {
                             dialog.dismiss();

@@ -23,8 +23,8 @@ public class Bio {
 
     public static Bio fromPacket(P26Bio packet) {
         Bio bio = new Bio();
-        bio.channelId = packet.getParent().channelId;
-        bio.messageId = packet.getParent().messageId;
+        bio.channelId = packet.channelId;
+        bio.messageId = packet.messageId;
         bio.bio = packet.bio;
         return bio;
     }

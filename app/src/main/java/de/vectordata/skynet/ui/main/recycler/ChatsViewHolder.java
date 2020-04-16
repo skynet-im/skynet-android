@@ -10,11 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import de.vectordata.libjvsl.util.cscompat.DateTime;
 import de.vectordata.skynet.R;
-import de.vectordata.skynet.ui.util.DateUtil;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.ThemeUtil;
+import de.vectordata.skynet.util.date.DateTime;
+import de.vectordata.skynet.util.date.DateUtil;
 
 /**
  * Created by Twometer on 14.12.2018.
@@ -44,7 +44,7 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
 
     void configure(ChatsItem item, boolean singleLine) {
         header.setText(item.getHeader());
-        DefaultProfileImage.create(item.getHeader().substring(0, 1), item.getCounterpartId(), 128, 128)
+        DefaultProfileImage.create(item.getHeader(), item.getCounterpartId(), 128, 128)
                 .loadInto(avatar);
 
         if (singleLine) {

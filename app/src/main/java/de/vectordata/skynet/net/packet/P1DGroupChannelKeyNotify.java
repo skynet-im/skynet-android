@@ -1,32 +1,35 @@
 package de.vectordata.skynet.net.packet;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.GroupChannelKeyNotify;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.LengthPrefix;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.model.PacketDirection;
+import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 
+@Flags(MessageFlags.NO_SENDER_SYNC)
 public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
 
-    public long channelId;
+    public long groupChannelId;
     public byte[] newKey;
     public byte[] historyKey;
 
     @Override
-    public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        buffer.writeInt64(channelId);
-        buffer.writeByteArray(newKey, true);
-        buffer.writeByteArray(historyKey, true);
+    public void writeContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        buffer.writeInt64(groupChannelId);
+        buffer.writeByteArray(newKey, LengthPrefix.NONE);
+        buffer.writeByteArray(historyKey, LengthPrefix.NONE);
     }
 
     @Override
-    public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        channelId = buffer.readInt64();
-        newKey = buffer.readByteArray();
-        historyKey = buffer.readByteArray();
+    public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
+        groupChannelId = buffer.readInt64();
+        newKey = buffer.readBytes(64);
+        historyKey = buffer.readBytes(64);
     }
 
     @Override
@@ -40,8 +43,8 @@ public class P1DGroupChannelKeyNotify extends ChannelMessagePacket {
     }
 
     @Override
-    public void writeToDatabase(PacketDirection packetDirection) {
-        if (packetDirection == PacketDirection.SEND && getParent().hasFlag(MessageFlags.NO_SENDER_SYNC))
+    public void persistContents(PacketDirection packetDirection) {
+        if (packetDirection == PacketDirection.SEND && hasFlag(MessageFlags.NO_SENDER_SYNC))
             return;
         Storage.getDatabase().groupChannelKeyNotifyDao().insert(GroupChannelKeyNotify.fromPacket(this));
     }

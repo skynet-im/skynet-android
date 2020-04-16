@@ -5,23 +5,25 @@ import java.util.List;
 
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.P08RestoreSession;
 import de.vectordata.skynet.net.packet.P09RestoreSessionResponse;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.util.Callback;
 
 public class Authenticator {
 
-    public static void authenticate(Session session, Callback<RestoreSessionError> callback) {
-        List<P08RestoreSession.ChannelItem> channelItems = new ArrayList<>();
+    public static void authenticate(Session session, Callback<RestoreSessionStatus> callback) {
+        ChannelMessage lastMessage = Storage.getDatabase().channelMessageDao().queryLast();
+        List<Long> channelIds = new ArrayList<>();
         List<Channel> channels = Storage.getDatabase().channelDao().getAll();
         for (Channel channel : channels)
-            channelItems.add(new P08RestoreSession.ChannelItem(channel.getChannelId(), channel.getLatestMessage()));
+            channelIds.add(channel.getChannelId());
         SkynetContext.getCurrent()
                 .getNetworkManager()
-                .sendPacket(new P08RestoreSession(session.getAccountId(), session.getSessionKeys().getKeyHash(), session.getSessionId(), channelItems))
-                .waitForPacket(P09RestoreSessionResponse.class, p -> callback.onCallback(p.errorCode));
+                .sendPacket(new P08RestoreSession(session.getSessionId(), session.getSessionToken(), lastMessage.getMessageId(), channelIds))
+                .waitForPacket(P09RestoreSessionResponse.class, p -> callback.onCallback(p.statusCode));
     }
 
 }

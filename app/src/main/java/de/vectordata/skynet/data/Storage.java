@@ -28,13 +28,13 @@ public class Storage {
     }
 
     public static void initialize(Context context) {
-        if (!checkBeforeInit())
+        if (!ensureUninitialized())
             return;
         skynetDatabase = Room.databaseBuilder(context.getApplicationContext(), SkynetDatabase.class, "skynet-db").build();
         sessionCache = new ObjectCache<>(context, "session");
     }
 
-    private static boolean checkBeforeInit() {
+    private static boolean ensureUninitialized() {
         if (initialized)
             return false;
         initialized = true;

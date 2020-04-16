@@ -3,8 +3,8 @@ package de.vectordata.skynet.net.messages;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
+import de.vectordata.skynet.data.model.FileInfo;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 public class ChannelMessageConfig {
 
@@ -14,9 +14,9 @@ public class ChannelMessageConfig {
 
     private long fileId;
 
-    private byte[] fileKey;
+    private FileInfo attachedFile;
 
-    private List<P0BChannelMessage.Dependency> dependencies = new ArrayList<>();
+    private List<ChannelMessagePacket.NetDependency> dependencies = new ArrayList<>();
 
     public static ChannelMessageConfig create() {
         return new ChannelMessageConfig();
@@ -27,18 +27,19 @@ public class ChannelMessageConfig {
         return this;
     }
 
-    public ChannelMessageConfig setAttachedFile(long fileId, byte[] fileKey) {
-        this.fileId = fileId;
-        this.fileKey = fileKey;
-        addFlag(MessageFlags.FILE_ATTACHED);
-        return this;
+    public FileInfo getAttachedFile() {
+        return attachedFile;
     }
 
-    public ChannelMessageConfig addDependency(long accountId, long channelId, long messageId) {
-        return addDependency(new P0BChannelMessage.Dependency(accountId, channelId, messageId));
+    public void setAttachedFile(FileInfo attachedFile) {
+        this.attachedFile = attachedFile;
     }
 
-    private ChannelMessageConfig addDependency(P0BChannelMessage.Dependency dependency) {
+    public ChannelMessageConfig addDependency(long accountId, long messageId) {
+        return addDependency(new ChannelMessagePacket.NetDependency(accountId, messageId));
+    }
+
+    private ChannelMessageConfig addDependency(ChannelMessagePacket.NetDependency dependency) {
         dependencies.add(dependency);
         return this;
     }
@@ -51,11 +52,7 @@ public class ChannelMessageConfig {
         return fileId;
     }
 
-    byte[] getFileKey() {
-        return fileKey;
-    }
-
-    List<P0BChannelMessage.Dependency> getDependencies() {
+    List<ChannelMessagePacket.NetDependency> getDependencies() {
         return dependencies;
     }
 

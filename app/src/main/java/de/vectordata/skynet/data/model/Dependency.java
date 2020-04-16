@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 
 import java.util.List;
 
-import de.vectordata.skynet.net.packet.P0BChannelMessage;
+import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 
 @Entity(tableName = "dependencies", foreignKeys = @ForeignKey(
         entity = ChannelMessage.class,
@@ -32,19 +32,18 @@ public class Dependency {
 
     private long dstMessageId;
 
-    public static Dependency[] arrayFromPacket(P0BChannelMessage packet, List<P0BChannelMessage.Dependency> children) {
+    public static Dependency[] arrayFromPacket(ChannelMessagePacket packet, List<ChannelMessagePacket.NetDependency> children) {
         Dependency[] dependencies = new Dependency[children.size()];
         for (int i = 0; i < children.size(); i++)
             dependencies[i] = fromPacket(packet, children.get(i));
         return dependencies;
     }
 
-    private static Dependency fromPacket(P0BChannelMessage packet, P0BChannelMessage.Dependency packetChild) {
+    private static Dependency fromPacket(ChannelMessagePacket packet, ChannelMessagePacket.NetDependency packetChild) {
         Dependency dependency = new Dependency();
         dependency.srcChannelId = packet.channelId;
         dependency.srcMessageId = packet.messageId;
         dependency.dstAccountId = packetChild.accountId;
-        dependency.dstChannelId = packetChild.channelId;
         dependency.dstMessageId = packetChild.messageId;
         return dependency;
     }

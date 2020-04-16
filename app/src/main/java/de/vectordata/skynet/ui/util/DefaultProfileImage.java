@@ -35,7 +35,9 @@ public class DefaultProfileImage {
         this.bitmap = bitmap;
     }
 
-    public static DefaultProfileImage create(String initials, long accountId, int width, int height) {
+    public static DefaultProfileImage create(String nickname, long accountId, int width, int height) {
+        String initials = nickname.length() < 2 ? nickname : nickname.substring(0, 1);
+
         int color = COLORS[(int) Math.abs(accountId % COLORS.length)];
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -47,11 +49,13 @@ public class DefaultProfileImage {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(68);
 
-        Rect textBounds = new Rect();
-        paint.getTextBounds(initials, 0, 1, textBounds);
-        int textHeight = Math.abs(textBounds.height());
+        if (!initials.isEmpty()) {
+            Rect textBounds = new Rect();
+            paint.getTextBounds(initials, 0, 1, textBounds);
+            int textHeight = Math.abs(textBounds.height());
 
-        canvas.drawText(initials, bitmap.getWidth() / 2f, bitmap.getHeight() / 2f + textHeight / 2f, paint);
+            canvas.drawText(initials, bitmap.getWidth() / 2f, bitmap.getHeight() / 2f + textHeight / 2f, paint);
+        }
         return new DefaultProfileImage(bitmap);
     }
 

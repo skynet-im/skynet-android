@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.ui.main.MainActivity;
 import de.vectordata.skynet.ui.util.NameUtil;
-import de.vectordata.skynet.util.Handlers;
+import de.vectordata.skynet.util.android.Handlers;
 
 public class NotificationManagerNew implements INotificationManager {
 

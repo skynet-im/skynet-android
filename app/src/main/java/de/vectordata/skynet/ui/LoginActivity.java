@@ -19,11 +19,11 @@ import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P06CreateSession;
 import de.vectordata.skynet.net.packet.P07CreateSessionResponse;
-import de.vectordata.skynet.net.packet.model.CreateSessionError;
+import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
 import de.vectordata.skynet.ui.base.SkynetActivity;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.dialogs.ProgressDialog;
-import de.vectordata.skynet.util.Activities;
+import de.vectordata.skynet.util.android.Activities;
 
 public class LoginActivity extends SkynetActivity {
 
@@ -78,15 +78,17 @@ public class LoginActivity extends SkynetActivity {
         networkManager.sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
                 .waitForPacket(P07CreateSessionResponse.class, p -> runOnUiThread(() -> {
                     progressDialog.dismiss();
-                    if (p.errorCode == CreateSessionError.INVALID_FCM_TOKEN)
+                    if (p.statusCode == CreateSessionStatus.INVALID_FCM_TOKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);
-                    else if (p.errorCode == CreateSessionError.INVALID_CREDENTIALS)
+                    else if (p.statusCode == CreateSessionStatus.INVALID_CREDENTIALS)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_invalid_credentials);
-                    else if (p.errorCode == CreateSessionError.UNCONFIRMED_ACCOUNT)
+                    else if (p.statusCode == CreateSessionStatus.UNCONFIRMED_ACCOUNT)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_unconfirmed_account);
-                    else if (p.errorCode == CreateSessionError.SUCCESS) {
+                    else if (p.statusCode == CreateSessionStatus.SUCCESS) {
                         session.setSessionId(p.sessionId);
                         session.setAccountId(p.accountId);
+                        session.setSessionToken(p.sessionToken);
+                        session.setWebToken(p.webToken);
                         Storage.setSession(session);
                         finish();
                     }
@@ -95,8 +97,10 @@ public class LoginActivity extends SkynetActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConnectionFailed(ConnectionFailedEvent event) {
-        progressDialog.dismiss();
-        Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_no_connection);
+        if (progressDialog != null && !progressDialog.isOpen()) {
+            progressDialog.dismiss();
+            Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_no_connection);
+        }
     }
 
     @Override

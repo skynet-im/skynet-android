@@ -16,6 +16,7 @@ import java.io.IOException;
  *
  * @param <T> The object type
  */
+@SuppressWarnings("unchecked")
 public class ObjectCache<T> {
 
     public static final String TAG = "ObjectCache";
@@ -52,7 +53,7 @@ public class ObjectCache<T> {
             inputStream.close();
             cache = (T) configuration.asObject(data);
         } catch (IOException e) {
-            Log.e(TAG, "Failed to read ObjectCache", e);
+            Log.w(TAG, "Failed to read ObjectCache", e);
         }
     }
 

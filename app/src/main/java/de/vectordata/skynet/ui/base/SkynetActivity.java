@@ -15,7 +15,7 @@ import de.vectordata.skynet.event.AuthenticationFailedEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
-import de.vectordata.skynet.net.packet.model.RestoreSessionError;
+import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 
 /**
@@ -42,9 +42,7 @@ public abstract class SkynetActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAuthenticationFailed(AuthenticationFailedEvent event) {
-        if (event.getError() == RestoreSessionError.INVALID_CREDENTIALS)
-            Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_credentials_restore);
-        else if (event.getError() == RestoreSessionError.INVALID_SESSION)
+        if (event.getError() == RestoreSessionStatus.INVALID_SESSION)
             Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
     }
 

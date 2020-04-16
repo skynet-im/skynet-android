@@ -11,8 +11,8 @@ android {
         applicationId "de.vectordata.skynet"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 58
-        versionName "0.8.3"
+        versionCode 59
+        versionName "0.9.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {
@@ -37,27 +37,26 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
-    implementation 'androidx.room:room-runtime:2.2.3'
+    implementation 'androidx.room:room-runtime:2.2.5'
     implementation "androidx.lifecycle:lifecycle-runtime:2.2.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0-alpha05'
     implementation 'com.takisoft.preferencex:preferencex-colorpicker:1.1.0-alpha05'
     implementation 'com.takisoft.preferencex:preferencex-ringtone:1.1.0-alpha05'
-    implementation 'vectordata:jvsl:1.3.6@aar'
     implementation 'vectordata:libargon2:1.0.1@aar'
     implementation 'de.ruedigermoeller:fst:2.56'
     implementation 'de.psdev.licensesdialog:licensesdialog:2.0.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha04'
-    implementation 'com.google.firebase:firebase-core:17.2.2'
-    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha06'
+    implementation 'com.google.firebase:firebase-core:17.3.0'
+    implementation 'com.google.firebase:firebase-messaging:20.1.5'
     implementation 'com.vanniktech:emoji-ios:0.6.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
-    annotationProcessor 'androidx.room:room-compiler:2.2.3'
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
 
-    testImplementation 'androidx.room:room-testing:2.2.3'
+    testImplementation 'androidx.room:room-testing:2.2.5'
     testImplementation 'junit:junit:4.12'
 
     androidTestImplementation 'androidx.test:runner:1.2.0'

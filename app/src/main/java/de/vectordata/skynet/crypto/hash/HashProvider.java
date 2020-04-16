@@ -9,7 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import de.vectordata.libargon2.Argon2;
 import de.vectordata.libargon2.Argon2Type;
 import de.vectordata.libargon2.Argon2Version;
-import de.vectordata.skynet.crypto.keys.KeyStore;
+import de.vectordata.skynet.crypto.keys.ChannelKeys;
+import de.vectordata.skynet.net.client.ByteUtils;
 import de.vectordata.skynet.util.Callback;
 
 /**
@@ -27,8 +28,10 @@ public class HashProvider {
     public static void buildHashesAsync(String username, String password, Callback<KeyCollection> completed) {
         new Thread(() -> {
             byte[] argon2Data = argon2(username, password);
-            KeyStore loopbackChannelKeys = KeyStore.from64ByteArray(argon2Data);
-            byte[] keyHash = sha256(argon2Data);
+
+            ChannelKeys loopbackChannelKeys = ChannelKeys.from64ByteArray(argon2Data); // 0...64
+            byte[] keyHash = ByteUtils.skipBytes(argon2Data, 64);              // 64...96
+
             completed.onCallback(new KeyCollection(loopbackChannelKeys, keyHash));
         }).start();
     }
@@ -36,7 +39,7 @@ public class HashProvider {
     private static byte[] argon2(String username, String password) {
         byte[] passwordBytes = getBytes(password);
         byte[] saltBytes = sha256(getBytes(username));
-        return Argon2.hash(TIME_COST, MEM_COST, PARALLELISM, passwordBytes, saltBytes, Argon2Type.ARGON2ID, Argon2Version.VERSION_13, 64);
+        return Argon2.hash(TIME_COST, MEM_COST, PARALLELISM, passwordBytes, saltBytes, Argon2Type.ARGON2ID, Argon2Version.VERSION_13, 64 + 32);
     }
 
     private static byte[] sha256(byte[] buf) {

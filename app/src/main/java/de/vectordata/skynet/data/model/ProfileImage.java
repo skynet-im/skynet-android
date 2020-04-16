@@ -23,8 +23,8 @@ public class ProfileImage {
 
     public static ProfileImage fromPacket(P27ProfileImage packet) {
         ProfileImage profileImage = new ProfileImage();
-        profileImage.channelId = packet.getParent().channelId;
-        profileImage.messageId = packet.getParent().messageId;
+        profileImage.channelId = packet.channelId;
+        profileImage.messageId = packet.messageId;
         profileImage.caption = packet.caption;
         return profileImage;
     }

@@ -44,8 +44,8 @@ public class ChatMessage {
 
     public static ChatMessage fromPacket(P20ChatMessage packet, MessageState messageState, boolean isUnread) {
         ChatMessage message = new ChatMessage();
-        message.channelId = packet.getParent().channelId;
-        message.messageId = packet.getParent().messageId;
+        message.channelId = packet.channelId;
+        message.messageId = packet.messageId;
         message.messageType = packet.messageType;
         message.text = packet.text;
         message.quotedMessage = packet.quotedMessage;

@@ -1,14 +1,14 @@
 package de.vectordata.skynet.net.packet;
 
-import de.vectordata.libjvsl.util.PacketBuffer;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.net.PacketHandler;
+import de.vectordata.skynet.net.client.PacketBuffer;
 import de.vectordata.skynet.net.packet.base.AbstractPacket;
-import de.vectordata.skynet.net.packet.model.CreateAccountError;
+import de.vectordata.skynet.net.packet.model.CreateAccountStatus;
 
 public class P03CreateAccountResponse extends AbstractPacket {
 
-    public CreateAccountError errorCode;
+    public CreateAccountStatus statusCode;
 
     @Override
     public void writePacket(PacketBuffer buffer, KeyProvider keyProvider) {
@@ -16,7 +16,7 @@ public class P03CreateAccountResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        errorCode = CreateAccountError.values()[buffer.readByte()];
+        statusCode = CreateAccountStatus.values()[buffer.readByte()];
     }
 
     @Override
