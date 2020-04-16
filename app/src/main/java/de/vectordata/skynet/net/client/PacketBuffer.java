@@ -1,8 +1,7 @@
 package de.vectordata.skynet.net.client;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 import de.vectordata.skynet.util.date.DateTime;
 
@@ -37,18 +36,6 @@ public class PacketBuffer {
         return buffer.capacity();
     }
 
-    public int getRemaining() {
-        return buffer.remaining();
-    }
-
-    public int getPosition() {
-        return buffer.position();
-    }
-
-    public void setPosition(int pos) {
-        buffer.position(pos);
-    }
-
     public DateTime readDate() {
         return DateTime.fromBinary(readInt64());
     }
@@ -58,7 +45,7 @@ public class PacketBuffer {
     }
 
     public void writeString(String string, LengthPrefix prefix) {
-        writeByteArray(string.getBytes(Charset.forName("UTF-8")), prefix);
+        writeByteArray(string.getBytes(StandardCharsets.UTF_8), prefix);
     }
 
     public String readString(LengthPrefix prefix) {
@@ -159,24 +146,6 @@ public class PacketBuffer {
         writeBytes(new byte[]{(byte) (i), (byte) (i >> 8), (byte) (i >> 16), (byte) (i >> 24)});
     }
 
-    public long readUInt32() {
-        byte[] b = readBytes(4);
-        return ByteBuffer.wrap(new byte[]{0, 0, 0, 0, b[3], b[2], b[1], b[0]}).getLong();
-    }
-
-    public void writeUInt64(long i) {
-        writeBytes(new byte[]{
-                (byte) (i),
-                (byte) (i >>> 8),
-                (byte) (i >>> 16),
-                (byte) (i >>> 24),
-                (byte) (i >>> 32),
-                (byte) (i >>> 40),
-                (byte) (i >>> 48),
-                (byte) (i >>> 56)
-        });
-    }
-
     public void writeInt64(long l) {
         byte[] b = new byte[]{(byte) (l), (byte) (l >> 8), (byte) (l >> 16), (byte) (l >> 24), (byte) (l >> 32), (byte) (l >> 40), (byte) (l >> 48), (byte) (l >> 56)};
         writeBytes(b);
@@ -227,9 +196,4 @@ public class PacketBuffer {
         return buffer.hasRemaining();
     }
 
-    public void writeUInt32List(List<Long> list) {
-        writeUInt16(list.size());
-        for (long l : list)
-            writeUInt32(l);
-    }
 }
