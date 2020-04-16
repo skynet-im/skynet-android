@@ -19,6 +19,9 @@ public final class DateUtil {
     }
 
     public static String toDateString(Context context, DateTime dateTime) {
+        if (dateTime == null)
+            return "null";
+
         if (dateTime.isToday())
             return context.getString(R.string.today);
         else if (dateTime.isYesterday())
