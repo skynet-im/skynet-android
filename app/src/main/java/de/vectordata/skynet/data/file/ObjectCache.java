@@ -53,7 +53,7 @@ public class ObjectCache<T> {
             inputStream.close();
             cache = (T) configuration.asObject(data);
         } catch (IOException e) {
-            Log.e(TAG, "Failed to read ObjectCache", e);
+            Log.w(TAG, "Failed to read ObjectCache", e);
         }
     }
 

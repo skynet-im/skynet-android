@@ -2,12 +2,14 @@ package de.vectordata.skynet.net.messages;
 
 import java.util.Random;
 
+import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.jobengine.jobs.ChannelMessageJob;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.response.ResponseAwaiter;
+import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageInterface {
 
@@ -69,7 +71,7 @@ public class MessageInterface {
      * @param persistenceMode Whether to save to the database
      */
     public void schedule(long channelId, long messageId, ChannelMessageConfig config, ChannelMessagePacket packet, PersistenceMode persistenceMode) {
-        configure(packet, channelId, newId(), config);
+        configure(packet, channelId, messageId, config);
         if (persistenceMode == PersistenceMode.DATABASE)
             packet.persist(PacketDirection.SEND);
         skynetContext.getJobEngine().schedule(new ChannelMessageJob(packet));
@@ -79,6 +81,8 @@ public class MessageInterface {
         packet.packetVersion = PACKET_VERSION;
         packet.channelId = channelId;
         packet.messageId = messageId;
+        packet.senderId = Storage.getSession().getAccountId();
+        packet.dispatchTime = DateTime.now();
         packet.messageFlags = config.getMessageFlags();
         packet.dependencies = config.getDependencies();
         packet.attachedFile = config.getAttachedFile();

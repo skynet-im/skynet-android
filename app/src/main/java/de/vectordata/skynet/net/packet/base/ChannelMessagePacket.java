@@ -106,6 +106,7 @@ public abstract class ChannelMessagePacket extends AbstractPacket {
             }
         }
 
+        dependencies.clear();
         int dependencyCount = buffer.readUInt16();
         for (int i = 0; i < dependencyCount; i++)
             dependencies.add(new NetDependency(buffer.readInt64(), buffer.readInt64()));
