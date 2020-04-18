@@ -62,7 +62,7 @@ public class P21MessageOverride extends ChannelMessagePacket {
 
     @Override
     public void persistContents(PacketDirection packetDirection) {
-        long targetMessageId = dependencies.get(0).messageId;
+        long targetMessageId = singleDependency().messageId;
         Channel channel = Storage.getDatabase().channelDao().getById(channelId);
         if (channel.getChannelType() == ChannelType.PROFILE_DATA) {
             DaystreamMessage message = Storage.getDatabase().daystreamMessageDao().get(channelId, targetMessageId);
