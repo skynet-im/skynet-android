@@ -190,7 +190,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             modifyMessageItem(dependency.messageId, i -> i.setMessageState(MessageState.SEEN));
         } else if (packetIn instanceof P21MessageOverride) {
             P21MessageOverride override = (P21MessageOverride) packetIn;
-            modifyMessageItem(override.messageId, i -> {
+            long referencedMessageid = override.singleDependency().messageId;
+            modifyMessageItem(referencedMessageid, i -> {
                 if (override.action == OverrideAction.EDIT) {
                     i.setEdited(true);
                     i.setContent(override.newText);
