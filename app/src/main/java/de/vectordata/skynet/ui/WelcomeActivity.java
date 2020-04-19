@@ -12,7 +12,6 @@ import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.messages.ChannelMessageConfig;
-import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.P25Nickname;
 import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.util.android.Activities;
@@ -35,7 +34,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 P25Nickname packet = new P25Nickname(nn);
                 SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(), new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED), packet)
-                        .waitForPacket(P0CChannelMessageResponse.class, p -> runOnUiThread(this::finish));
+                        .waitForResponse(r -> runOnUiThread(this::finish));
             }).start();
         });
 

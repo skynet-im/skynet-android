@@ -54,7 +54,7 @@ public class CreateAccountActivity extends SkynetActivity {
         networkManager.connect();
 
         networkManager.sendPacket(new P02CreateAccount(accountName, keyHash))
-                .waitForPacket(P03CreateAccountResponse.class, packet -> runOnUiThread(() -> {
+                .waitFor(P03CreateAccountResponse.class, packet -> runOnUiThread(() -> {
                     progressDialog.dismiss();
                     if (packet.statusCode == CreateAccountStatus.ACCOUNT_NAME_TAKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_account_name_taken);

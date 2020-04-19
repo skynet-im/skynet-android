@@ -8,7 +8,7 @@ import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.response.ResponseAwaiter;
+import de.vectordata.skynet.net.response.PacketTask;
 import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageInterface {
@@ -43,7 +43,7 @@ public class MessageInterface {
      * @param packet    The content packet
      * @return An awaitable for the response
      */
-    public ResponseAwaiter send(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+    public PacketTask send(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
         configure(packet, channelId, newId(), config);
         packet.persist(PacketDirection.SEND);
         return skynetContext.getNetworkManager().sendPacket(packet);

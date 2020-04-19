@@ -65,7 +65,6 @@ import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
 import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
 import de.vectordata.skynet.net.packet.model.KeyFormat;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
-import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
 
@@ -73,14 +72,12 @@ public class PacketHandler {
 
     private KeyProvider keyProvider;
     private NetworkManager networkManager;
-    private ResponseAwaiter responseAwaiter;
 
     private boolean inSync;
 
-    public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager, ResponseAwaiter responseAwaiter) {
+    public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager) {
         this.keyProvider = keyProvider;
         this.networkManager = networkManager;
-        this.responseAwaiter = responseAwaiter;
     }
 
     void handlePacket(byte id, byte[] payload) {
@@ -115,7 +112,6 @@ public class PacketHandler {
         Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
 
         packet.handlePacket(this);
-        responseAwaiter.onPacket(packet);
         EventBus.getDefault().post(new PacketEvent(packet));
     }
 
@@ -203,7 +199,7 @@ public class PacketHandler {
                             new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPrivateKey()),
                             new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPrivateKey())
                     )
-            ).waitForPacket(P0CChannelMessageResponse.class, response -> {
+            ).waitForResponse(response -> {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
                         new ChannelMessageConfig()
@@ -306,8 +302,7 @@ public class PacketHandler {
                 .send(channelId,
                         new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
                         new P22MessageReceived()
-                );
-        setMessageState(channelId, messageId, MessageState.DELIVERED);
+                ).waitForResponse(response -> setMessageState(channelId, messageId, MessageState.DELIVERED));
     }
 
     private void setMessageState(long channelId, long messageId, MessageState messageState) {

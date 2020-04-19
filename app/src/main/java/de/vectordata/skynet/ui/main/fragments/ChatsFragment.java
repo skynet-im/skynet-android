@@ -19,7 +19,6 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
@@ -75,9 +74,9 @@ public class ChatsFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        context = Objects.requireNonNull(getActivity());
+        context = requireActivity();
         if (handler == null)
-            handler = Handlers.createOnThread("BackgroundThread");
+            handler = Handlers.createOnThread(Handlers.THREAD_BACKGROUND);
 
         adapter = new ChatsAdapter(dataset);
         adapter.setItemClickListener(idx -> {

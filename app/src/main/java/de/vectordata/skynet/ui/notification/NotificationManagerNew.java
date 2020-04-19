@@ -51,7 +51,7 @@ public class NotificationManagerNew implements INotificationManager {
     public void onInitialize(Context context) {
         this.context = context;
         this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        this.handler = Handlers.createOnThread("NotificationDatabaseThread");
+        this.handler = Handlers.createOnThread(Handlers.THREAD_NOTIFICATIONS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, context.getString(R.string.notification_channel_name), NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription(context.getString(R.string.notification_channel_desc));

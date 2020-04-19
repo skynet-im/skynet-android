@@ -76,7 +76,7 @@ public class LoginActivity extends SkynetActivity {
         Session session = new Session(keys);
 
         networkManager.sendPacket(new P06CreateSession(accountName, keys.getKeyHash(), token))
-                .waitForPacket(P07CreateSessionResponse.class, p -> runOnUiThread(() -> {
+                .waitFor(P07CreateSessionResponse.class, p -> runOnUiThread(() -> {
                     progressDialog.dismiss();
                     if (p.statusCode == CreateSessionStatus.INVALID_FCM_TOKEN)
                         Dialogs.showMessageBox(this, R.string.error_header_login, R.string.error_firebase_token);

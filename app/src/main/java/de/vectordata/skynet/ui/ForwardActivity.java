@@ -35,7 +35,7 @@ public class ForwardActivity extends ThemedActivity {
 
     public static final String EXTRA_SRC_MESSAGE = "skynet.forward.srcMessage";
 
-    private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
+    private Handler backgroundHandler = Handlers.createOnThread(Handlers.THREAD_BACKGROUND);
 
     private ChatMessage source;
 
