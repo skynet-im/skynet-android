@@ -8,7 +8,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -51,6 +50,7 @@ import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
 import de.vectordata.skynet.ui.chat.recycler.QuotedMessage;
+import de.vectordata.skynet.ui.chat.views.NonPredictiveLinearLayoutManager;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
@@ -83,7 +83,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         adapter = new MessageAdapter(messageItems);
 
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new NonPredictiveLinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
 
         findViewById(R.id.button_send).setOnClickListener(this::onSendMessage);
