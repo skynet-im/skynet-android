@@ -315,7 +315,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
     private void onSendMessage(View v) {
         String text;
-        if (messageInput.getText() == null || (text = messageInput.getText().toString()).trim().isEmpty())
+        if (messageInput.getText() == null || (text = messageInput.getText().toString().trim()).isEmpty())
             return;
 
         if (!hasKeys) {

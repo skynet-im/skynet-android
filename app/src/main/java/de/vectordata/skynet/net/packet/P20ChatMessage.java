@@ -36,7 +36,7 @@ public class P20ChatMessage extends ChannelMessagePacket {
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
         messageType = MessageType.values()[buffer.readByte()];
-        text = buffer.readString(LengthPrefix.MEDIUM);
+        text = buffer.readString(LengthPrefix.MEDIUM).trim();
         quotedMessage = buffer.readInt64();
     }
 
