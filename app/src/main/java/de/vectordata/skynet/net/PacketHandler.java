@@ -229,11 +229,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P17PrivateKeys packet) {
-
+        Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
     }
 
     public void handlePacket(P18PublicKeys packet) {
-
+        Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
     }
 
     public void handlePacket(P19ArchiveChannel packet) {

@@ -31,7 +31,7 @@ public interface ChannelKeyDao {
     @Query("DELETE FROM channelKeys WHERE channelId=:channelId")
     void dropKeys(long channelId);
 
-    @Query("SELECT COUNT(channelId) FROM channelKeys WHERE channelId=:channelId")
+    @Query("SELECT COUNT(messageId) FROM channelKeys WHERE channelId=:channelId")
     int countKeys(long channelId);
 
     @TypeConverters({KeyTypeConverter.class, ChannelTypeConverter.class})

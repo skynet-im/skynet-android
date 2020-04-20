@@ -133,7 +133,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
         ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
 
-        this.hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(accountDataChannel.getChannelId()) != 0;
+        this.hasKeys = Storage.getDatabase().channelKeyDao().countKeys(accountDataChannel.getChannelId()) != 0;
 
         if (onlineState == null)
             runOnUiThread(() -> subtitleView.setVisibility(View.GONE));
