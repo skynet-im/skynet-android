@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.chat.recycler;
 
 import android.graphics.Typeface;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,6 +52,8 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
             if (state != null)
                 state.setVisibility(View.VISIBLE);
         }
+
+        message.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (edited != null)
             edited.setVisibility(messageItem.isEdited() && !isDeleted ? View.VISIBLE : View.GONE);

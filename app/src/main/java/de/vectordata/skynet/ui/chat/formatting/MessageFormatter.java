@@ -6,7 +6,8 @@ import android.text.SpannableStringBuilder;
 public class MessageFormatter {
 
     private static final IMessageFormatting[] formattingSteps = new IMessageFormatting[]{
-            new MarkdownFormatting()
+            new MarkdownFormatting(),
+            new LinkFormatting()
     };
 
     public static Spannable format(CharSequence message) {
