@@ -11,8 +11,8 @@ android {
         applicationId "de.vectordata.skynet"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 59
-        versionName "0.9.0"
+        versionCode 60
+        versionName "0.9.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {

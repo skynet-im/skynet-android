@@ -108,8 +108,6 @@ public class PacketHandler {
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).persist(PacketDirection.RECEIVE);
 
-        Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
-
         packet.handlePacket(this);
         EventBus.getDefault().post(new PacketEvent(packet));
     }
