@@ -12,6 +12,7 @@ import java.util.Objects;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.crypto.hash.HashProvider;
 import de.vectordata.skynet.event.ConnectionFailedEvent;
+import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.net.NetworkManager;
 import de.vectordata.skynet.net.packet.P02CreateAccount;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
@@ -71,6 +72,12 @@ public class CreateAccountActivity extends SkynetActivity {
             progressDialog.dismiss();
             Dialogs.showMessageBox(this, R.string.error_header_create_acc, R.string.error_no_connection);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHandshakeFailed(HandshakeFailedEvent event) {
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 
     @Override
