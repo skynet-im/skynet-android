@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_message_right">
 
+        <!-- Quotes -->
         <View
             android:id="@+id/quote_indicator"
             android:layout_width="2dp"
@@ -56,46 +57,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/quote_indicator"
             app:layout_constraintTop_toBottomOf="@+id/label_quoted_name"
-            tools:text="test  lets assume they wrote me a really really long message and now i have to read this message" />
-
-        <ImageView
-            android:id="@+id/image_state"
-            android:layout_width="16dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
-            android:tint="?attr/invWhite_dark"
-            app:layout_constraintBottom_toBottomOf="@+id/label_time"
-            app:layout_constraintEnd_toStartOf="@+id/image_edited"
-            app:layout_constraintTop_toTopOf="@+id/label_time"
-            app:srcCompat="@drawable/ic_msg_sending" />
-
-        <TextView
-            android:id="@+id/label_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:textColor="?attr/invWhite_dark"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="@+id/label_message"
-            app:layout_constraintEnd_toStartOf="@+id/image_state"
-            tools:text="06:44" />
-
-        <de.vectordata.skynet.ui.chat.views.VariableSizeEmojiTextView
-            android:id="@+id/label_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:textColor="?attr/invWhite_dark"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/label_time"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/label_quoted_text"
-            tools:text="Message test" />
+            tools:text="test  Message testMessage testMessage test Message testMessage testMessage test Message testMessage testMessage test" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_quote"
@@ -104,16 +66,73 @@
             android:visibility="visible"
             app:constraint_referenced_ids="label_quoted_name,label_quoted_text,quote_indicator" />
 
-        <ImageView
-            android:id="@+id/image_edited"
-            android:layout_width="16dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/image_state"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/image_state"
-            app:srcCompat="@drawable/ic_edit" />
+        <!-- Message metadata -->
+        <LinearLayout
+            android:id="@+id/layout_message_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/label_message"
+            app:layout_constraintEnd_toEndOf="parent">
 
+            <TextView
+                android:id="@+id/label_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:textColor="?attr/invWhite_dark"
+                android:textSize="10sp"
+                tools:text="06:44" />
+
+            <ImageView
+                android:id="@+id/image_state"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="8dp"
+                android:tint="?attr/invWhite_dark"
+                app:srcCompat="@drawable/ic_msg_sending" />
+
+            <ImageView
+                android:id="@+id/image_edited"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_edit" />
+        </LinearLayout>
+
+        <!-- Message content -->
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:constraint_referenced_ids="label_message,layout_message_meta"
+            app:flow_horizontalBias="1"
+            app:flow_horizontalStyle="spread_inside"
+            app:flow_verticalAlign="bottom"
+            app:flow_wrapMode="chain"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/quote_indicator" />
+
+        <de.vectordata.skynet.ui.chat.views.VariableSizeEmojiTextView
+            android:id="@+id/label_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/invWhite_dark"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@id/flow"
+            app:layout_constraintEnd_toEndOf="@id/flow"
+            app:layout_constraintStart_toStartOf="@id/flow"
+            app:layout_constraintTop_toBottomOf="@id/flow"
+            tools:ignore="MissingConstraints"
+            tools:text="Message test" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
