@@ -8,6 +8,7 @@ import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
@@ -60,10 +61,8 @@ import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
-import de.vectordata.skynet.net.packet.model.AsymmetricKey;
 import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
 import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
-import de.vectordata.skynet.net.packet.model.KeyFormat;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 
 public class PacketHandler {
@@ -180,50 +179,38 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0BSyncStarted packet) {
-        Log.d(TAG, "Resyncing...");
+        Log.d(TAG, "Resynchronizing (" + packet.minCount + ") ...");
         inSync = false;
     }
 
     public void handlePacket(P0FSyncFinished packet) {
-        boolean hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(ChannelType.LOOPBACK) != 0;
-        if (!hasKeys) {
-            Log.d(TAG, "No loopback keys found, generating...");
-            EC.KeyMaterial signature = EC.generateKeypair();
-            EC.KeyMaterial derivation = EC.generateKeypair();
-            if (signature == null || derivation == null)
-                return;
-            Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
-            SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(),
-                    new ChannelMessageConfig(),
-                    new P17PrivateKeys(
-                            new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPrivateKey()),
-                            new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPrivateKey())
-                    )
-            ).waitForResponse(response -> {
-                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
-                SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
-                        new ChannelMessageConfig()
-                                .addDependency(Storage.getSession().getAccountId(), response.messageId),
-                        new P18PublicKeys(
-                                new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPublicKey()),
-                                new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPublicKey())
-                        )
-                );
-            });
-        }
+        Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
+
+        // Check if there are at least two keys (public and private)
+        boolean hasKeys = Storage.getDatabase().channelKeyDao().countKeys(loopbackChannel.getChannelId()) >= 2;
+        if (!hasKeys)
+            regenerateLoopbackKeys(loopbackChannel);
 
         inSync = true;
         EventBus.getDefault().post(new SyncFinishedEvent());
+
+        // Update client state with the server
+        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState()));
+
+        // Send receive confirmations for all messages that are yet to be confirmed
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed(Storage.getSession().getAccountId())) {
             sendReceiveConfirmation(msg.getChannelId(), msg.getMessageId());
         }
+
+        // Update notifications for unread messages
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnread()) {
             ChannelMessage channelMsg = Storage.getDatabase().channelMessageDao().getById(msg.getChannelId(), msg.getMessageId());
             if (channelMsg.getSenderId() == Storage.getSession().getAccountId())
                 continue;
             SkynetContext.getCurrent().getNotificationManager().onMessageReceived(msg.getChannelId(), msg.getMessageId(), msg.getText());
         }
-        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState()));
+
+        Log.d(TAG, "Synchronized with the server");
     }
 
 
@@ -270,7 +257,6 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1EGroupChannelUpdate packet) {
-
     }
 
     public void handlePacket(P20ChatMessage packet) {
@@ -283,6 +269,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P21MessageOverride packet) {
+
     }
 
     // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received/read it.
@@ -295,24 +282,6 @@ public class PacketHandler {
         ChannelMessagePacket.NetDependency dependency = packet.singleDependency();
         setMessageState(packet.channelId, dependency.messageId, MessageState.SEEN);
         SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(packet.channelId, dependency.messageId);
-    }
-
-    private void sendReceiveConfirmation(long channelId, long messageId) {
-        SkynetContext.getCurrent().getMessageInterface()
-                .send(channelId,
-                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
-                        new P22MessageReceived()
-                ).waitForResponse(response -> setMessageState(channelId, messageId, MessageState.DELIVERED));
-    }
-
-    private void setMessageState(long channelId, long messageId, MessageState messageState) {
-        ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
-        if (message.getMessageState() == MessageState.SEEN) // Do not un-see the message
-            return;
-        message.setMessageState(messageState);
-        if (messageState == MessageState.SEEN)
-            message.setUnread(false);
-        Storage.getDatabase().chatMessageDao().update(message);
     }
 
     public void handlePacket(P24DaystreamMessage packet) {
@@ -358,6 +327,48 @@ public class PacketHandler {
 
     public void handlePacket(P33DeviceListResponse packet) {
 
+    }
+
+    ////////////////////// Utility methods //////////////////////
+    private void regenerateLoopbackKeys(Channel loopbackChannel) {
+        Log.d(TAG, "Incomplete or missing loopback channel keys. Regenerating...");
+        Storage.getDatabase().channelKeyDao().dropKeys(loopbackChannel.getChannelId());
+
+        EC.KeyMaterial signature = EC.generateKeypair();
+        EC.KeyMaterial derivation = EC.generateKeypair();
+        if (signature == null || derivation == null)
+            return;
+
+        P17PrivateKeys privateKeys = new P17PrivateKeys(signature.getPrivateKey(), derivation.getPrivateKey());
+        P18PublicKeys publicKeys = new P18PublicKeys(signature.getPublicKey(), derivation.getPublicKey());
+
+        // First transmit the private keys
+        SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(), privateKeys)
+                .waitForSuccess(r -> {
+                    // If that was successful, store them in the database and transmit public keys
+                    Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(privateKeys));
+
+                    SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(), publicKeys)
+                            .waitForSuccess(r2 -> Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(publicKeys)));
+                });
+    }
+
+    private void sendReceiveConfirmation(long channelId, long messageId) {
+        SkynetContext.getCurrent().getMessageInterface()
+                .send(channelId,
+                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
+                        new P22MessageReceived()
+                ).waitForSuccess(response -> setMessageState(channelId, messageId, MessageState.DELIVERED));
+    }
+
+    private void setMessageState(long channelId, long messageId, MessageState messageState) {
+        ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
+        if (message.getMessageState() == MessageState.SEEN) // Do not un-see the message
+            return;
+        message.setMessageState(messageState);
+        if (messageState == MessageState.SEEN)
+            message.setUnread(false);
+        Storage.getDatabase().chatMessageDao().update(message);
     }
 
     boolean isInSync() {

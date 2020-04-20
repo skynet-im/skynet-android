@@ -181,7 +181,7 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
                         new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
                         new P23MessageRead()
                 )
-                .waitForResponse(p -> backgroundHandler.post(() -> {
+                .waitForSuccess(p -> backgroundHandler.post(() -> {
                     ChatMessage message = Storage.getDatabase().chatMessageDao().query(messageChannel.getChannelId(), messageId);
                     message.setUnread(false);
                     Storage.getDatabase().chatMessageDao().update(message);

@@ -28,13 +28,11 @@ public interface ChannelKeyDao {
     @Query("SELECT * FROM channelKeys WHERE channelId=:channelId AND messageId=:messageId")
     ChannelKey get(long channelId, long messageId);
 
-    @TypeConverters(ChannelTypeConverter.class)
-    @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelType=:type")
-    int hasKeys(ChannelType type);
+    @Query("DELETE FROM channelKeys WHERE channelId=:channelId")
+    void dropKeys(long channelId);
 
-    @TypeConverters(ChannelTypeConverter.class)
-    @Query("SELECT 1 FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channels.channelId=:channelId")
-    int hasKeys(long channelId);
+    @Query("SELECT COUNT(channelId) FROM channelKeys WHERE channelId=:channelId")
+    int countKeys(long channelId);
 
     @TypeConverters({KeyTypeConverter.class, ChannelTypeConverter.class})
     @Query("SELECT channelKeys.channelId,channelKeys.messageId,keyType,signatureKeyFormat,signatureKey,derivationKeyFormat,derivationKey FROM channels,channelKeys WHERE channels.channelId=channelKeys.channelId AND channelType=:channelType AND ownerId=:ownerId AND keyType=:keyType ORDER BY messageId DESC LIMIT 1")

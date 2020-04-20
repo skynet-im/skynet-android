@@ -34,7 +34,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
                 P25Nickname packet = new P25Nickname(nn);
                 SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(), new ChannelMessageConfig().addFlag(MessageFlags.UNENCRYPTED), packet)
-                        .waitForResponse(r -> runOnUiThread(this::finish));
+                        .waitForSuccess(r -> runOnUiThread(this::finish));
             }).start();
         });
 

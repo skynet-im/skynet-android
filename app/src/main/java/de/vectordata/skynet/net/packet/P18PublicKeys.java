@@ -1,8 +1,6 @@
 package de.vectordata.skynet.net.packet;
 
 import de.vectordata.skynet.crypto.keys.KeyProvider;
-import de.vectordata.skynet.data.Storage;
-import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.net.PacketHandler;
 import de.vectordata.skynet.net.client.LengthPrefix;
 import de.vectordata.skynet.net.client.PacketBuffer;
@@ -59,6 +57,5 @@ public class P18PublicKeys extends ChannelMessagePacket {
 
     @Override
     public void persistContents(PacketDirection packetDirection) {
-        Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(this));
     }
 }

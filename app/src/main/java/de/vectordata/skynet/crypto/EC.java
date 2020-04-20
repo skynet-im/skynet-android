@@ -15,6 +15,9 @@ import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.KeyAgreement;
 
+import de.vectordata.skynet.net.packet.model.AsymmetricKey;
+import de.vectordata.skynet.net.packet.model.KeyFormat;
+
 /**
  * Created by Twometer on 21.01.2019.
  * (c) 2019 Twometer
@@ -82,12 +85,12 @@ public class EC {
 
         }
 
-        public byte[] getPrivateKey() {
-            return privateKey;
+        public AsymmetricKey getPrivateKey() {
+            return new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, privateKey);
         }
 
-        public byte[] getPublicKey() {
-            return publicKey;
+        public AsymmetricKey getPublicKey() {
+            return new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, publicKey);
         }
     }
 

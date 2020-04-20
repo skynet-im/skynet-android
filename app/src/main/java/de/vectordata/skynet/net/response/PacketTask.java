@@ -9,6 +9,7 @@ import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.net.packet.P0CChannelMessageResponse;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
+import de.vectordata.skynet.net.packet.model.MessageSendStatus;
 import de.vectordata.skynet.util.android.Handlers;
 
 public class PacketTask {
@@ -31,7 +32,7 @@ public class PacketTask {
         waitFor(packetClass, handler, null);
     }
 
-    public <T extends Packet> void waitFor(Class<T> packetClass, ResponseHandler<T> handler, final Runnable onTimeout) {
+    private <T extends Packet> void waitFor(Class<T> packetClass, ResponseHandler<T> handler, final Runnable onTimeout) {
         if (onTimeout != null)
             timeoutScheduler.postDelayed(new TimeoutRunnableProxy(onTimeout), RESPONSE_TIMEOUT);
 
@@ -43,7 +44,14 @@ public class PacketTask {
         });
     }
 
-    public void waitForResponse(ResponseHandler<P0CChannelMessageResponse> handler) {
+    public void waitForSuccess(ResponseHandler<P0CChannelMessageResponse> handler) {
+        waitForResponse(packet -> {
+            if (packet.statusCode == MessageSendStatus.SUCCESS)
+                handler.handle(packet);
+        });
+    }
+
+    private void waitForResponse(ResponseHandler<P0CChannelMessageResponse> handler) {
         waitForResponse(handler, null);
     }
 
