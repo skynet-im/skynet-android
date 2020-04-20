@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.ui.chat.formatting.MessageFormatter;
 
 class MessageViewHolder extends RecyclerView.ViewHolder {
 
@@ -46,7 +47,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         } else {
             message.setTypeface(null, Typeface.NORMAL);
             message.setAlpha(1.0f);
-            message.setText(messageItem.getContent());
+            message.setText(MessageFormatter.format(messageItem.getContent()));
             if (state != null)
                 state.setVisibility(View.VISIBLE);
         }
@@ -63,7 +64,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         if (messageItem.hasQuote()) {
             quoteGroup.setVisibility(View.VISIBLE);
             quotedName.setText(messageItem.getQuotedMessage().getName());
-            quotedMessage.setText(messageItem.getQuotedMessage().getMessage());
+            quotedMessage.setText(MessageFormatter.format(messageItem.getQuotedMessage().getMessage()));
         } else quoteGroup.setVisibility(View.GONE);
     }
 
