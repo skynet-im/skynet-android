@@ -19,7 +19,6 @@ public class P2ESearchAccountResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        results.clear();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++) {
             long accountId = buffer.readInt64();

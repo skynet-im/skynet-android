@@ -100,6 +100,12 @@ public class PacketHandler {
             if (flags != null)
                 if ((message.messageFlags | flags.value()) != message.messageFlags)
                     throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
+
+            if (message.isCorrupted) {
+                // TODO: Check if it's a chat message and if so, notify the user accordingly
+                Log.e(TAG, "Dropped corrupted channel message");
+                return;
+            }
         }
 
         if (!packet.validatePacket())
