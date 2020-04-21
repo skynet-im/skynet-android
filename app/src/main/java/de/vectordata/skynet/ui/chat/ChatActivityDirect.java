@@ -499,7 +499,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private boolean mayOverwrite(MessageItem messageItem) {
         boolean noTimeout = System.currentTimeMillis() - messageItem.getSentDate().toJavaDate().getTime() <= P21MessageOverride.OVERWRITE_TIMEOUT;
         boolean ownMessage = messageItem.getMessageSide() == MessageSide.RIGHT;
-        return noTimeout && ownMessage;
+        boolean sent = messageItem.getMessageState() != MessageState.SENDING;
+        return noTimeout && ownMessage && sent;
     }
 
 }
