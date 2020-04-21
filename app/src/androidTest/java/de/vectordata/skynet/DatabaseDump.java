@@ -2,8 +2,8 @@ package de.vectordata.skynet;
 
 import android.content.Context;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +13,7 @@ import java.util.List;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChannelMessage;
+import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.Dependency;
 import de.vectordata.skynet.data.sql.db.SkynetDatabase;
 import de.vectordata.skynet.util.date.DateUtil;
@@ -22,7 +23,7 @@ public class DatabaseDump {
 
     @Test
     public void test() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = ApplicationProvider.getApplicationContext();
         Storage.initialize(appContext);
         SkynetDatabase database = Storage.getDatabase();
 
@@ -32,7 +33,16 @@ public class DatabaseDump {
             System.out.printf("\n\n=== %d (%s) ===%n", channel.getChannelId(), channel.getChannelType());
             List<ChannelMessage> messages = database.channelMessageDao().query(channel.getChannelId());
             for (ChannelMessage message : messages) {
-                System.out.printf("%d\t%d\t%s\t%n", message.getMessageId(), message.getSenderId(), DateUtil.toDateString(appContext, message.getDispatchTime()));
+                ChatMessage chatMessage = database.chatMessageDao().query(message.getChannelId(), message.getMessageId());
+                String messageText = "";
+                if (chatMessage != null) {
+                    if (chatMessage.getText().length() < 50)
+                        messageText = chatMessage.getText();
+                    else
+                        messageText = chatMessage.getText().substring(0, 48) + "…";
+                }
+                System.out.printf("%d\t%d\t%s\t%s%n", message.getMessageId(), message.getSenderId(),
+                        DateUtil.toDateString(appContext, message.getDispatchTime()), messageText);
                 List<Dependency> dependencies = database.dependencyDao().getDependencies(message.getChannelId(), message.getMessageId());
                 for (Dependency dependency : dependencies) {
                     System.out.printf("  %d -> %d %d%n", dependency.getSrcMessageId(), dependency.getDstMessageId(), dependency.getDstAccountId());
