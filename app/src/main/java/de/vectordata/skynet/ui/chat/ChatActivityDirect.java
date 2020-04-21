@@ -241,6 +241,9 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
                     mode.getMenu().findItem(R.id.action_delete).setVisible(mayOverwrite);
                     mode.getMenu().findItem(R.id.action_edit).setVisible(mayOverwrite);
+
+                    if (selectedMessage.getMessageState() == MessageState.SENDING)
+                        mode.getMenu().findItem(R.id.action_quote).setVisible(false);
                 }
             }
         }
