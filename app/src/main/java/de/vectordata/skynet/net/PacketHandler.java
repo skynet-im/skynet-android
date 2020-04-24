@@ -191,11 +191,12 @@ public class PacketHandler {
 
     public void handlePacket(P0FSyncFinished packet) {
         Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
+        Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
 
-        // Check if there are at least two keys (public and private)
-        boolean hasKeys = Storage.getDatabase().channelKeyDao().countKeys(loopbackChannel.getChannelId()) >= 2;
+        // Check if there is a key in the account data channel
+        boolean hasKeys = Storage.getDatabase().channelKeyDao().countKeys(accountDataChannel.getChannelId()) != 0;
         if (!hasKeys)
-            regenerateLoopbackKeys(loopbackChannel);
+            regenerateLoopbackKeys(loopbackChannel, accountDataChannel);
 
         inSync = true;
         EventBus.getDefault().post(new SyncFinishedEvent());
@@ -336,7 +337,7 @@ public class PacketHandler {
     }
 
     ////////////////////// Utility methods //////////////////////
-    private void regenerateLoopbackKeys(Channel loopbackChannel) {
+    private void regenerateLoopbackKeys(Channel loopbackChannel, Channel accountDataChannel) {
         Log.d(TAG, "Incomplete or missing loopback channel keys. Regenerating...");
         Storage.getDatabase().channelKeyDao().dropKeys(loopbackChannel.getChannelId());
 
@@ -351,14 +352,15 @@ public class PacketHandler {
         // First transmit the private keys
         SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(), privateKeys)
                 .waitForSuccess(r -> {
-                    // If that was successful, store them in the database and transmit public keys
+                    // If that was successful, store them in the database
                     Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(privateKeys));
 
                     // Create a dependency to the private key that we just created
                     ChannelMessageConfig config = ChannelMessageConfig.create()
                             .addDependency(Storage.getSession().getAccountId(), r.messageId);
 
-                    SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(), config, publicKeys)
+                    // And transmit the public key
+                    SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(), config, publicKeys)
                             .waitForSuccess(r2 -> Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(publicKeys)));
                 });
     }
