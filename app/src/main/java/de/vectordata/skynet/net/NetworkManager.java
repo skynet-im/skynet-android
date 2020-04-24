@@ -183,4 +183,8 @@ public class NetworkManager implements SslClientListener {
         return packetHandler.isInSync();
     }
 
+    public int getLastSyncCorruptedMessages() {
+        return packetHandler.getNumCorruptedMessages();
+    }
+
 }

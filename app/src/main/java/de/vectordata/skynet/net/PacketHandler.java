@@ -72,6 +72,7 @@ public class PacketHandler {
     private KeyProvider keyProvider;
     private NetworkManager networkManager;
 
+    private int numCorruptedMessages;
     private boolean inSync;
 
     public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager) {
@@ -102,7 +103,7 @@ public class PacketHandler {
                     throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
 
             if (message.isCorrupted) {
-                // TODO: Check if it's a chat message and if so, notify the user accordingly
+                numCorruptedMessages++;
                 Log.e(TAG, "Dropped corrupted channel message");
                 return;
             }
@@ -185,6 +186,7 @@ public class PacketHandler {
     public void handlePacket(P0BSyncStarted packet) {
         Log.d(TAG, "Resynchronizing (" + packet.minCount + ") ...");
         inSync = false;
+        numCorruptedMessages = 0;
     }
 
     public void handlePacket(P0FSyncFinished packet) {
@@ -379,4 +381,7 @@ public class PacketHandler {
         return inSync;
     }
 
+    int getNumCorruptedMessages() {
+        return numCorruptedMessages;
+    }
 }

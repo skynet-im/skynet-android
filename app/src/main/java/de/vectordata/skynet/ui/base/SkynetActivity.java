@@ -1,7 +1,9 @@
 package de.vectordata.skynet.ui.base;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.event.AuthenticationFailedEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
+import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
@@ -32,6 +35,10 @@ public abstract class SkynetActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), clazz));
     }
 
+    protected void startBrowser(String link) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHandshakeFailed(HandshakeFailedEvent event) {
         if (event.getState() == HandshakeState.CAN_UPGRADE)
@@ -44,6 +51,19 @@ public abstract class SkynetActivity extends AppCompatActivity {
     public void onAuthenticationFailed(AuthenticationFailedEvent event) {
         if (event.getError() == RestoreSessionStatus.INVALID_SESSION)
             Dialogs.showMessageBox(this, R.string.error_header_connect, R.string.error_invalid_session);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSyncFinished(SyncFinishedEvent event) {
+        int corruptedMessages = SkynetContext.getCurrent().getNetworkManager().getLastSyncCorruptedMessages();
+        if (corruptedMessages > 0) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.error_header_sync)
+                    .setMessage(getString(R.string.error_corrupted_messages, corruptedMessages))
+                    .setPositiveButton(R.string.ok, null)
+                    .setNeutralButton(R.string.action_report_issue, (dialog, which) -> startBrowser("https://www.skynet.app/bug"))
+                    .show();
+        }
     }
 
     @Override
