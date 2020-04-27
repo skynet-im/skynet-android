@@ -14,7 +14,6 @@ import java.util.Objects;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.model.ChatMessage;
-import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.ui.chat.formatting.MessageFormatter;
 
 class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -40,7 +39,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
 
     void configure(MessageItem messageItem) {
         boolean isDeleted = Objects.equals(messageItem.getContent(), ChatMessage.DELETED);
-        boolean isCorrupted = messageItem.getMessageState() == MessageState.CORRUPTED;
+        boolean isCorrupted = messageItem.isCorrupted();
 
         if (isDeleted) {
             message.setTypeface(null, Typeface.ITALIC);

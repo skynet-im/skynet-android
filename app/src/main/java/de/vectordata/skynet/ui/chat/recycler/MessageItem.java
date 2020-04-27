@@ -20,7 +20,9 @@ public class MessageItem {
 
     private boolean isEdited;
 
-    public MessageItem(long messageId, String content, DateTime sentDate, MessageState messageState, MessageSide messageSide, QuotedMessage quotedMessage, boolean isEdited) {
+    private boolean isCorrupted;
+
+    public MessageItem(long messageId, String content, DateTime sentDate, MessageState messageState, MessageSide messageSide, QuotedMessage quotedMessage, boolean isEdited, boolean isCorrupted) {
         this.messageId = messageId;
         this.content = content;
         this.sentDate = sentDate;
@@ -28,10 +30,11 @@ public class MessageItem {
         this.messageSide = messageSide;
         this.quotedMessage = quotedMessage;
         this.isEdited = isEdited;
+        this.isCorrupted = isCorrupted;
     }
 
     public static MessageItem newSystemMessage(String content) {
-        return new MessageItem(0, content, null, MessageState.SYSTEM, MessageSide.CENTER, null, false);
+        return new MessageItem(0, content, null, MessageState.SYSTEM, MessageSide.CENTER, null, false, false);
     }
 
     public long getMessageId() {
@@ -80,5 +83,9 @@ public class MessageItem {
 
     public void setEdited(boolean edited) {
         this.isEdited = true;
+    }
+
+    public boolean isCorrupted() {
+        return isCorrupted;
     }
 }

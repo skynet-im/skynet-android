@@ -376,7 +376,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         if (msg.quotedMessage != 0)
             quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
 
-        MessageItem newLatest = new MessageItem(msg.messageId, msg.text, msg.dispatchTime, messageState, messageSide, quotedMessage, false);
+        MessageItem newLatest = new MessageItem(msg.messageId, msg.text, msg.dispatchTime, messageState, messageSide, quotedMessage, false, msg.isCorrupted);
         runOnUiThread(() -> {
             if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
                 messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));
@@ -421,7 +421,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             QuotedMessage quotedMessage = null;
             if (message.getQuotedMessage() != 0)
                 quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
-            messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited()));
+            messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited(), parent.isCorrupted()));
             previous = parent;
         }
 
@@ -461,7 +461,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 QuotedMessage quotedMessage = null;
                 if (message.getQuotedMessage() != 0)
                     quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
-                messageItems.add(idx, new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited()));
+                messageItems.add(idx, new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited(), parent.isCorrupted()));
                 idx++;
                 previous = parent;
             }
