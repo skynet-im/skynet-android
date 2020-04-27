@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.ui.chat.formatting.MessageFormatter;
 
 class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -36,13 +37,19 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     void configure(MessageItem messageItem) {
-
         boolean isDeleted = messageItem.getContent().equals(ChatMessage.DELETED);
+        boolean isCorrupted = messageItem.getMessageState() == MessageState.CORRUPTED;
 
         if (isDeleted) {
             message.setTypeface(null, Typeface.ITALIC);
             message.setAlpha(0.75f);
             message.setText(R.string.message_deleted);
+            if (state != null)
+                state.setVisibility(View.GONE);
+        } else if (isCorrupted) {
+            message.setTypeface(null, Typeface.ITALIC);
+            message.setAlpha(0.75f);
+            message.setText(R.string.message_corrupted);
             if (state != null)
                 state.setVisibility(View.GONE);
         } else {

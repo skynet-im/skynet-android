@@ -120,6 +120,7 @@
     <string name="notification_subtitle">%1$d messages from %2$d chats</string>
 
     <string name="message_deleted">This message was deleted.</string>
+    <string name="message_corrupted">This message cannot be decrypted.</string>
 
     <string name="state_online">online</string>
     <string name="state_typing">typing…</string>

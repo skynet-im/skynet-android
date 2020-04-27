@@ -35,6 +35,8 @@ public class ChannelMessage {
 
     private long fileId;
 
+    private boolean corrupted;
+
     public static ChannelMessage fromPacket(ChannelMessagePacket packet) {
         ChannelMessage message = new ChannelMessage();
         message.channelId = packet.channelId;
@@ -43,6 +45,7 @@ public class ChannelMessage {
         message.dispatchTime = packet.dispatchTime;
         message.messageFlags = packet.messageFlags;
         message.fileId = packet.fileId;
+        message.corrupted = packet.isCorrupted;
         return message;
     }
 
@@ -102,4 +105,11 @@ public class ChannelMessage {
         this.fileId = fileId;
     }
 
+    public boolean isCorrupted() {
+        return corrupted;
+    }
+
+    public void setCorrupted(boolean corrupted) {
+        this.corrupted = corrupted;
+    }
 }

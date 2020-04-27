@@ -49,7 +49,7 @@ public class ChatMessage {
         message.messageType = packet.messageType;
         message.text = packet.text;
         message.quotedMessage = packet.quotedMessage;
-        message.messageState = messageState;
+        message.messageState = packet.isCorrupted ? MessageState.CORRUPTED : messageState;
         message.isUnread = isUnread;
         return message;
     }

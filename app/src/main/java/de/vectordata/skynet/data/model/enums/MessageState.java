@@ -14,6 +14,7 @@ public enum MessageState {
     DELIVERED,
     SEEN,
     SYSTEM,
+    CORRUPTED,
     NONE;
 
     public void apply(ImageView imageView) {

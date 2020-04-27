@@ -161,6 +161,7 @@ public class ChatsFragment extends Fragment {
         String content = context.getString(R.string.tip_start_chatting);
         MessageSide side = MessageSide.LEFT;
         MessageState state = MessageState.NONE;
+        ChatsItem.Type type = ChatsItem.Type.NORMAL;
 
         if (hasContent) {
             ChannelMessage latestChannelMessage = db.channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
@@ -168,6 +169,8 @@ public class ChatsFragment extends Fragment {
             content = latestMessage.getText();
             side = latestChannelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
             state = latestMessage.getMessageState();
+            if (latestChannelMessage.isCorrupted())
+                type = ChatsItem.Type.CORRUPTED;
         }
 
         ChatsItem item = new ChatsItem(header, lastActive, channel);
@@ -176,6 +179,7 @@ public class ChatsFragment extends Fragment {
             item.setUnreadMessages(countUnreadMessages(channel, unreadMessages));
             item.setMessageSide(side);
             item.setMessageState(state);
+            item.setType(type);
         } else if (channelAction == ChannelAction.TYPING) {
             item.setType(ChatsItem.Type.HIGHLIGHTED);
             item.setContent(context.getString(R.string.state_typing));

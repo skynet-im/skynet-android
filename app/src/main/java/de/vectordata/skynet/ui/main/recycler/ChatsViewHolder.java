@@ -85,6 +85,12 @@ class ChatsViewHolder extends RecyclerView.ViewHolder {
                 message.setText(R.string.message_deleted);
                 messageState.setVisibility(View.GONE);
                 break;
+            case CORRUPTED:
+                message.setTypeface(null, Typeface.ITALIC);
+                message.setAlpha(0.75f);
+                message.setText(R.string.message_corrupted);
+                messageState.setVisibility(View.GONE);
+                break;
             case HIGHLIGHTED:
                 message.setTypeface(null, Typeface.NORMAL);
                 message.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
