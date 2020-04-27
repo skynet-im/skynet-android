@@ -104,7 +104,7 @@ public class PacketHandler {
 
             if (message.isCorrupted) {
                 numCorruptedMessages++;
-                Log.e(TAG, "Dropped corrupted channel message");
+                Log.e(TAG, "Received corrupted channel message!");
             }
         }
 

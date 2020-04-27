@@ -13,6 +13,9 @@ public class MessageTypeConverter {
 
     @TypeConverter
     public static int toInteger(MessageType messageType) {
+        if (messageType == null) // This may happen with corrupted messages
+            return MessageType.PLAINTEXT.ordinal();
+
         return messageType.ordinal();
     }
 

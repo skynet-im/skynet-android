@@ -11,6 +11,9 @@ public class MessageFormatter {
     };
 
     public static Spannable format(CharSequence message) {
+        if (message == null)
+            message = "";
+
         SpannableStringBuilder builder = new SpannableStringBuilder(message);
         for (IMessageFormatting step : formattingSteps)
             step.format(builder);

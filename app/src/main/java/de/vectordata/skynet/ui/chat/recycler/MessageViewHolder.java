@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.Group;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Objects;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
@@ -37,7 +39,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     void configure(MessageItem messageItem) {
-        boolean isDeleted = messageItem.getContent().equals(ChatMessage.DELETED);
+        boolean isDeleted = Objects.equals(messageItem.getContent(), ChatMessage.DELETED);
         boolean isCorrupted = messageItem.getMessageState() == MessageState.CORRUPTED;
 
         if (isDeleted) {

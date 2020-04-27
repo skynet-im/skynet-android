@@ -1,5 +1,7 @@
 package de.vectordata.skynet.ui.main.recycler;
 
+import java.util.Objects;
+
 import de.vectordata.skynet.data.model.Channel;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.MessageState;
@@ -105,7 +107,7 @@ public class ChatsItem {
     }
 
     public Type getType() {
-        if (content.equals(ChatMessage.DELETED))
+        if (Objects.equals(content, ChatMessage.DELETED))
             return Type.DELETED;
         else return type;
     }
