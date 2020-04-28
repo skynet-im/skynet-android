@@ -8,11 +8,13 @@ import de.vectordata.skynet.crypto.EC;
 import de.vectordata.skynet.crypto.keys.KeyProvider;
 import de.vectordata.skynet.data.Storage;
 import de.vectordata.skynet.data.model.Channel;
+import de.vectordata.skynet.data.model.ChannelKey;
 import de.vectordata.skynet.data.model.ChannelMessage;
 import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
+import de.vectordata.skynet.event.CorruptedMessageEvent;
 import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.client.PacketBuffer;
@@ -60,12 +62,10 @@ import de.vectordata.skynet.net.packet.P34SetClientState;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
-import de.vectordata.skynet.net.packet.model.AsymmetricKey;
 import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
 import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
-import de.vectordata.skynet.net.packet.model.KeyFormat;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
-import de.vectordata.skynet.net.response.ResponseAwaiter;
 
 public class PacketHandler {
 
@@ -73,14 +73,13 @@ public class PacketHandler {
 
     private KeyProvider keyProvider;
     private NetworkManager networkManager;
-    private ResponseAwaiter responseAwaiter;
 
+    private int numCorruptedMessages;
     private boolean inSync;
 
-    public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager, ResponseAwaiter responseAwaiter) {
+    public PacketHandler(KeyProvider keyProvider, NetworkManager networkManager) {
         this.keyProvider = keyProvider;
         this.networkManager = networkManager;
-        this.responseAwaiter = responseAwaiter;
     }
 
     void handlePacket(byte id, byte[] payload) {
@@ -104,6 +103,12 @@ public class PacketHandler {
             if (flags != null)
                 if ((message.messageFlags | flags.value()) != message.messageFlags)
                     throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
+
+            if (message.isCorrupted && message.hasFlag(MessageFlags.LOOPBACK)) {
+                numCorruptedMessages++;
+                EventBus.getDefault().post(new CorruptedMessageEvent(message));
+                Log.e(TAG, "Received corrupted channel message!");
+            }
         }
 
         if (!packet.validatePacket())
@@ -112,10 +117,7 @@ public class PacketHandler {
         if (packet instanceof ChannelMessagePacket)
             ((ChannelMessagePacket) packet).persist(PacketDirection.RECEIVE);
 
-        Log.d(TAG, "Handling packet 0x" + Integer.toHexString(packet.getId()));
-
         packet.handlePacket(this);
-        responseAwaiter.onPacket(packet);
         EventBus.getDefault().post(new PacketEvent(packet));
     }
 
@@ -184,50 +186,40 @@ public class PacketHandler {
     }
 
     public void handlePacket(P0BSyncStarted packet) {
-        Log.d(TAG, "Resyncing...");
+        Log.d(TAG, "Resynchronizing (" + packet.minCount + ") ...");
         inSync = false;
+        numCorruptedMessages = 0;
     }
 
     public void handlePacket(P0FSyncFinished packet) {
-        boolean hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(ChannelType.LOOPBACK) != 0;
-        if (!hasKeys) {
-            Log.d(TAG, "No loopback keys found, generating...");
-            EC.KeyMaterial signature = EC.generateKeypair();
-            EC.KeyMaterial derivation = EC.generateKeypair();
-            if (signature == null || derivation == null)
-                return;
-            Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
-            SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(),
-                    new ChannelMessageConfig(),
-                    new P17PrivateKeys(
-                            new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPrivateKey()),
-                            new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPrivateKey())
-                    )
-            ).waitForPacket(P0CChannelMessageResponse.class, response -> {
-                Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
-                SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(),
-                        new ChannelMessageConfig()
-                                .addDependency(Storage.getSession().getAccountId(), response.messageId),
-                        new P18PublicKeys(
-                                new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, signature.getPublicKey()),
-                                new AsymmetricKey(KeyFormat.BOUNCY_CASTLE, derivation.getPublicKey())
-                        )
-                );
-            });
-        }
+        Channel loopbackChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.LOOPBACK);
+        Channel accountDataChannel = Storage.getDatabase().channelDao().getByType(Storage.getSession().getAccountId(), ChannelType.ACCOUNT_DATA);
+
+        // Check if there is a key in the account data channel
+        boolean hasKeys = Storage.getDatabase().channelKeyDao().countKeys(accountDataChannel.getChannelId()) != 0;
+        if (!hasKeys)
+            regenerateLoopbackKeys(loopbackChannel, accountDataChannel);
 
         inSync = true;
         EventBus.getDefault().post(new SyncFinishedEvent());
+
+        // Update client state with the server
+        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState()));
+
+        // Send receive confirmations for all messages that are yet to be confirmed
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnconfirmed(Storage.getSession().getAccountId())) {
             sendReceiveConfirmation(msg.getChannelId(), msg.getMessageId());
         }
+
+        // Update notifications for unread messages
         for (ChatMessage msg : Storage.getDatabase().chatMessageDao().queryUnread()) {
             ChannelMessage channelMsg = Storage.getDatabase().channelMessageDao().getById(msg.getChannelId(), msg.getMessageId());
             if (channelMsg.getSenderId() == Storage.getSession().getAccountId())
                 continue;
             SkynetContext.getCurrent().getNotificationManager().onMessageReceived(msg.getChannelId(), msg.getMessageId(), msg.getText());
         }
-        SkynetContext.getCurrent().getNetworkManager().sendPacket(new P34SetClientState(SkynetContext.getCurrent().getAppState().getOnlineState()));
+
+        Log.d(TAG, "Synchronized with the server");
     }
 
 
@@ -246,11 +238,11 @@ public class PacketHandler {
     }
 
     public void handlePacket(P17PrivateKeys packet) {
-
+        Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
     }
 
     public void handlePacket(P18PublicKeys packet) {
-
+        Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(packet));
     }
 
     public void handlePacket(P19ArchiveChannel packet) {
@@ -274,7 +266,6 @@ public class PacketHandler {
     }
 
     public void handlePacket(P1EGroupChannelUpdate packet) {
-
     }
 
     public void handlePacket(P20ChatMessage packet) {
@@ -287,6 +278,7 @@ public class PacketHandler {
     }
 
     public void handlePacket(P21MessageOverride packet) {
+
     }
 
     // TODO: Only update message state if EVERYONE in the channel received it. Also, save those who received/read it.
@@ -299,25 +291,6 @@ public class PacketHandler {
         ChannelMessagePacket.NetDependency dependency = packet.singleDependency();
         setMessageState(packet.channelId, dependency.messageId, MessageState.SEEN);
         SkynetContext.getCurrent().getNotificationManager().onMessageDeleted(packet.channelId, dependency.messageId);
-    }
-
-    private void sendReceiveConfirmation(long channelId, long messageId) {
-        SkynetContext.getCurrent().getMessageInterface()
-                .send(channelId,
-                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
-                        new P22MessageReceived()
-                );
-        setMessageState(channelId, messageId, MessageState.DELIVERED);
-    }
-
-    private void setMessageState(long channelId, long messageId, MessageState messageState) {
-        ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
-        if (message.getMessageState() == MessageState.SEEN) // Do not un-see the message
-            return;
-        message.setMessageState(messageState);
-        if (messageState == MessageState.SEEN)
-            message.setUnread(false);
-        Storage.getDatabase().chatMessageDao().update(message);
     }
 
     public void handlePacket(P24DaystreamMessage packet) {
@@ -365,8 +338,58 @@ public class PacketHandler {
 
     }
 
+    ////////////////////// Utility methods //////////////////////
+    private void regenerateLoopbackKeys(Channel loopbackChannel, Channel accountDataChannel) {
+        Log.d(TAG, "Incomplete or missing loopback channel keys. Regenerating...");
+        Storage.getDatabase().channelKeyDao().dropKeys(loopbackChannel.getChannelId());
+
+        EC.KeyMaterial signature = EC.generateKeypair();
+        EC.KeyMaterial derivation = EC.generateKeypair();
+        if (signature == null || derivation == null)
+            return;
+
+        P17PrivateKeys privateKeys = new P17PrivateKeys(signature.getPrivateKey(), derivation.getPrivateKey());
+        P18PublicKeys publicKeys = new P18PublicKeys(signature.getPublicKey(), derivation.getPublicKey());
+
+        // First transmit the private keys
+        SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(), privateKeys)
+                .waitForSuccess(r -> {
+                    // If that was successful, store them in the database with the new message ID
+                    Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(privateKeys).withMessageId(r.messageId));
+
+                    // Create a dependency to the private key that we just created
+                    ChannelMessageConfig config = ChannelMessageConfig.create()
+                            .addDependency(Storage.getSession().getAccountId(), r.messageId);
+
+                    // And transmit the public key
+                    SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(), config, publicKeys)
+                            .waitForSuccess(r2 -> Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(publicKeys).withMessageId(r2.messageId)));
+                });
+    }
+
+    private void sendReceiveConfirmation(long channelId, long messageId) {
+        SkynetContext.getCurrent().getMessageInterface()
+                .send(channelId,
+                        new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
+                        new P22MessageReceived()
+                ).waitForSuccess(response -> setMessageState(channelId, messageId, MessageState.DELIVERED));
+    }
+
+    private void setMessageState(long channelId, long messageId, MessageState messageState) {
+        ChatMessage message = Storage.getDatabase().chatMessageDao().query(channelId, messageId);
+        if (message.getMessageState() == MessageState.SEEN) // Do not un-see the message
+            return;
+        message.setMessageState(messageState);
+        if (messageState == MessageState.SEEN)
+            message.setUnread(false);
+        Storage.getDatabase().chatMessageDao().update(message);
+    }
+
     boolean isInSync() {
         return inSync;
     }
 
+    int getNumCorruptedMessages() {
+        return numCorruptedMessages;
+    }
 }

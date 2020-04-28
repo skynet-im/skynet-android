@@ -28,7 +28,7 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
-import de.vectordata.skynet.net.response.ResponseAwaiter;
+import de.vectordata.skynet.net.response.PacketTask;
 
 public class NetworkManager implements SslClientListener {
 
@@ -38,7 +38,6 @@ public class NetworkManager implements SslClientListener {
 
     private SslClient sslClient;
     private PacketHandler packetHandler;
-    private ResponseAwaiter responseAwaiter = new ResponseAwaiter();
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
     private List<Packet> packetCache = new ArrayList<>();
@@ -62,8 +61,7 @@ public class NetworkManager implements SslClientListener {
         Log.i(TAG, "Connecting to server...");
         connectionState = ConnectionState.CONNECTING;
 
-        responseAwaiter.initialize();
-        packetHandler = new PacketHandler(skynetContext, this, responseAwaiter);
+        packetHandler = new PacketHandler(skynetContext, this);
         sslClient.setListener(this);
         sslClient.connect(SkynetApplication.SERVER_IP, SkynetApplication.SERVER_PORT);
     }
@@ -72,9 +70,9 @@ public class NetworkManager implements SslClientListener {
         sslClient.disconnect();
     }
 
-    public ResponseAwaiter sendPacket(Packet packet) {
+    public PacketTask sendPacket(Packet packet) {
         if (connectionState != ConnectionState.AUTHENTICATED && packet instanceof ChannelMessagePacket)
-            return responseAwaiter;
+            return new PacketTask(packet);
 
         if (shouldCache(packet)) packetCache.add(packet);
         else {
@@ -83,7 +81,7 @@ public class NetworkManager implements SslClientListener {
             Log.d(TAG, "Sending packet 0x" + Integer.toHexString(packet.getId()));
             sslClient.sendPacket(packet.getId(), buffer.toArray());
         }
-        return responseAwaiter;
+        return new PacketTask(packet);
     }
 
     private boolean shouldCache(Packet packet) {
@@ -108,7 +106,7 @@ public class NetworkManager implements SslClientListener {
         connectionState = ConnectionState.HANDSHAKING;
         Log.v(TAG, "Sending handshake...");
         sendPacket(new P00ConnectionHandshake(SkynetApplication.PROTOCOL_VERSION, SkynetApplication.APPLICATION_IDENTIFIER, SkynetApplication.VERSION_CODE))
-                .waitForPacket(P01ConnectionResponse.class, p -> {
+                .waitFor(P01ConnectionResponse.class, p -> {
                     if (p.handshakeState == HandshakeState.MUST_UPGRADE) {
                         Log.e(TAG, "Server rejected connection: version too old, update to " + p.latestVersionCode);
                         raiseHandshakeEvent(HandshakeState.MUST_UPGRADE, p.latestVersion);
@@ -183,6 +181,10 @@ public class NetworkManager implements SslClientListener {
 
     boolean isInSync() {
         return packetHandler.isInSync();
+    }
+
+    public int getLastSyncCorruptedMessages() {
+        return packetHandler.getNumCorruptedMessages();
     }
 
 }

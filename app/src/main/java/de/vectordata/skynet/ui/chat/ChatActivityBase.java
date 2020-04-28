@@ -55,7 +55,7 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
      * Shared handler for executing things like loading from the database on a separate
      * thread.
      */
-    Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
+    Handler backgroundHandler = Handlers.createOnThread(Handlers.THREAD_BACKGROUND);
 
     Handler foregroundHandler = new Handler();
 
@@ -180,12 +180,12 @@ public abstract class ChatActivityBase extends ThemedActivity implements TypingW
                 .send(messageChannel.getChannelId(),
                         new ChannelMessageConfig().addDependency(ChannelMessageConfig.ANY_ACCOUNT, messageId),
                         new P23MessageRead()
-                );
-        backgroundHandler.post(() -> {
-            ChatMessage message = Storage.getDatabase().chatMessageDao().query(messageChannel.getChannelId(), messageId);
-            message.setUnread(false);
-            Storage.getDatabase().chatMessageDao().update(message);
-        });
+                )
+                .waitForSuccess(p -> backgroundHandler.post(() -> {
+                    ChatMessage message = Storage.getDatabase().chatMessageDao().query(messageChannel.getChannelId(), messageId);
+                    message.setUnread(false);
+                    Storage.getDatabase().chatMessageDao().update(message);
+                }));
     }
 
     void clearDraft() {

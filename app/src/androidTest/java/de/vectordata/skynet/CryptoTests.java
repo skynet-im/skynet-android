@@ -1,6 +1,6 @@
 package de.vectordata.skynet;
 
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import de.vectordata.libargon2.Argon2Type;
 import de.vectordata.libargon2.Argon2Version;
 import de.vectordata.skynet.net.client.ByteUtils;
 
-@RunWith(AndroidJUnit4ClassRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class CryptoTests {
 
     @Test

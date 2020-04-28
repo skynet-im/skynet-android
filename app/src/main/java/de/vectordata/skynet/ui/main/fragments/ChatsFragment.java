@@ -19,7 +19,6 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.Storage;
@@ -75,9 +74,9 @@ public class ChatsFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        context = Objects.requireNonNull(getActivity());
+        context = requireActivity();
         if (handler == null)
-            handler = Handlers.createOnThread("BackgroundThread");
+            handler = Handlers.createOnThread(Handlers.THREAD_BACKGROUND);
 
         adapter = new ChatsAdapter(dataset);
         adapter.setItemClickListener(idx -> {
@@ -162,6 +161,7 @@ public class ChatsFragment extends Fragment {
         String content = context.getString(R.string.tip_start_chatting);
         MessageSide side = MessageSide.LEFT;
         MessageState state = MessageState.NONE;
+        ChatsItem.Type type = ChatsItem.Type.NORMAL;
 
         if (hasContent) {
             ChannelMessage latestChannelMessage = db.channelMessageDao().getById(latestMessage.getChannelId(), latestMessage.getMessageId());
@@ -169,6 +169,8 @@ public class ChatsFragment extends Fragment {
             content = latestMessage.getText();
             side = latestChannelMessage.getSenderId() == Storage.getSession().getAccountId() ? MessageSide.RIGHT : MessageSide.LEFT;
             state = latestMessage.getMessageState();
+            if (latestChannelMessage.isCorrupted())
+                type = ChatsItem.Type.CORRUPTED;
         }
 
         ChatsItem item = new ChatsItem(header, lastActive, channel);
@@ -177,6 +179,7 @@ public class ChatsFragment extends Fragment {
             item.setUnreadMessages(countUnreadMessages(channel, unreadMessages));
             item.setMessageSide(side);
             item.setMessageState(state);
+            item.setType(type);
         } else if (channelAction == ChannelAction.TYPING) {
             item.setType(ChatsItem.Type.HIGHLIGHTED);
             item.setContent(context.getString(R.string.state_typing));

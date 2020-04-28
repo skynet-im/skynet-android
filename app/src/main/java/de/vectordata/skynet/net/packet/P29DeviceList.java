@@ -26,7 +26,6 @@ public class P29DeviceList extends ChannelMessagePacket {
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        devices.clear();
         int count = buffer.readUInt16();
         for (int i = 0; i < count; i++)
             devices.add(new PDevice(buffer.readInt64(), buffer.readDate(), buffer.readString(LengthPrefix.SHORT)));

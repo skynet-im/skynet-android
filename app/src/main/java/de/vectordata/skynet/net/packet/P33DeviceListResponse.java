@@ -25,7 +25,6 @@ public class P33DeviceListResponse extends AbstractPacket {
 
     @Override
     public void readPacket(PacketBuffer buffer, KeyProvider keyProvider) {
-        sessionDetails.clear();
         int size = buffer.readUInt16();
         for (int i = 0; i < size; i++)
             sessionDetails.add(new SessionInfo(buffer.readInt64(), buffer.readDate(), buffer.readInt32()));

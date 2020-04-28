@@ -17,7 +17,7 @@ class ManagedSocket {
     private InputStream inputStream;
     private OutputStream outputStream;
 
-    private Handler sendHandler = Handlers.createOnThread("NetworkThread");
+    private Handler sendHandler = Handlers.createOnThread(Handlers.THREAD_NETWORK);
 
     private volatile boolean connected;
 

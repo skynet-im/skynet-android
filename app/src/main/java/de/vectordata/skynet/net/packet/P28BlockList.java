@@ -29,9 +29,6 @@ public class P28BlockList extends ChannelMessagePacket {
 
     @Override
     public void readContents(PacketBuffer buffer, KeyProvider keyProvider) {
-        this.blockedAccounts.clear();
-        this.blockedConversations.clear();
-
         int size = buffer.readUInt16();
         for (int i = 0; i < size; i++)
             blockedAccounts.add(buffer.readInt64());

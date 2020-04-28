@@ -8,6 +8,10 @@ import java.util.Map;
 
 public final class Handlers {
 
+    public static final String THREAD_NETWORK = "NetworkThread";
+    public static final String THREAD_BACKGROUND = "BackgroundThread";
+    public static final String THREAD_NOTIFICATIONS = "NotificationThread";
+
     private static Map<String, Handler> cache = new HashMap<>();
 
     public static Handler createOnThread(String threadName) {

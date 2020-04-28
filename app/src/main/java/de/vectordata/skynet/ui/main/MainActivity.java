@@ -1,7 +1,6 @@
 package de.vectordata.skynet.ui.main;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -139,8 +138,7 @@ public class MainActivity extends ThemedActivity {
         }
 
         if (id == R.id.action_beta_info) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.skynet.app/beta"));
-            startActivity(browserIntent);
+            startBrowser("https://www.skynet.app/beta");
             return true;
         }
 

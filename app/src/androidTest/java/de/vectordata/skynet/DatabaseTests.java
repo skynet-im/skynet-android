@@ -2,8 +2,8 @@ package de.vectordata.skynet;
 
 import android.content.Context;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ public class DatabaseTests {
 
     @Test
     public void testForeignKeys() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = ApplicationProvider.getApplicationContext();
         Storage.initialize(appContext);
         SkynetDatabase database = Storage.getDatabase();
 

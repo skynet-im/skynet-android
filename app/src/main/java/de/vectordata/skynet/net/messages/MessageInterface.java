@@ -8,7 +8,7 @@ import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.model.PacketDirection;
 import de.vectordata.skynet.net.packet.annotation.Flags;
 import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
-import de.vectordata.skynet.net.response.ResponseAwaiter;
+import de.vectordata.skynet.net.response.PacketTask;
 import de.vectordata.skynet.util.date.DateTime;
 
 public class MessageInterface {
@@ -39,11 +39,23 @@ public class MessageInterface {
      * using the job engine
      *
      * @param channelId The channel to send the message to
+     * @param packet    The content packet
+     * @return An awaitable for the response
+     */
+    public PacketTask send(long channelId, ChannelMessagePacket packet) {
+        return send(channelId, new ChannelMessageConfig(), packet);
+    }
+
+    /**
+     * Send a channel message packet, generating a new random message ID, without
+     * using the job engine
+     *
+     * @param channelId The channel to send the message to
      * @param config    The message config
      * @param packet    The content packet
      * @return An awaitable for the response
      */
-    public ResponseAwaiter send(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
+    public PacketTask send(long channelId, ChannelMessageConfig config, ChannelMessagePacket packet) {
         configure(packet, channelId, newId(), config);
         packet.persist(PacketDirection.SEND);
         return skynetContext.getNetworkManager().sendPacket(packet);

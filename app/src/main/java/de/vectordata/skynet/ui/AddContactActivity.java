@@ -32,7 +32,7 @@ import de.vectordata.skynet.util.date.DateTime;
 
 public class AddContactActivity extends ThemedActivity {
 
-    private Handler backgroundHandler = Handlers.createOnThread("BackgroundThread");
+    private Handler backgroundHandler = Handlers.createOnThread(Handlers.THREAD_BACKGROUND);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class AddContactActivity extends ThemedActivity {
                 Storage.getDatabase().channelDao().insert(channel);
                 Packet packet = new P0ACreateChannel(tempChannelId, ChannelType.DIRECT, accountId);
                 SkynetContext.getCurrent().getNetworkManager().sendPacket(packet)
-                        .waitForPacket(P2FCreateChannelResponse.class, px -> runOnUiThread(() -> {
+                        .waitFor(P2FCreateChannelResponse.class, px -> runOnUiThread(() -> {
                             dialog.dismiss();
                             finish();
                         }));
@@ -73,7 +73,7 @@ public class AddContactActivity extends ThemedActivity {
         findViewById(R.id.action_search).setOnClickListener(v -> {
             ProgressDialog progressDialog = Dialogs.showProgressDialog(this, R.string.progress_searching, true);
             SkynetContext.getCurrent().getNetworkManager().sendPacket(new P2DSearchAccount(searchInput.getText().toString()))
-                    .waitForPacket(P2ESearchAccountResponse.class, p -> runOnUiThread(() -> {
+                    .waitFor(P2ESearchAccountResponse.class, p -> runOnUiThread(() -> {
                         if (progressDialog.isCancelled())
                             return;
                         progressDialog.dismiss();

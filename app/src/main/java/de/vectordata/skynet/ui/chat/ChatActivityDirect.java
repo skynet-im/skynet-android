@@ -8,7 +8,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -51,6 +50,7 @@ import de.vectordata.skynet.ui.chat.recycler.MessageAdapter;
 import de.vectordata.skynet.ui.chat.recycler.MessageItem;
 import de.vectordata.skynet.ui.chat.recycler.MultiChoiceListener;
 import de.vectordata.skynet.ui.chat.recycler.QuotedMessage;
+import de.vectordata.skynet.ui.chat.views.NonPredictiveLinearLayoutManager;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 import de.vectordata.skynet.ui.util.DefaultProfileImage;
 import de.vectordata.skynet.ui.util.KeyboardUtil;
@@ -83,7 +83,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         adapter = new MessageAdapter(messageItems);
 
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new NonPredictiveLinearLayoutManager(this));
         recyclerView.setActionModeCallback(this);
 
         findViewById(R.id.button_send).setOnClickListener(this::onSendMessage);
@@ -133,7 +133,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         OnlineStateDb onlineState = Storage.getDatabase().onlineStateDao().get(accountDataChannel.getChannelId());
         ChannelAction channelAction = SkynetContext.getCurrent().getAppState().getChannelAction(messageChannelId);
 
-        this.hasKeys = Storage.getDatabase().channelKeyDao().hasKeys(accountDataChannel.getChannelId()) != 0;
+        this.hasKeys = Storage.getDatabase().channelKeyDao().countKeys(accountDataChannel.getChannelId()) != 0;
 
         if (onlineState == null)
             runOnUiThread(() -> subtitleView.setVisibility(View.GONE));
@@ -241,6 +241,9 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
                     mode.getMenu().findItem(R.id.action_delete).setVisible(mayOverwrite);
                     mode.getMenu().findItem(R.id.action_edit).setVisible(mayOverwrite);
+
+                    if (selectedMessage.getMessageState() == MessageState.SENDING)
+                        mode.getMenu().findItem(R.id.action_quote).setVisible(false);
                 }
             }
         }
@@ -315,7 +318,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
 
     private void onSendMessage(View v) {
         String text;
-        if (messageInput.getText() == null || (text = messageInput.getText().toString()).trim().isEmpty())
+        if (messageInput.getText() == null || (text = messageInput.getText().toString().trim()).isEmpty())
             return;
 
         if (!hasKeys) {
@@ -373,7 +376,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
         if (msg.quotedMessage != 0)
             quotedMessage = QuotedMessage.load(this, msg.quotedMessage, messageChannel, accountDataChannel);
 
-        MessageItem newLatest = new MessageItem(msg.messageId, msg.text, msg.dispatchTime, messageState, messageSide, quotedMessage, false);
+        MessageItem newLatest = new MessageItem(msg.messageId, msg.text, msg.dispatchTime, messageState, messageSide, quotedMessage, false, msg.isCorrupted);
         runOnUiThread(() -> {
             if (oldLatest == null || !oldLatest.getSentDate().isSameDay(newLatest.getSentDate())) {
                 messageItems.add(MessageItem.newSystemMessage(DateUtil.toDateString(this, newLatest.getSentDate())));
@@ -418,7 +421,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
             QuotedMessage quotedMessage = null;
             if (message.getQuotedMessage() != 0)
                 quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
-            messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited()));
+            messageItems.add(new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited(), parent.isCorrupted()));
             previous = parent;
         }
 
@@ -458,7 +461,7 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
                 QuotedMessage quotedMessage = null;
                 if (message.getQuotedMessage() != 0)
                     quotedMessage = QuotedMessage.load(this, message.getQuotedMessage(), messageChannel, accountDataChannel);
-                messageItems.add(idx, new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited()));
+                messageItems.add(idx, new MessageItem(message.getMessageId(), message.getText(), dispatchTime, message.getMessageState(), messageSide, quotedMessage, message.isEdited(), parent.isCorrupted()));
                 idx++;
                 previous = parent;
             }
@@ -499,7 +502,8 @@ public class ChatActivityDirect extends ChatActivityBase implements MultiChoiceL
     private boolean mayOverwrite(MessageItem messageItem) {
         boolean noTimeout = System.currentTimeMillis() - messageItem.getSentDate().toJavaDate().getTime() <= P21MessageOverride.OVERWRITE_TIMEOUT;
         boolean ownMessage = messageItem.getMessageSide() == MessageSide.RIGHT;
-        return noTimeout && ownMessage;
+        boolean sent = messageItem.getMessageState() != MessageState.SENDING;
+        return noTimeout && ownMessage && sent;
     }
 
 }

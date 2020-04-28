@@ -11,7 +11,6 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.greenrobot.eventbus.Subscribe;
 
-import de.vectordata.skynet.event.ConnectionFailedEvent;
 import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.SkynetContext;
 
@@ -44,12 +43,7 @@ public class FcmService extends FirebaseMessagingService {
     }
 
 
-    // If we are done syncing or lost connection to the server,
-    // release the wake lock
-    @Subscribe
-    public void onConnectionLost(ConnectionFailedEvent event) {
-        wakeLock.release();
-    }
+    // If we are done syncing, release the wake lock
 
     @Subscribe
     public void onSyncFinished(SyncFinishedEvent event) {

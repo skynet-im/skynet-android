@@ -1,6 +1,7 @@
 package de.vectordata.skynet.ui.chat.recycler;
 
 import android.graphics.Typeface;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -9,8 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.Group;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Objects;
+
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.data.model.ChatMessage;
+import de.vectordata.skynet.ui.chat.formatting.MessageFormatter;
 
 class MessageViewHolder extends RecyclerView.ViewHolder {
 
@@ -34,8 +38,8 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     void configure(MessageItem messageItem) {
-
-        boolean isDeleted = messageItem.getContent().equals(ChatMessage.DELETED);
+        boolean isDeleted = Objects.equals(messageItem.getContent(), ChatMessage.DELETED);
+        boolean isCorrupted = messageItem.isCorrupted();
 
         if (isDeleted) {
             message.setTypeface(null, Typeface.ITALIC);
@@ -43,13 +47,21 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
             message.setText(R.string.message_deleted);
             if (state != null)
                 state.setVisibility(View.GONE);
+        } else if (isCorrupted) {
+            message.setTypeface(null, Typeface.ITALIC);
+            message.setAlpha(0.75f);
+            message.setText(R.string.message_corrupted);
+            if (state != null)
+                state.setVisibility(View.GONE);
         } else {
             message.setTypeface(null, Typeface.NORMAL);
             message.setAlpha(1.0f);
-            message.setText(messageItem.getContent());
+            message.setText(MessageFormatter.format(messageItem.getContent()));
             if (state != null)
                 state.setVisibility(View.VISIBLE);
         }
+
+        message.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (edited != null)
             edited.setVisibility(messageItem.isEdited() && !isDeleted ? View.VISIBLE : View.GONE);
@@ -63,7 +75,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         if (messageItem.hasQuote()) {
             quoteGroup.setVisibility(View.VISIBLE);
             quotedName.setText(messageItem.getQuotedMessage().getName());
-            quotedMessage.setText(messageItem.getQuotedMessage().getMessage());
+            quotedMessage.setText(MessageFormatter.format(messageItem.getQuotedMessage().getMessage()));
         } else quoteGroup.setVisibility(View.GONE);
     }
 

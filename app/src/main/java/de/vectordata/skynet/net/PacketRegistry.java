@@ -1,5 +1,7 @@
 package de.vectordata.skynet.net;
 
+import android.util.Log;
+
 import de.vectordata.skynet.net.packet.P01ConnectionResponse;
 import de.vectordata.skynet.net.packet.P03CreateAccountResponse;
 import de.vectordata.skynet.net.packet.P05DeleteAccountResponse;
@@ -40,6 +42,8 @@ import de.vectordata.skynet.net.packet.P33DeviceListResponse;
 import de.vectordata.skynet.net.packet.base.Packet;
 
 class PacketRegistry {
+
+    private static final String TAG = "PacketRegistry";
 
     private static final Packet[] PACKETS = new Packet[255];
 
@@ -94,7 +98,16 @@ class PacketRegistry {
     }
 
     static Packet getPacket(byte id) {
-        return PACKETS[id & 0xFF];
+        return createNewInstance(PACKETS[id & 0xFF]);
+    }
+
+    private static Packet createNewInstance(Packet packet) {
+        try {
+            return packet.getClass().newInstance();
+        } catch (IllegalAccessException | InstantiationException e) {
+            Log.e(TAG, "Failed to create new instance of packet", e);
+            return null;
+        }
     }
 
 }

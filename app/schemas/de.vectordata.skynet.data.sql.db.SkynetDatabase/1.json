@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "99bc6d6efd11f77343b4ecf927d52fac",
+    "identityHash": "445df4acbd8af97853e99370005e94fb",
     "entities": [
       {
         "tableName": "channels",
@@ -65,7 +65,7 @@
       },
       {
         "tableName": "channelMessages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`internalId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `senderId` INTEGER NOT NULL, `dispatchTime` INTEGER, `messageFlags` INTEGER NOT NULL, `fileId` INTEGER NOT NULL, FOREIGN KEY(`channelId`) REFERENCES `channels`(`channelId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`internalId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `channelId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `senderId` INTEGER NOT NULL, `dispatchTime` INTEGER, `messageFlags` INTEGER NOT NULL, `fileId` INTEGER NOT NULL, `corrupted` INTEGER NOT NULL, FOREIGN KEY(`channelId`) REFERENCES `channels`(`channelId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "internalId",
@@ -106,6 +106,12 @@
           {
             "fieldPath": "fileId",
             "columnName": "fileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "corrupted",
+            "columnName": "corrupted",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -1015,7 +1021,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '99bc6d6efd11f77343b4ecf927d52fac')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '445df4acbd8af97853e99370005e94fb')"
     ]
   }
 }
