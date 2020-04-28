@@ -19,7 +19,6 @@ import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
-import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 
@@ -70,7 +69,7 @@ public abstract class SkynetActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCorruptedMessage(CorruptedMessageEvent event) {
-        if (event.getPacket().hasFlag(MessageFlags.LOOPBACK) && SkynetContext.getCurrent().isInSync())
+        if (SkynetContext.getCurrent().isInSync())
             new AlertDialog.Builder(this)
                     .setTitle(R.string.error_header_sync)
                     .setMessage(R.string.error_corrupted_message_single)

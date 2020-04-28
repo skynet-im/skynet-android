@@ -64,6 +64,7 @@ import de.vectordata.skynet.net.packet.base.ChannelMessagePacket;
 import de.vectordata.skynet.net.packet.base.Packet;
 import de.vectordata.skynet.net.packet.model.CreateChannelStatus;
 import de.vectordata.skynet.net.packet.model.CreateSessionStatus;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 
 public class PacketHandler {
@@ -103,7 +104,7 @@ public class PacketHandler {
                 if ((message.messageFlags | flags.value()) != message.messageFlags)
                     throw new IllegalStateException(String.format("Incoming channel message lacks required message flags (got: %s, required at least: %d)", message.messageFlags, flags.value()));
 
-            if (message.isCorrupted) {
+            if (message.isCorrupted && message.hasFlag(MessageFlags.LOOPBACK)) {
                 numCorruptedMessages++;
                 EventBus.getDefault().post(new CorruptedMessageEvent(message));
                 Log.e(TAG, "Received corrupted channel message!");
