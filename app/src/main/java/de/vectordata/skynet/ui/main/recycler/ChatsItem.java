@@ -52,6 +52,7 @@ public class ChatsItem {
         this.messageSide = MessageSide.LEFT;
         this.channelId = channelId;
         this.counterpartId = counterpartId;
+        this.type = Type.NORMAL;
     }
 
     String getHeader() {
