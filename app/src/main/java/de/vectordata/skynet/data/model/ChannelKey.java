@@ -62,6 +62,11 @@ public class ChannelKey {
         return channelKey;
     }
 
+    public ChannelKey withMessageId(long messageId) {
+        this.messageId = messageId;
+        return this;
+    }
+
     public long getChannelId() {
         return channelId;
     }

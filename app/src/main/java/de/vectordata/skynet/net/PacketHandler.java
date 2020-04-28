@@ -354,8 +354,8 @@ public class PacketHandler {
         // First transmit the private keys
         SkynetContext.getCurrent().getMessageInterface().send(loopbackChannel.getChannelId(), privateKeys)
                 .waitForSuccess(r -> {
-                    // If that was successful, store them in the database
-                    Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(privateKeys));
+                    // If that was successful, store them in the database with the new message ID
+                    Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(privateKeys).withMessageId(r.messageId));
 
                     // Create a dependency to the private key that we just created
                     ChannelMessageConfig config = ChannelMessageConfig.create()
@@ -363,7 +363,7 @@ public class PacketHandler {
 
                     // And transmit the public key
                     SkynetContext.getCurrent().getMessageInterface().send(accountDataChannel.getChannelId(), config, publicKeys)
-                            .waitForSuccess(r2 -> Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(publicKeys)));
+                            .waitForSuccess(r2 -> Storage.getDatabase().channelKeyDao().insert(ChannelKey.fromPacket(publicKeys).withMessageId(r2.messageId)));
                 });
     }
 
