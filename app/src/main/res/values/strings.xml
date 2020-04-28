@@ -53,7 +53,8 @@
     <string name="error_passwords_not_matching">The passwords you entered do not match.</string>
     <string name="error_must_upgrade">Your Skynet version is too old. Please update to v%s.</string>
     <string name="error_missing_keys">Sorry, we can\'t send the message. Your chat partner has to log in to Skynet at least once before messages can be sent.</string>
-    <string name="error_corrupted_messages">During the last sync, we detected %d corrupted messages. This should not happen, please report an issue.</string>
+    <string name="error_corrupted_message_multi">During the last sync, we detected %d corrupted messages. This should not happen, please report an issue.</string>
+    <string name="error_corrupted_message_single">Received internal message that could not be decrypted. Please report an issue</string>
 
     <string name="warn_header_eol">End of life warning</string>
     <string name="warn_can_upgrade">Your Skynet version is reaching its end of life. We recommend updating to v%s.</string>

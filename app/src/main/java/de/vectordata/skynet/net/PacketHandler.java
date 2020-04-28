@@ -14,6 +14,7 @@ import de.vectordata.skynet.data.model.ChatMessage;
 import de.vectordata.skynet.data.model.enums.ChannelType;
 import de.vectordata.skynet.data.model.enums.MessageState;
 import de.vectordata.skynet.event.ChatMessageSentEvent;
+import de.vectordata.skynet.event.CorruptedMessageEvent;
 import de.vectordata.skynet.event.PacketEvent;
 import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.client.PacketBuffer;
@@ -104,6 +105,7 @@ public class PacketHandler {
 
             if (message.isCorrupted) {
                 numCorruptedMessages++;
+                EventBus.getDefault().post(new CorruptedMessageEvent(message));
                 Log.e(TAG, "Received corrupted channel message!");
             }
         }

@@ -14,10 +14,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import de.vectordata.skynet.R;
 import de.vectordata.skynet.event.AuthenticationFailedEvent;
+import de.vectordata.skynet.event.CorruptedMessageEvent;
 import de.vectordata.skynet.event.HandshakeFailedEvent;
 import de.vectordata.skynet.event.SyncFinishedEvent;
 import de.vectordata.skynet.net.SkynetContext;
 import de.vectordata.skynet.net.packet.model.HandshakeState;
+import de.vectordata.skynet.net.packet.model.MessageFlags;
 import de.vectordata.skynet.net.packet.model.RestoreSessionStatus;
 import de.vectordata.skynet.ui.dialogs.Dialogs;
 
@@ -59,11 +61,22 @@ public abstract class SkynetActivity extends AppCompatActivity {
         if (corruptedMessages > 0) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.error_header_sync)
-                    .setMessage(getString(R.string.error_corrupted_messages, corruptedMessages))
+                    .setMessage(getString(R.string.error_corrupted_message_multi, corruptedMessages))
                     .setPositiveButton(R.string.ok, null)
                     .setNeutralButton(R.string.action_report_issue, (dialog, which) -> startBrowser("https://www.skynet.app/bug"))
                     .show();
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCorruptedMessage(CorruptedMessageEvent event) {
+        if (event.getPacket().hasFlag(MessageFlags.LOOPBACK) && SkynetContext.getCurrent().isInSync())
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.error_header_sync)
+                    .setMessage(R.string.error_corrupted_message_single)
+                    .setPositiveButton(R.string.ok, null)
+                    .setNeutralButton(R.string.action_report_issue, (dialog, which) -> startBrowser("https://www.skynet.app/bug"))
+                    .show();
     }
 
     @Override
